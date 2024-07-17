@@ -1,0 +1,26 @@
+{
+    "name": "com.rwth.unity.omilaxr",
+    "version": "2.0.0",
+    "displayName": "OmiLAXR",
+    "description": "This is the base package for OmiLAXR ecosystem. This package has shareable code for all OmiLAXR packages.",
+    "unity": "2021.3",
+    "unityRelease": "15f1",
+    "documentationUrl": "https://gitlab.com/learntech-rwth/omilaxr-framework/omilaxrv2/-/wikis",
+    "changelogUrl": "https://gitlab.com/learntech-rwth/omilaxr-ecosystem/omilaxrv2/-/blob/main/CHANGELOG",
+    "licensesUrl": "https://gitlab.com/learntech-rwth/omilaxr-ecosystem/omilaxrv2/-/blob/main/LICENSE",
+    "dependencies": {
+      "com.unity.textmeshpro": "3.2",
+      "com.unity.nuget.newtonsoft-json": "3.0.2"
+   },
+   "keywords": [
+      "Educational VR",
+      "Educational AR",
+      "Educational XR",
+      "Framework"
+    ],
+    "author": {
+      "name": "Sergej Görzen",
+      "email": "goerzen@cs.rwth-aachen.de",
+      "url": "https://elearn.rwth-aachen.de/goerzen"
+    }
+  }
