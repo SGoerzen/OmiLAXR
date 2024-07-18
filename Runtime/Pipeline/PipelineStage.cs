@@ -3,9 +3,10 @@ using UnityEngine;
 
 namespace OmiLAXR.Pipeline
 {
-    public abstract class PipelineStage : MonoBehaviour
+    public class PipelineStages<TInput, TOutput> : List<PipelineStage<TInput, TOutput>> {}
+    public abstract class PipelineStage<TInput, TOutput> : MonoBehaviour
     {
-        public readonly List<PipelineJob> jobs = new List<PipelineJob>();
-        public abstract PipelineData Pass(PipelineData input);
+        public readonly PipelineJobs<TInput, TOutput> Jobs = new PipelineJobs<TInput, TOutput>();
+        public abstract PipelineData<TOutput> Pass(PipelineData<TInput> input);
     }
 }

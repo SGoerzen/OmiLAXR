@@ -3,12 +3,12 @@ using UnityEngine;
 
 namespace OmiLAXR.Pipeline.Stages.ObjectFilters
 {
-    public class BlacklistFilter : PipelineJob
+    public class BlacklistFilter : PipelineJob<GameObject, GameObject>
     {
         public List<string> blacklist;
-        public override PipelineData Pass(PipelineData data)
+        public override PipelineData<GameObject> Pass(PipelineData<GameObject> data)
         {
-            return data.Filter<GameObject>(d => blacklist.Contains(d.name));
+            return data.Filter(d => blacklist.Contains(d.name));
         }
     }
 }

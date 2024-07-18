@@ -9,11 +9,10 @@ namespace OmiLAXR.Pipeline
     /// </summary>
     public abstract class Pipeline : MonoBehaviour
     {
-        public List<PipelineStage> stages = new List<PipelineStage>();
+        public readonly PipelineStages<object, object> Stages = new PipelineStages<object, object>();
 
         private void Start()
         {
-            
             Debug.Log("[OmiLAXR] Pipeline started " + GetType());
         }
 

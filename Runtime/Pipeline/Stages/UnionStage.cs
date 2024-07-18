@@ -3,15 +3,15 @@ using System.Linq;
 
 namespace OmiLAXR.Pipeline.Stages
 {
-    public class UnionStage : PipelineStage
+    public class UnionStage<TInput, TOutput> : PipelineStage<TInput, TOutput>
     {
-        public override PipelineData Pass(PipelineData input)
+        public override PipelineData<TOutput> Pass(PipelineData<TInput> input)
         {
-            IEnumerable<object> objects = new List<object>();
-            objects = jobs
+            IEnumerable<TOutput> objects = new List<TOutput>();
+            objects = Jobs
                 .Select(job => job.Pass(input))
                 .Aggregate(objects, (current, o) => current.Union(o.Data));
-            return PipelineData.From(objects);
+            return PipelineData<TOutput>.From(objects.ToArray());
         }
     }
 }

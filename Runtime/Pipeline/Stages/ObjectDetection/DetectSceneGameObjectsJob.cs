@@ -2,12 +2,15 @@ using UnityEngine;
 
 namespace OmiLAXR.Pipeline.Stages.ObjectDetection
 {
-    public class DetectSceneGameObjectsJob : PipelineJob
+    [RequireComponent(typeof(ObjectDetectorsStage))]
+    [DisallowMultipleComponent]
+    [AddComponentMenu("OmiLAXR / Pipeline / Stages / Object Detectors / Jobs / Detect Scene Objects Job")]
+    public class DetectSceneGameObjectsJob : PipelineJob<GameObject, GameObject>
     {
-        public override PipelineData Pass(PipelineData data)
+        public override PipelineData<GameObject> Pass(PipelineData<GameObject> data)
         {
             var gameObjects = Object.FindObjectsOfType<GameObject>();
-            return PipelineData.From(gameObjects);
+            return PipelineData<GameObject>.From(gameObjects);
         }
     }
 }

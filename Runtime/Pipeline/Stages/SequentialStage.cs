@@ -2,11 +2,12 @@ using System.Linq;
 
 namespace OmiLAXR.Pipeline.Stages
 {
-    public class SequentialStage : PipelineStage
+    public class SequentialStage<TInput, TOutput> : PipelineStage<TInput, TOutput>
     {
-        public override PipelineData Pass(PipelineData input)
+        public override PipelineData<TOutput> Pass(PipelineData<TInput> input)
         {
-            return jobs.Aggregate(input, (data, next) => next.Pass(data)).Clone();
+            return Jobs.Aggregate(input, (cur, next) => next.Pass(cur).ConvertTo<TInput>())
+                .ConvertTo<TOutput>();
         }
     }
 }

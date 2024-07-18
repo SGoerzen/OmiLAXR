@@ -1,11 +1,13 @@
 using System.Collections.Generic;
+using UnityEngine;
 
 namespace OmiLAXR.Pipeline
 {
-    public abstract class PipelineJob
+    public class PipelineJobs<TInput, TOutput> : List<PipelineJob<TInput, TOutput>> {}
+    public abstract class PipelineJob<TInput, TOutput> : MonoBehaviour
     {
-        public readonly List<PipelineJob> jobs = new List<PipelineJob>();
+        public readonly PipelineJobs<TInput, TOutput> Jobs = new PipelineJobs<TInput, TOutput>();
 
-        public abstract PipelineData Pass(PipelineData data);
+        public abstract PipelineData<TOutput> Pass(PipelineData<TInput> data);
     }
 }

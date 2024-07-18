@@ -4,33 +4,40 @@ using System.Linq;
 namespace OmiLAXR.Pipeline
 {
     public delegate bool PipelineDataFilter<T>(T data);
-    public class PipelineData
+    public class PipelineData<TDataType>
     {
-        public readonly object[] Data;
+        public readonly TDataType[] Data;
 
-        private PipelineData(object[] data)
+        private PipelineData(TDataType[] data)
         {
             Data = data;
         }
 
-        public static PipelineData From<T>(T data) 
+        public static PipelineData<TDataType> From(TDataType[] data) 
         {
-            return new PipelineData(data as object[]);
+            return new PipelineData<TDataType>(data);
         }
 
-        public static PipelineData Empty => new PipelineData(Array.Empty<object>());
+        public static PipelineData<TDataType> Empty => new PipelineData<TDataType>(Array.Empty<TDataType>());
 
-        public PipelineData Clone()
+        public PipelineData<TDataType> Clone()
         {
-            var destData = new object[Data.Length];
+            var destData = new TDataType[Data.Length];
             Buffer.BlockCopy(Data, 0, destData, 0, Data.Length);
             return From(destData);
         }
 
-        public PipelineData Filter<T>(PipelineDataFilter<T> filter)
+        public PipelineData<TDataType> Filter(PipelineDataFilter<TDataType> filter)
         {
-            var filteredData = Data.Where(d => filter((T)d));
+            var filteredData = Data.Where(d => filter(d));
             return From(filteredData.ToArray());
+        }
+
+        public PipelineData<T> ConvertTo<T>()
+        {
+            var neutralData = Data as object[];
+            var data = neutralData as T[];
+            return new PipelineData<T>(data);
         }
     }
 }
