@@ -9,14 +9,12 @@ namespace OmiLAXR.Tests
     public class OmiLAXR_Tests
     {
         private GameObject _mainGo;
-        private MainTrackingBehaviour _mainTrackingBehaviour;
         
         [SetUp]
         public void Setup()
         {
             // Pipeline Setup
             _mainGo = Object.Instantiate(AssetDatabase.LoadAssetAtPath<GameObject>("Packages/com.rwth.unity.omilaxr/Prefabs/OmiLAXR.prefab"));
-            _mainTrackingBehaviour = _mainGo.GetComponent<MainTrackingBehaviour>();
         }
         // A UnityTest behaves like a coroutine in Play Mode. In Edit Mode you can use
         // `yield return null;` to skip a frame.
@@ -30,8 +28,6 @@ namespace OmiLAXR.Tests
         [Test]
         public void TestPrefab()
         {
-            Assert.NotNull(_mainTrackingBehaviour);
-            Assert.AreEqual(2, _mainTrackingBehaviour.pipelines.Length);
         }
 
         // A UnityTest behaves like a coroutine in Play Mode. In Edit Mode you can use

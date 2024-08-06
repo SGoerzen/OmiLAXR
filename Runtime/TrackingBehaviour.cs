@@ -1,20 +1,21 @@
+
 using UnityEngine;
 
 namespace OmiLAXR
 {
-    public abstract class TrackingBehaviour : MonoBehaviour
+    public abstract class TrackingBehaviour : PipelineStage
     {
-        protected MainTrackingBehaviour mainTrackingBehaviour;
-        protected void Awake()
+        public event System.Action<UnityEngine.Object[]> onBind;
+        protected override void Awake()
         {
-            mainTrackingBehaviour = GetComponentInParent<MainTrackingBehaviour>();
+            base.Awake();
+            pipeline.afterFilteredObjects += Pipe;
         }
 
-        public abstract void Listen(GameObject go);
-
-        public void SendStatement()
+        protected override void Pipe(Object[] objects)
         {
-            mainTrackingBehaviour.SendToDataProviders();
+            onBind?.Invoke(objects);
         }
+
     }
 }

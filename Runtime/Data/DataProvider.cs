@@ -2,14 +2,18 @@ using UnityEngine;
 
 namespace OmiLAXR.Data
 {
-    public abstract class DataProvider : MonoBehaviour
+    public class DataProvider : MonoBehaviour
     {
+        [HideInInspector]
         public StatementComposer[] composers;
         private void Awake()
         {
-            composers = FindObjectsOfType<StatementComposer>();
+            composers = GetComponentsInChildren<StatementComposer>();
             Debug.Log("Found " + composers.Length + " composers.");
         }
+        
+        public static DataProvider GetAll() => FindObjectOfType<DataProvider>();
+
       
     }
 }

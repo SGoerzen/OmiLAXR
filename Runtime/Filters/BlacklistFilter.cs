@@ -1,14 +1,15 @@
 using System.Collections.Generic;
+using System.Linq;
 using UnityEngine;
 
 namespace OmiLAXR.Pipelines.Filters
 {
-    public class BlacklistFilter : PipelineJob<GameObject, GameObject>
+    public class BlacklistFilter : Filter
     {
         public List<string> blacklist;
-        public override PipelineData<GameObject> Pass(PipelineData<GameObject> data)
+        public override Object[] Pass(Object[] objects)
         {
-            return data.Filter(d => blacklist.Contains(d.name));
+            return objects.Where(go => !blacklist.Contains(go.GetTrackingName())).ToArray();
         }
     }
 }

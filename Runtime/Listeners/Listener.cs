@@ -1,21 +1,15 @@
-using System;
 using UnityEngine;
 
 namespace OmiLAXR.Listeners
 {
-    public abstract class Listener : MonoBehaviour
+    public abstract class Listener : PipelineStage
     {
-        public MainTrackingBehaviour mainTrackingBehaviour;
-        private void Awake()
-        {
-            mainTrackingBehaviour = GetComponentInParent<MainTrackingBehaviour>();
-        }
-
+        public event System.Action<Object[]> onFoundObjects;
         public abstract void StartListening();
 
-        public void Register(params GameObject[] gameObjects)
+        protected override void Pipe(Object[] objects)
         {
-            mainTrackingBehaviour.Register(gameObjects);
+            onFoundObjects?.Invoke(objects);
         }
     }
 }
