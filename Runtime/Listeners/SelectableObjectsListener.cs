@@ -9,7 +9,7 @@ namespace OmiLAXR.Listeners
         public override void StartListening()
         {
             var selectables = FindObjectsOfType<Selectable>(includeInactive);
-            Pipe(selectables);
+            Found(selectables);
         }
     }
 }

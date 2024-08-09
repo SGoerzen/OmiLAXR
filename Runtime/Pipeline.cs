@@ -49,10 +49,6 @@ namespace OmiLAXR
         private void Awake()
         {
             trackingBehaviours = GetComponentsInChildren<TrackingBehaviour>().ToList();
-            foreach (var tb in trackingBehaviours)
-            {
-                tb.onBind += afterBindTrackingBehavior;
-            }
             
             // Find available listeners
             listeners = GetComponentsInChildren<Listener>().ToList();

@@ -16,7 +16,7 @@ namespace OmiLAXR.Pipelines.Learner
             
             foreach (var selectable in selectables)
             {
-                var type = selectable!.GetType();
+                var type = selectable.GetType();
 
                 if (type == typeof(Button))
                 {

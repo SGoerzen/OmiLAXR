@@ -8,7 +8,7 @@ namespace OmiLAXR.Listeners
         public override void StartListening()
         {
             var colliders = FindObjectsOfType<Collider>();
-            Pipe(colliders);
+            Found(colliders);
         }
     }
 }

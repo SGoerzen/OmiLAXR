@@ -21,10 +21,8 @@ namespace OmiLAXR
         
         protected void Log(string message, params object[] ps)
             => OmiLAXR.DebugLog.OmiLAXR.Print($"(Pipeline {pipeline.name}) " + message);
-
-        protected abstract void Pipe(Object[] objects);
-
+        
         protected T[] Select<T>(Object[] objects) where T : Object
-            => objects.Where(o => o.GetType() == typeof(T)).Select(o => o as T).ToArray();
+            => objects.Where(o => o.GetType().IsSubclassOf(typeof(T))).Select(o => o as T).ToArray();
     }
 }
