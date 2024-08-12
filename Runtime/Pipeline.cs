@@ -12,7 +12,7 @@ namespace OmiLAXR
     /// </summary>
     public class Pipeline : MonoBehaviour
     {
-        public PipelineActor actor;
+        public Actor actor;
         
         [HideInInspector]
         public List<Listener> listeners;

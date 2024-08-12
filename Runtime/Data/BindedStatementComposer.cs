@@ -1,8 +1,11 @@
+using UnityEngine;
+
 namespace OmiLAXR.Data
 {
     public abstract class BindedStatementComposer<T> : StatementComposer 
         where T : TrackingBehaviour
     {
+        [HideInInspector]
         public T trackingBehaviour;
 
         protected virtual void Awake()

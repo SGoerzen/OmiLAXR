@@ -6,7 +6,7 @@ namespace OmiLAXR
     public abstract class PipelineStage : MonoBehaviour
     {
         protected Pipeline pipeline { get; private set; }
-        public PipelineActor GetActor() => pipeline.actor;
+        public Actor GetActor() => pipeline.actor;
         protected virtual void Awake()
         {
             pipeline = GetComponentInParent<Pipeline>();
