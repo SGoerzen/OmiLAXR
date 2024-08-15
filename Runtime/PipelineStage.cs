@@ -12,12 +12,10 @@ namespace OmiLAXR
             pipeline = GetComponentInParent<Pipeline>();
             pipeline.afterFoundObjects += AfterFoundObjects;
             pipeline.afterFilteredObjects += AfterFilteredObjects;
-            pipeline.afterBindTrackingBehavior += AfterBindObjects;
         }
         
         protected virtual void AfterFoundObjects(Object[] objects) {}
         protected virtual void AfterFilteredObjects(Object[] objects) {}
-        protected virtual void AfterBindObjects(Object[] objects) {}
         
         protected void Log(string message, params object[] ps)
             => OmiLAXR.DebugLog.OmiLAXR.Print($"(Pipeline {pipeline.name}) " + message);

@@ -44,7 +44,6 @@ namespace OmiLAXR
 
         public event System.Action<Object[]> afterFoundObjects;
         public event System.Action<Object[]> afterFilteredObjects;
-        public event System.Action<Object[]> afterBindTrackingBehavior;
 
         public readonly List<Object> trackingObjects = new List<Object>();
         
