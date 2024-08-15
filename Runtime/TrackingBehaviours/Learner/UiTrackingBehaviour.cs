@@ -8,8 +8,8 @@ namespace OmiLAXR.TrackingBehaviours.Learner
     [AddComponentMenu("OmiLAXR / 3) Tracking Behaviors / UI Tracking Behavior")]
     public class UiTrackingBehaviour : TrackingBehaviour
     {
-        public event Action<Button> OnClickedButton;
-        public event Action<Slider, float> OnChangedSlider;
+        public event TrackingBehaviourAction<Button> OnClickedButton;
+        public event TrackingBehaviourAction<Slider, float> OnChangedSlider;
 
         protected override void AfterFilteredObjects(Object[] objects)
         {
@@ -25,7 +25,7 @@ namespace OmiLAXR.TrackingBehaviours.Learner
                     button.onClick.AddListener(() =>
                     {
                         print("hello");
-                        OnClickedButton?.Invoke(button);
+                        OnClickedButton?.Invoke(this, button);
                     });
                 }
                 else if (type == typeof(Slider))
@@ -33,7 +33,7 @@ namespace OmiLAXR.TrackingBehaviours.Learner
                     var slider = (Slider)selectable;
                     slider.onValueChanged.AddListener((value) =>
                     {
-                        OnChangedSlider?.Invoke(slider, value);
+                        OnChangedSlider?.Invoke(this, slider, value);
                     });
                 }
             }
