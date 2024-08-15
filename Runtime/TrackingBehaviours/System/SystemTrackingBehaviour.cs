@@ -1,8 +1,9 @@
 using System;
 using UnityEngine;
 
-namespace OmiLAXR.Tracking.Behaviours
+namespace OmiLAXR.TrackingBehaviours.System
 {
+    [AddComponentMenu("OmiLAXR / 3) Tracking Behaviors / System Tracking Behavior")]
     public class SystemTrackingBehaviour : TrackingBehaviour
     {
         private static SystemTrackingBehaviour _instance;

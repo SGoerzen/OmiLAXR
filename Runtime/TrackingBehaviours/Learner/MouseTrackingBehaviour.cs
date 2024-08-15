@@ -1,9 +1,9 @@
 using System;
 using UnityEngine;
-using Object = UnityEngine.Object;
 
-namespace OmiLAXR.Pipelines.Learner
+namespace OmiLAXR.TrackingBehaviours.Learner
 {
+    [AddComponentMenu("OmiLAXR / 3) Tracking Behaviors /  Mouse Tracking Behavior")]
     public class MouseTrackingBehaviour : TrackingBehaviour
     {
         public event Action<string> OnClicked;

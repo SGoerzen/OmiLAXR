@@ -1,7 +1,7 @@
 using TMPro;
 using UnityEngine.UI;
 
-namespace OmiLAXR.xAPI.Extensions
+namespace OmiLAXR.Extensions
 {
     public static class Selectable_Ext
     {

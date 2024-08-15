@@ -1,6 +1,6 @@
 using UnityEngine;
 
-namespace OmiLAXR.Data
+namespace OmiLAXR.Hooks
 {
     public abstract class StatementHook : MonoBehaviour
     {

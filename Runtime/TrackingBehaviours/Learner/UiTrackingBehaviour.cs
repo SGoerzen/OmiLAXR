@@ -1,10 +1,11 @@
 using System;
-using System.Linq;
+using UnityEngine;
 using UnityEngine.UI;
 using Object = UnityEngine.Object;
 
-namespace OmiLAXR.Pipelines.Learner
+namespace OmiLAXR.TrackingBehaviours.Learner
 {
+    [AddComponentMenu("OmiLAXR / 3) Tracking Behaviors / UI Tracking Behavior")]
     public class UiTrackingBehaviour : TrackingBehaviour
     {
         public event Action<Button> OnClickedButton;

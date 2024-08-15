@@ -2,7 +2,7 @@ using UnityEngine;
 
 namespace OmiLAXR
 {
-    [AddComponentMenu("OmiLAXR / Tracking / Add restriction")]
+    [AddComponentMenu("OmiLAXR / Tracking / Tracking Restriction")]
     public class TrackingRestriction : MonoBehaviour
     {
         [Tooltip("Track position")] public bool trackPosition;

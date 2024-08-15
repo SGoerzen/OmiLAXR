@@ -4,6 +4,7 @@ using UnityEngine;
 
 namespace OmiLAXR.Pipelines.Filters
 {
+    [AddComponentMenu("OmiLAXR / 2) Filters / Blacklist Filter")]
     public class BlacklistFilter : Filter
     {
         public List<string> blacklist;

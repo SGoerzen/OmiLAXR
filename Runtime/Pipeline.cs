@@ -1,8 +1,9 @@
 using System.Collections.Generic;
 using System.Linq;
-using OmiLAXR.Data;
+using OmiLAXR.Endpoints;
 using OmiLAXR.Listeners;
 using OmiLAXR.Pipelines.Filters;
+using OmiLAXR.TrackingBehaviours;
 using UnityEngine;
 
 namespace OmiLAXR
@@ -10,6 +11,7 @@ namespace OmiLAXR
     /// <summary>
     /// Pipeline System containing many stages.
     /// </summary>
+    [AddComponentMenu("OmiLAXR / 0) Pipelines / Pipeline")]
     public class Pipeline : MonoBehaviour
     {
         public Actor actor;

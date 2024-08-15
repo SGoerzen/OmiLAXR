@@ -1,7 +1,9 @@
+using OmiLAXR.Composers;
 using UnityEngine;
 
-namespace OmiLAXR.Data
+namespace OmiLAXR
 {
+    [AddComponentMenu("OmiLAXR / 0) Pipelines / Data Provider")]
     public class DataProvider : MonoBehaviour
     {
         [HideInInspector]

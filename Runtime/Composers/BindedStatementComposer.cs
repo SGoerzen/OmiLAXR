@@ -1,6 +1,7 @@
+using OmiLAXR.TrackingBehaviours;
 using UnityEngine;
 
-namespace OmiLAXR.Data
+namespace OmiLAXR.Composers
 {
     public abstract class BindedStatementComposer<T> : StatementComposer 
         where T : TrackingBehaviour
