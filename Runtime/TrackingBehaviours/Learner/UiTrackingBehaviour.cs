@@ -24,7 +24,6 @@ namespace OmiLAXR.TrackingBehaviours.Learner
                     var button = (Button)selectable;
                     button.onClick.AddListener(() =>
                     {
-                        print("hello");
                         OnClickedButton?.Invoke(this, button);
                     });
                 }

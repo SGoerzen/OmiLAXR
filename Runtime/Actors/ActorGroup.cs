@@ -5,6 +5,6 @@ namespace OmiLAXR
     [AddComponentMenu("OmiLAXR / 0) Pipelines / Actor Group")]
     public class ActorGroup : Actor
     {
-        
+        [HideInInspector] public Actor[] members;
     }
 }

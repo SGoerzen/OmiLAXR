@@ -12,6 +12,9 @@ namespace OmiLAXR.Composers
         protected virtual void Awake()
         {
             trackingBehaviour = GetTrackingBehaviour<T>();
+            Compose(trackingBehaviour);
         }
+
+        protected abstract void Compose(T tb);
     }
 }

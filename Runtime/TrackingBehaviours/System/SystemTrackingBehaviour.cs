@@ -1,3 +1,4 @@
+using System;
 using UnityEngine;
 
 namespace OmiLAXR.TrackingBehaviours.System
@@ -6,6 +7,7 @@ namespace OmiLAXR.TrackingBehaviours.System
     public class SystemTrackingBehaviour : TrackingBehaviour
     {
         public event TrackingBehaviourAction OnGameStarted;
+        public event TrackingBehaviourAction OnGameQuit;
         
         [RuntimeInitializeOnLoadMethod]
         private static void GameStarted()
@@ -16,7 +18,20 @@ namespace OmiLAXR.TrackingBehaviours.System
                 stb.OnGameStarted?.Invoke(stb);
             }
         }
-        
-        
+
+        private void OnApplicationQuit()
+        {
+           OnGameQuit?.Invoke(this);
+        }
+
+        private void OnApplicationFocus(bool hasFocus)
+        {
+            // todo
+        }
+
+        private void OnApplicationPause(bool pauseStatus)
+        {
+            // todo
+        }
     }
 }

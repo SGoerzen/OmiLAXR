@@ -18,5 +18,9 @@ namespace OmiLAXR.Endpoints
             this.username = username;
             this.password = password;
         }
+        
+        public bool IsValid => !string.IsNullOrEmpty(endpoint) 
+                               && !string.IsNullOrEmpty(username) 
+                               && !string.IsNullOrEmpty(password);
     }
 }

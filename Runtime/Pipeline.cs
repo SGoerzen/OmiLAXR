@@ -1,6 +1,7 @@
 using System.Collections.Generic;
 using System.Linq;
-using OmiLAXR.Endpoints;
+using OmiLAXR.Composers;
+using OmiLAXR.Hooks;
 using OmiLAXR.Listeners;
 using OmiLAXR.Pipelines.Filters;
 using OmiLAXR.TrackingBehaviours;
@@ -12,18 +13,15 @@ namespace OmiLAXR
     /// Pipeline System containing many stages.
     /// </summary>
     [AddComponentMenu("OmiLAXR / 0) Pipelines / Pipeline")]
+    [DefaultExecutionOrder(0)]
     public class Pipeline : MonoBehaviour
     {
         public Actor actor;
         
-        [HideInInspector]
-        public List<Listener> listeners;
-        [HideInInspector]
-        public List<DataProvider> dataProviders;
-        [HideInInspector]
-        public List<TrackingBehaviour> trackingBehaviours;      
-        [HideInInspector]
-        public List<Filter> filters;
+        [HideInInspector] public List<Listener> listeners;
+        [HideInInspector] public List<DataProvider> dataProviders;
+        [HideInInspector] public List<TrackingBehaviour> trackingBehaviours;      
+        [HideInInspector] public List<Filter> filters;
         
         public static T GetPipeline<T>() where T : Pipeline
             => FindObjectOfType<T>();
@@ -44,6 +42,9 @@ namespace OmiLAXR
 
         public event System.Action<Object[]> afterFoundObjects;
         public event System.Action<Object[]> afterFilteredObjects;
+        public event System.Action<IStatement> afterComposedObjects; 
+        public event System.Action<IStatement> beforeSendObjects; 
+        public event System.Action<IStatement> afterSendObjects; 
 
         public readonly List<Object> trackingObjects = new List<Object>();
         
@@ -59,12 +60,15 @@ namespace OmiLAXR
             
             // Find available data providers
             dataProviders = FindObjectsOfType<DataProvider>().ToList();
+
+            var composersCount = dataProviders.Aggregate(0, (i, provider) => i + provider.composers.Count);
+            var hooksCount = dataProviders.Aggregate(0, (i, provider) => i + provider.hooks.Count);
             
-            DebugLog.OmiLAXR.Print($"Started Pipeline {name} with {listeners.Count} listeners, {filters.Count} filters and {dataProviders.Count} data providers" );
+            DebugLog.OmiLAXR.Print($"Started Pipeline {name} with {listeners.Count} listeners, {filters.Count} filters, {composersCount} composers, {hooksCount} hooks and {dataProviders.Count} data providers" );
         }
 
         protected void Log(string message, params object[] ps)
-            => OmiLAXR.DebugLog.OmiLAXR.Print($"(Pipeline {name}) " + message);
+            => DebugLog.OmiLAXR.Print($"(Pipeline {name}) " + message);
 
         private void Start()
         {

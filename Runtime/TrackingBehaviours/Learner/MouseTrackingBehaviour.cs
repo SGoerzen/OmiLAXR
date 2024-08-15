@@ -1,5 +1,6 @@
 using System;
 using UnityEngine;
+using UnityEngine.Serialization;
 
 namespace OmiLAXR.TrackingBehaviours.Learner
 {
@@ -21,14 +22,25 @@ namespace OmiLAXR.TrackingBehaviours.Learner
         public event TrackingBehaviourAction<MouseTrackingBehaviourArgs> OnClicked;
         public event TrackingBehaviourAction<MouseTrackingBehaviourArgs> OnPressedDown;
         public event TrackingBehaviourAction<MouseTrackingBehaviourArgs, float> OnScrolledWheel;
+        public event TrackingBehaviourAction<Vector3> OnMousePositionChanged; 
         
         private bool _isLeftDown;
         private bool _isRightDown;
         private bool _isWheelDown;
+
+        public float movementThreshold = 3.0f; // Threshold in pixels
+        private Vector3 _lastMousePosition;
         
         private float _mouseWheel = 0;
+        public float mouseWheelThreshold = .5f; 
+
         private static readonly string[] ButtonNames = { "left", "right", "middle" };
-        
+
+        private void Start()
+        {
+            _lastMousePosition = Input.mousePosition;
+        }
+
         private void HandleMouseClick(int index, ref bool wasDown, Vector3 position)
         {
             var isDown = Input.GetMouseButton(index);
@@ -54,11 +66,25 @@ namespace OmiLAXR.TrackingBehaviours.Learner
             HandleMouseClick(1, ref _isRightDown, mousePos);
             HandleMouseClick(2, ref _isWheelDown, mousePos);
             
+            // Detect mouse wheel
             var curMouseWheel = Input.mouseScrollDelta.y;
-            if (!Mathf.Approximately(_mouseWheel, curMouseWheel))
+            var mouseWheelDis = Mathf.Abs(_mouseWheel - curMouseWheel);
+            if (mouseWheelDis > mouseWheelThreshold)
             {
                 _mouseWheel = curMouseWheel;
                 OnScrolledWheel?.Invoke(this, new MouseTrackingBehaviourArgs("wheel", mousePos), curMouseWheel);
+            }
+            
+            // Detect Mouse move
+            // Calculate the distance between the last and current mouse positions
+            var distance = Vector3.Distance(Input.mousePosition, _lastMousePosition);
+
+            // Check if the distance exceeds the threshold
+            if (distance > movementThreshold)
+            {
+                // Update last mouse position
+                _lastMousePosition = Input.mousePosition;
+                OnMousePositionChanged?.Invoke(this, Input.mousePosition);
             }
         }
     }

@@ -48,9 +48,17 @@ PrefabInstance:
       propertyPath: m_LocalEulerAnglesHint.z
       value: 0
       objectReference: {fileID: 0}
+    - target: {fileID: 4595212218988023255, guid: 3406909dc7d1f436c8728e682dd9f930, type: 3}
+      propertyPath: actorName
+      value: System
+      objectReference: {fileID: 0}
+    - target: {fileID: 4595212218988023255, guid: 3406909dc7d1f436c8728e682dd9f930, type: 3}
+      propertyPath: actorEmail
+      value: system@omilaxr.dev
+      objectReference: {fileID: 0}
     - target: {fileID: 6582749516187797561, guid: 3406909dc7d1f436c8728e682dd9f930, type: 3}
       propertyPath: m_Name
-      value: System Pipeline Variant
+      value: System Pipeline
       objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
