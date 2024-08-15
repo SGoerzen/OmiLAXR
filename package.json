@@ -5,9 +5,9 @@
     "description": "This is the base package for OmiLAXR ecosystem. This package has shareable code for all OmiLAXR packages.",
     "unity": "2021.3",
     "unityRelease": "15f1",
-    "documentationUrl": "https://gitlab.com/learntech-rwth/omilaxr-framework/omilaxrv2/-/wikis",
-    "changelogUrl": "https://gitlab.com/learntech-rwth/omilaxr-ecosystem/omilaxrv2/-/blob/main/CHANGELOG",
-    "licensesUrl": "https://gitlab.com/learntech-rwth/omilaxr-ecosystem/omilaxrv2/-/blob/main/LICENSE",
+    "documentationUrl": "https://gitlab.com/learntech-rwth/omilaxr-framework/v2/omilaxr/-/wikis",
+    "changelogUrl": "https://gitlab.com/learntech-rwth/omilaxr-ecosystem/v2/omilaxr/-/blob/main/CHANGELOG",
+    "licensesUrl": "https://gitlab.com/learntech-rwth/omilaxr-ecosystem/v2/omilaxr/-/blob/main/LICENSE",
     "dependencies": {
       "com.unity.textmeshpro": "3.2",
       "com.unity.nuget.newtonsoft-json": "3.0.2"
