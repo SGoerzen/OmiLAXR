@@ -1,7 +1,6 @@
 using System.Collections.Generic;
 using System.Linq;
 using OmiLAXR.Composers;
-using OmiLAXR.Hooks;
 using OmiLAXR.Listeners;
 using OmiLAXR.Pipelines.Filters;
 using OmiLAXR.TrackingBehaviours;
@@ -18,10 +17,10 @@ namespace OmiLAXR
     {
         public Actor actor;
         
-        [HideInInspector] public List<Listener> listeners;
-        [HideInInspector] public List<DataProvider> dataProviders;
-        [HideInInspector] public List<TrackingBehaviour> trackingBehaviours;      
-        [HideInInspector] public List<Filter> filters;
+        public Listener[] Listeners { get; private set; }
+        public DataProvider[] DataProviders { get; private set; }
+        public TrackingBehaviour[] TrackingBehaviours { get; private set; }   
+        public Filter[] Filters { get; private set; }   
         
         public static T GetPipeline<T>() where T : Pipeline
             => FindObjectOfType<T>();
@@ -29,16 +28,16 @@ namespace OmiLAXR
         public static Pipeline GetAll() => FindObjectOfType<Pipeline>();
         
         public T GetDataProvider<T>() where T : DataProvider
-            => dataProviders.OfType<T>().Select(dp => dp as T).FirstOrDefault();
+            => DataProviders.OfType<T>().Select(dp => dp as T).FirstOrDefault();
         
         public T GetTrackingBehaviour<T>() where T : TrackingBehaviour
-            => trackingBehaviours.OfType<T>().Select(dp => dp as T).FirstOrDefault();
+            => TrackingBehaviours.OfType<T>().Select(dp => dp as T).FirstOrDefault();
         
         public T GetFilters<T>() where T : Filter
-            => filters.OfType<T>().Select(dp => dp as T).FirstOrDefault();
+            => Filters.OfType<T>().Select(dp => dp as T).FirstOrDefault();
         
         public T GetListener<T>() where T : Listener
-            => listeners.OfType<T>().Select(listener => listener as T).FirstOrDefault();
+            => Listeners.OfType<T>().Select(listener => listener as T).FirstOrDefault();
 
         public event System.Action<Object[]> afterFoundObjects;
         public event System.Action<Object[]> afterFilteredObjects;
@@ -50,21 +49,24 @@ namespace OmiLAXR
         
         private void Awake()
         {
-            trackingBehaviours = GetComponentsInChildren<TrackingBehaviour>().ToList();
+            if (actor == null)
+                actor = GetComponent<Actor>();
+            
+            TrackingBehaviours = GetComponentsInChildren<TrackingBehaviour>();
             
             // Find available listeners
-            listeners = GetComponentsInChildren<Listener>().ToList();
+            Listeners = GetComponentsInChildren<Listener>();
             
             // Find available data providers
-            filters = GetComponentsInChildren<Filter>().ToList();
+            Filters = GetComponentsInChildren<Filter>();
             
             // Find available data providers
-            dataProviders = FindObjectsOfType<DataProvider>().ToList();
+            DataProviders = FindObjectsOfType<DataProvider>();
 
-            var composersCount = dataProviders.Aggregate(0, (i, provider) => i + provider.composers.Count);
-            var hooksCount = dataProviders.Aggregate(0, (i, provider) => i + provider.hooks.Count);
+            var composersCount = DataProviders.Aggregate(0, (i, provider) => i + provider.Composers.Length);
+            var hooksCount = DataProviders.Aggregate(0, (i, provider) => i + provider.Hooks.Length);
             
-            DebugLog.OmiLAXR.Print($"Started Pipeline {name} with {listeners.Count} listeners, {filters.Count} filters, {composersCount} composers, {hooksCount} hooks and {dataProviders.Count} data providers" );
+            DebugLog.OmiLAXR.Print($"Started Pipeline {name} with {Listeners.Length} listeners, {Filters.Length} filters, {composersCount} composers, {hooksCount} hooks and {DataProviders.Length} data providers" );
         }
 
         protected void Log(string message, params object[] ps)
@@ -73,7 +75,7 @@ namespace OmiLAXR
         private void Start()
         {
             // 1) Start listening for events
-            foreach (var listener in listeners.Where(l => l.enabled))
+            foreach (var listener in Listeners.Where(l => l.enabled))
             {
                 listener.onFoundObjects += FoundObjects;
                 listener.StartListening();
@@ -88,7 +90,7 @@ namespace OmiLAXR
             Log($"Found {found} objects.");
 
             // 2) apply all filters
-            objects = filters.Aggregate(objects, (gos, filter) => filter.Pass(gos));
+            objects = Filters.Aggregate(objects, (gos, filter) => filter.Pass(gos));
             afterFilteredObjects?.Invoke(objects);
             
             Log($"Filtered {found - objects.Length} objects.");
