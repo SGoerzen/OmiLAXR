@@ -14,7 +14,7 @@ namespace OmiLAXR
         [HideInInspector] public List<StatementComposer> composers;
         [HideInInspector] public List<StatementHook> hooks;
         [HideInInspector] public List<DataEndpoint> dataEndpoints;
-
+        
         public T GetComposer<T>() where T : StatementComposer
             => composers.OfType<T>().Select(composer => composer as T).FirstOrDefault();
         
@@ -37,7 +37,13 @@ namespace OmiLAXR
             {
                 composer.afterComposed += statement =>
                 {
-                    statement = hooks.Where(h => h.enabled).Aggregate(statement, (current, hook) => hook.AfterCompose(current));
+                    foreach (var hook in hooks.Where(hook => hook.enabled))
+                    {
+                        statement = hook.AfterCompose(statement);
+                        if (statement.IsDiscarded())
+                            return;
+                    }
+
                     foreach (var dp in dataEndpoints)
                     {
                         dp.SendStatement(statement);
