@@ -147,7 +147,8 @@ PrefabInstance:
       propertyPath: m_Name
       value: System Pipeline
       objectReference: {fileID: 0}
-    m_RemovedComponents: []
+    m_RemovedComponents:
+    - {fileID: 8282859340480525290, guid: e7a42caab67734afb9fccfba2f0f027f, type: 3}
     m_RemovedGameObjects: []
     m_AddedGameObjects: []
     m_AddedComponents:

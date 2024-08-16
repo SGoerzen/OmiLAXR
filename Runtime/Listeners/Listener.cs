@@ -7,7 +7,7 @@ namespace OmiLAXR.Listeners
         public event System.Action<Object[]> onFoundObjects;
         public abstract void StartListening();
 
-        protected void Found(Object[] objects)
+        protected void Found<T>(T[] objects) where T : Object
         {
             onFoundObjects?.Invoke(objects);
         }

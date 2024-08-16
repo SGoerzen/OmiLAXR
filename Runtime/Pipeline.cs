@@ -73,34 +73,25 @@ namespace OmiLAXR
         private void Start()
         {
             // 1) Start listening for events
-            foreach (var listener in listeners)
+            foreach (var listener in listeners.Where(l => l.enabled))
             {
                 listener.onFoundObjects += FoundObjects;
                 listener.StartListening();
             }
         }
 
-        public void Register(Listener listener)
-            => listeners.Add(listener);
-
-        public void Register(DataProvider dataProvider)
-            => dataProviders.Add(dataProvider);
-
-        public void Register(Filter filter)
-            => filters.Add(filter);
-
-        public void Register(TrackingBehaviour trackingBehaviour)
-            => trackingBehaviours.Add(trackingBehaviour);
-
         private void FoundObjects(UnityEngine.Object[] objects)
         {
             afterFoundObjects?.Invoke(objects);
-            
-            Log($"Found {objects.Length} objects.");
+
+            var found = objects.Length;
+            Log($"Found {found} objects.");
 
             // 2) apply all filters
             objects = filters.Aggregate(objects, (gos, filter) => filter.Pass(gos));
             afterFilteredObjects?.Invoke(objects);
+            
+            Log($"Filtered {found - objects.Length} objects.");
             
             trackingObjects.AddRange(objects);
         }
