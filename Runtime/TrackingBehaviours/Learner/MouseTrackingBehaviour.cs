@@ -1,10 +1,9 @@
-using System;
 using UnityEngine;
-using UnityEngine.Serialization;
+using Object = UnityEngine.Object;
 
 namespace OmiLAXR.TrackingBehaviours.Learner
 {
-    [AddComponentMenu("OmiLAXR / 3) Tracking Behaviors /  Mouse Tracking Behavior")]
+    [AddComponentMenu("OmiLAXR / 3) Tracking Behaviours / Mouse Tracking Behaviour")]
     public class MouseTrackingBehaviour : TrackingBehaviour
     {
         public struct MouseTrackingBehaviourArgs
@@ -86,6 +85,11 @@ namespace OmiLAXR.TrackingBehaviours.Learner
                 _lastMousePosition = Input.mousePosition;
                 OnMousePositionChanged?.Invoke(this, Input.mousePosition);
             }
+        }
+
+        protected override void AfterFilteredObjects(Object[] objects)
+        {
+            
         }
     }
 }

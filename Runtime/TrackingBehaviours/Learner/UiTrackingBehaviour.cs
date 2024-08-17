@@ -5,7 +5,7 @@ using Object = UnityEngine.Object;
 
 namespace OmiLAXR.TrackingBehaviours.Learner
 {
-    [AddComponentMenu("OmiLAXR / 3) Tracking Behaviors / UI Tracking Behavior")]
+    [AddComponentMenu("OmiLAXR / 3) Tracking Behaviours / UI Tracking Behaviour")]
     public class UiTrackingBehaviour : TrackingBehaviour
     {
         public event TrackingBehaviourAction<Button> OnClickedButton;

@@ -1,9 +1,9 @@
-using System;
 using UnityEngine;
+using Object = UnityEngine.Object;
 
 namespace OmiLAXR.TrackingBehaviours.System
 {
-    [AddComponentMenu("OmiLAXR / 3) Tracking Behaviors / System Tracking Behavior")]
+    [AddComponentMenu("OmiLAXR / 3) Tracking Behaviours / System Tracking Behaviour")]
     public class SystemTrackingBehaviour : TrackingBehaviour
     {
         public event TrackingBehaviourAction OnGameStarted;
@@ -32,6 +32,11 @@ namespace OmiLAXR.TrackingBehaviours.System
         private void OnApplicationPause(bool pauseStatus)
         {
             // todo
+        }
+
+        protected override void AfterFilteredObjects(Object[] objects)
+        {
+            
         }
     }
 }

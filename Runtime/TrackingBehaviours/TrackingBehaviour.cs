@@ -1,6 +1,26 @@
+using System.Linq;
+using UnityEngine;
+
 namespace OmiLAXR.TrackingBehaviours
 {
-    public abstract class TrackingBehaviour : PipelineStage
+    public abstract class TrackingBehaviour : MonoBehaviour
     {
+        protected Pipeline pipeline { get; private set; }
+        public Actor GetActor() => pipeline.actor;
+        protected virtual void Awake()
+        {
+            pipeline = GetComponentInParent<Pipeline>();
+            pipeline.afterFoundObjects += AfterFoundObjects;
+            pipeline.afterFilteredObjects += AfterFilteredObjects;
+        }
+        
+        protected virtual void AfterFoundObjects(Object[] objects) {}
+        protected abstract void AfterFilteredObjects(Object[] objects);
+        
+        protected void Log(string message, params object[] ps)
+            => OmiLAXR.DebugLog.OmiLAXR.Print($"(Pipeline {pipeline.name}) " + message);
+        
+        protected T[] Select<T>(Object[] objects) where T : Object
+            => objects.Where(o => o.GetType().IsSubclassOf(typeof(T))).Select(o => o as T).ToArray();
     }
 }
