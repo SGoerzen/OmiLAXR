@@ -14,10 +14,11 @@
     "com.unity.nuget.newtonsoft-json": "3.0.2"
   },
   "keywords": [
-    "Educational VR",
-    "Educational AR",
-    "Educational XR",
-    "Framework"
+    "OmiLAXR",
+    "Learning Analytics",
+    "Virtual Reality",
+    "Augmented Reality",
+    "eXtended Reality"
   ],
   "author": {
     "name": "Sergej Görzen",
