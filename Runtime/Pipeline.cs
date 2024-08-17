@@ -43,7 +43,9 @@ namespace OmiLAXR
         public event System.Action<Object[]> afterFilteredObjects;
         public event System.Action<IStatement> afterComposedObjects; 
         public event System.Action<IStatement> beforeSendObjects; 
-        public event System.Action<IStatement> afterSendObjects; 
+        public event System.Action<IStatement> afterSendObjects;
+        public event System.Action onStartedPipeline;
+        public event System.Action onStoppedPipeline; 
 
         public readonly List<Object> trackingObjects = new List<Object>();
         
