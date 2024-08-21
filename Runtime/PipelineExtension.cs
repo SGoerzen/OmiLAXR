@@ -6,7 +6,7 @@ using UnityEngine;
 namespace OmiLAXR
 {
     [DefaultExecutionOrder(-1)]
-    public abstract class PipelineExtension<T> : MonoBehaviour
+    public abstract class PipelineExtension<T> : MonoBehaviour, IPipelineExtension
     where T : Pipeline
     {
         protected T Pipeline;
@@ -21,14 +21,15 @@ namespace OmiLAXR
         }
 
         protected void Add(Listener listener)
-            => this.Pipeline.Listeners.Add(listener);
+            => this.Pipeline.Add(listener);
 
         protected void Add(Filter filter)
-            => this.Pipeline.Filters.Add(filter);
+            => this.Pipeline.Add(filter);
 
         protected void Add(TrackingBehaviour trackingBehaviour)
-            => this.Pipeline.TrackingBehaviours.Add(trackingBehaviour);
+            => this.Pipeline.Add(trackingBehaviour);
 
         protected abstract void Extend(T pipeline);
+        public Pipeline GetPipeline() => Pipeline;
     }
 }

@@ -39,16 +39,27 @@ namespace OmiLAXR
         public T GetListener<T>() where T : Listener
             => Listeners.OfType<T>().Select(listener => listener as T).FirstOrDefault();
 
+        public event System.Action<Pipeline> AfterInit;
+        public event System.Action<Pipeline> AfterStarted;
         public event System.Action<Pipeline> OnCollect; 
         public event System.Action<Object[]> AfterFoundObjects;
         public event System.Action<Object[]> AfterFilteredObjects;
         public event System.Action<IStatement> AfterComposedObjects; 
-        public event System.Action<IStatement> beforeSendObjects; 
-        public event System.Action<IStatement> afterSendObjects;
-        public event System.Action onStartedPipeline;
-        public event System.Action onStoppedPipeline; 
+        public event System.Action<IStatement> BeforeSendObjects; 
+        public event System.Action<IStatement> AfterSendObjects;
+        public event System.Action OnStartedPipeline;
+        public event System.Action OnStoppedPipeline; 
 
         public readonly List<Object> trackingObjects = new List<Object>();
+
+        public void Add(Listener listener)
+            => this.Listeners.Add(listener);
+
+        public void Add(Filter filter)
+            => this.Filters.Add(filter);
+
+        public void Add(TrackingBehaviour trackingBehaviour)
+            => this.TrackingBehaviours.Add(trackingBehaviour);
         
         private void Awake()
         {
@@ -71,7 +82,9 @@ namespace OmiLAXR
             
             OnCollect?.Invoke(this);
             
-            DebugLog.OmiLAXR.Print($"Started Pipeline {name} with {Listeners.Count} listeners, {Filters.Count} filters, {composersCount} composers, {hooksCount} hooks and {DataProviders.Count} data providers" );
+            DebugLog.OmiLAXR.Print($"Initialized Pipeline {name} with {Listeners.Count} listeners, {Filters.Count} filters, {composersCount} composers, {hooksCount} hooks and {DataProviders.Count} data providers" );
+            
+            AfterInit?.Invoke(this);
         }
 
         protected void Log(string message, params object[] ps)
@@ -85,6 +98,8 @@ namespace OmiLAXR
                 listener.onFoundObjects += FoundObjects;
                 listener.StartListening();
             }
+            
+            AfterStarted?.Invoke(this);
         }
 
         private void FoundObjects(UnityEngine.Object[] objects)
@@ -110,7 +125,7 @@ namespace OmiLAXR
 
         protected virtual void OnBeforeSendObjects(IStatement obj)
         {
-            beforeSendObjects?.Invoke(obj);
+            BeforeSendObjects?.Invoke(obj);
         }
     }
 }

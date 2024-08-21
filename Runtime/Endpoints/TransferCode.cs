@@ -1,11 +1,11 @@
 namespace OmiLAXR.Endpoints
 {
-    public enum TransferCode
+    public enum TransferCode : int
     {
-        NoStatements,
-        InvalidCredentials,
-        Error,
-        Success
+        NoStatements = 204,
+        InvalidCredentials = 401,
+        Error = 500,
+        Success = 200
     }
 
 }

@@ -25,10 +25,27 @@ namespace OmiLAXR.Endpoints
             while (!_sendWorker.CancellationPending)
             {
                 var result = TransferStatement();
+
                 if (result != TransferCode.Success && result != TransferCode.NoStatements)
                 {
                     DebugLog.OmiLAXR.Error("Failed to send statements. Error code: " + result);
                 }
+                
+                // handle codes
+                switch (result)
+                {
+                    case TransferCode.NoStatements:
+                        break;
+                    case TransferCode.Success:
+                        break;
+                    case TransferCode.InvalidCredentials:
+                        StopSending();
+                        break;
+                    case TransferCode.Error:
+                        break;
+                }
+                
+                
             }
         }
 
