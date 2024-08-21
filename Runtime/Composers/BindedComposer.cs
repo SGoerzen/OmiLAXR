@@ -3,7 +3,7 @@ using UnityEngine;
 
 namespace OmiLAXR.Composers
 {
-    public abstract class BindedStatementComposer<T> : StatementComposer 
+    public abstract class BindedComposer<T> : Composer 
         where T : TrackingBehaviour
     {
         [HideInInspector]

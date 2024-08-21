@@ -1,3 +1,4 @@
+using System.Collections.Generic;
 using System.Linq;
 using OmiLAXR.Composers;
 using OmiLAXR.Composers.HigherComposers;
@@ -11,27 +12,31 @@ namespace OmiLAXR
     [DefaultExecutionOrder(-1)]
     public class DataProvider : MonoBehaviour
     {
-        public StatementComposer[] Composers { get; private set; }   
-        public HigherStatementComposer<IStatement>[] HigherComposers { get; private set; }   
-        public StatementHook[] Hooks { get; private set; }   
-        public DataEndpoint[] DataEndpoints { get; private set; }   
+        public readonly List<Composer> Composers = new List<Composer>();
+
+        public readonly List<HigherComposer<IStatement>> HigherComposers =
+            new List<HigherComposer<IStatement>>();
+
+        public readonly List<Hook> Hooks = new List<Hook>();
+        public readonly List<Endpoint> Endpoints = new List<Endpoint>();   
         
-        public T GetComposer<T>() where T : StatementComposer
+        public T GetComposer<T>() where T : Composer
             => Composers.OfType<T>().Select(composer => composer as T).FirstOrDefault();
         
         protected virtual void Awake()
         {
             // Find available composers
-            Composers = GetComponentsInChildren<StatementComposer>().Where(c => c.enabled).ToArray();
+            var composers = GetComponentsInChildren<Composer>().Where(c => c.enabled);
+            Composers.AddRange(composers);
             
             // Find available higher composers
-            HigherComposers = Composers.Where(c => c.IsHigherComposer).Select(c => c as HigherStatementComposer<IStatement>).ToArray();
+            HigherComposers.AddRange(Composers.Where(c => c.IsHigherComposer).Select(c => c as HigherComposer<IStatement>));
             
             // Find available hooks
-            Hooks = GetComponentsInChildren<StatementHook>().Where(c => c.enabled).ToArray();
+            Hooks.AddRange(GetComponentsInChildren<Hook>().Where(c => c.enabled));
             
             // Find available data endpoints
-            DataEndpoints = GetComponentsInChildren<DataEndpoint>();
+            Endpoints.AddRange(GetComponentsInChildren<Endpoint>());
         }
 
         protected void Start()
@@ -58,7 +63,7 @@ namespace OmiLAXR
                     return;
             }
 
-            foreach (var dp in DataEndpoints)
+            foreach (var dp in Endpoints)
             {
                 dp.SendStatement(statement);
             }

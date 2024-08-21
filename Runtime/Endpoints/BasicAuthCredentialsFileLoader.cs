@@ -4,18 +4,18 @@ using UnityEngine;
 
 namespace OmiLAXR.Endpoints
 {
-    [RequireComponent(typeof(DataEndpoint))]
+    [RequireComponent(typeof(Endpoint))]
     [AddComponentMenu("OmiLAXR / 6) Endpoints / Basic Auth Credentials File Loader")]
     public class BasicAuthCredentialsFileLoader : MonoBehaviour
     {
         [Header("Name of file that is located in Assets folder (data path).")]
         public string filename = "credentials.json";
 
-        private DataEndpoint _dataEndpoint;
+        private Endpoint _endpoint;
         
         private void OnEnable()
         {
-            _dataEndpoint = GetComponent<DataEndpoint>();
+            _endpoint = GetComponent<Endpoint>();
             LoadConfig();
         }
 
@@ -33,7 +33,7 @@ namespace OmiLAXR.Endpoints
                 var jsonContent = File.ReadAllText(filePath);
                 var credentials = JsonUtility.FromJson<BasicAuthCredentials>(jsonContent);
 
-                _dataEndpoint.credentials = credentials;
+                _endpoint.credentials = credentials;
 
                 Debug.Log($"Loaded '{filename}' successfully.");
             }

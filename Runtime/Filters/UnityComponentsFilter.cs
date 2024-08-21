@@ -5,7 +5,7 @@ using UnityEngine;
 using UnityEngine.EventSystems;
 using Object = UnityEngine.Object;
 
-namespace OmiLAXR.Pipelines.Filters
+namespace OmiLAXR.Filters
 {
     [AddComponentMenu("OmiLAXR / 2) Filters / Unity Components Filter")]
     public class UnityComponentsFilter : Filter
@@ -30,15 +30,17 @@ namespace OmiLAXR.Pipelines.Filters
         {
             var type = obj.GetType();
 
-            if (typeof(GameObject) == type)
-            {
-                var go = obj as GameObject;
-                var components = go.GetComponents<Component>();
-                throw new NotImplementedException();
-                return false;
-            }
+            if (typeof(GameObject) != type) 
+                return IsAllowedType(type);
             
-            return IsAllowedType(type);
+            var go = obj as GameObject;
+
+            if (!go)
+                return false;
+            
+            var components = go.GetComponents<Component>();
+            return components.Any(c => IsAllowedType(c.GetType()));
+
         }
     }
 }

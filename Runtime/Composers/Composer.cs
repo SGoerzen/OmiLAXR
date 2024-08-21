@@ -4,13 +4,13 @@ using UnityEngine;
 
 namespace OmiLAXR.Composers
 {
-    public abstract class StatementComposer : MonoBehaviour
+    public abstract class Composer : MonoBehaviour
     {
         private void OnEnable()
         {
             
         }
-
+        
         protected abstract Author GetAuthor();
         public virtual bool IsHigherComposer => false;
         public event Action<IStatement> afterComposed;

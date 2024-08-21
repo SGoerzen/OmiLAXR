@@ -3,7 +3,7 @@ using UnityEngine;
 
 namespace OmiLAXR.Hooks
 {
-    public abstract class StatementHook : MonoBehaviour
+    public abstract class Hook : MonoBehaviour
     {
         public abstract IStatement AfterCompose(IStatement statement);
     }

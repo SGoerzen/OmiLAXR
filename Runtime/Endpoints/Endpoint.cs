@@ -5,13 +5,13 @@ using UnityEngine;
 
 namespace OmiLAXR.Endpoints
 {
-    public abstract class DataEndpoint : MonoBehaviour
+    public abstract class Endpoint : MonoBehaviour
     {
-        public DataEndpointAction onStartedSending;
-        public DataEndpointAction onStoppedSending;
-        public DataEndpointAction onPausedSending;
-        public DataEndpointAction<IStatement> onSentStatement;
-        public DataEndpointAction<IStatement> onFailedSendingStatement;
+        public EndpointAction onStartedSending;
+        public EndpointAction onStoppedSending;
+        public EndpointAction onPausedSending;
+        public EndpointAction<IStatement> onSentStatement;
+        public EndpointAction<IStatement> onFailedSendingStatement;
 
         private bool _isSending;
         

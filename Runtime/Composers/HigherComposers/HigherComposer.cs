@@ -4,7 +4,7 @@ using System.Linq;
 
 namespace OmiLAXR.Composers.HigherComposers
 {
-    public abstract class HigherStatementComposer<T> : StatementComposer
+    public abstract class HigherComposer<T> : Composer
         where T : IStatement
     {
         protected abstract Dictionary<string, MatchCondition<T>> Conditions();

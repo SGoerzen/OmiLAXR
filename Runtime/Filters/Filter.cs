@@ -1,10 +1,9 @@
 using UnityEngine;
 
-namespace OmiLAXR.Pipelines.Filters
+namespace OmiLAXR.Filters
 {
     public abstract class Filter : MonoBehaviour
     {
         public abstract Object[] Pass(Object[] gos);
-
     }
 }

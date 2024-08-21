@@ -2,7 +2,7 @@ using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
 
-namespace OmiLAXR.Pipelines.Filters
+namespace OmiLAXR.Filters
 {
     [AddComponentMenu("OmiLAXR / 2) Filters / Blacklist Filter")]
     public class BlacklistFilter : Filter
