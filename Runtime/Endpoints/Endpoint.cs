@@ -1,11 +1,10 @@
 using System.Collections.Generic;
 using System.ComponentModel;
 using OmiLAXR.Composers;
-using UnityEngine;
 
 namespace OmiLAXR.Endpoints
 {
-    public abstract class Endpoint : MonoBehaviour
+    public abstract class Endpoint : PipelineComponent
     {
         public EndpointAction onStartedSending;
         public EndpointAction onStoppedSending;

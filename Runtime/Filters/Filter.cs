@@ -4,7 +4,7 @@ using Object = UnityEngine.Object;
 
 namespace OmiLAXR.Filters
 {
-    public abstract class Filter : MonoBehaviour
+    public abstract class Filter : PipelineComponent
     {
         protected void OnEnable()
         {

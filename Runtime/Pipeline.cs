@@ -57,14 +57,24 @@ namespace OmiLAXR
 
         public readonly List<Object> trackingObjects = new List<Object>();
 
+        public void Add(PipelineComponent comp)
+        {
+            var type = comp.GetType();
+            if (type == typeof(Listener))
+                Listeners.Add(comp as Listener);
+            else if (type == typeof(Filter))
+                Filters.Add(comp as Filter);
+            else if (type == typeof(TrackingBehaviour))
+                TrackingBehaviours.Add(comp as TrackingBehaviour);
+        }
         public void Add(Listener listener)
-            => this.Listeners.Add(listener);
+            => Listeners.Add(listener);
 
         public void Add(Filter filter)
-            => this.Filters.Add(filter);
+            => Filters.Add(filter);
 
         public void Add(TrackingBehaviour trackingBehaviour)
-            => this.TrackingBehaviours.Add(trackingBehaviour);
+            => TrackingBehaviours.Add(trackingBehaviour);
         
         private void Awake()
         {
@@ -139,6 +149,7 @@ namespace OmiLAXR
             }
             
             Log($"Started Pipeline with {trackingObjects.Count} tracking target objects...");
+            AfterStarted?.Invoke(this);
         }
 
         private void OnDisable()
@@ -146,6 +157,16 @@ namespace OmiLAXR
             BeforeStoppedPipeline?.Invoke(this);
 
             Log("Stopped Pipeline!");
+        }
+
+        public void StartPipeline()
+        {
+            gameObject.SetActive(true);
+        }
+
+        public void StopPipeline()
+        {
+            gameObject.SetActive(false);
         }
 
         private void FoundObjects(Object[] objects)

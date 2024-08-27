@@ -3,7 +3,7 @@ using Object = UnityEngine.Object;
 
 namespace OmiLAXR.Listeners
 {
-    public abstract class Listener : MonoBehaviour
+    public abstract class Listener : PipelineComponent
     {
         protected Pipeline pipeline { get; private set; }
         public Actor GetActor() => pipeline.actor;

@@ -5,13 +5,13 @@ using UnityEngine;
 namespace OmiLAXR.TrackingBehaviours
 {
     [DefaultExecutionOrder(-1)]
-    public abstract class TrackingBehaviour : MonoBehaviour
+    public abstract class TrackingBehaviour : PipelineComponent
     {
         protected Pipeline pipeline { get; private set; }
         public Actor GetActor() => pipeline.actor;
         protected virtual void Awake()
         {
-            pipeline = GetComponentInParent<Pipeline>();
+            pipeline = GetComponentInParent<Pipeline>(true);
 
             // cannot find a pipeline. Look for a Pipeline Extension
             if (!pipeline)

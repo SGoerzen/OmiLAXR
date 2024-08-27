@@ -1,3 +1,4 @@
+using OmiLAXR.Extensions;
 using OmiLAXR.Listeners;
 using OmiLAXR.Filters;
 using OmiLAXR.TrackingBehaviours;
@@ -6,16 +7,25 @@ using UnityEngine;
 namespace OmiLAXR
 {
     [DefaultExecutionOrder(-1)]
-    public abstract class PipelineExtension<T> : MonoBehaviour, IPipelineExtension
+    public abstract class PipelineExtension<T> : PipelineComponent, IPipelineExtension
     where T : Pipeline
     {
         protected T Pipeline;
         private void Awake()
         {
-            Pipeline = FindObjectOfType<T>();
-            this.Pipeline.OnCollect += pipeline =>
+            Pipeline = FindObjectOfType<T>(true);
+            Pipeline.OnCollect += pipeline =>
             {
-                Extend(this.Pipeline);
+                var extensions = OnExtend();
+                foreach (var ext in extensions)
+                {
+                    // add to lists
+                    pipeline.Add(ext);
+                    // register in pipeline, just fyi
+                    var extWrapper = pipeline.gameObject.AddComponent<Extension>();
+                    extWrapper.extensionComponent = ext;
+                    extWrapper.pipelineExtension = this;
+                }    
             }; 
             DebugLog.OmiLAXR.Print("Extended pipeline " + typeof(T));
         }
@@ -29,7 +39,7 @@ namespace OmiLAXR
         protected void Add(TrackingBehaviour trackingBehaviour)
             => this.Pipeline.Add(trackingBehaviour);
 
-        protected abstract void Extend(T pipeline);
+        protected abstract PipelineComponent[] OnExtend();
         public Pipeline GetPipeline() => Pipeline;
     }
 }
