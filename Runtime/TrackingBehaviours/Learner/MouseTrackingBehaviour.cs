@@ -1,9 +1,13 @@
+using System.ComponentModel;
 using UnityEngine;
+using NotImplementedException = System.NotImplementedException;
 using Object = UnityEngine.Object;
 
 namespace OmiLAXR.TrackingBehaviours.Learner
 {
-    [AddComponentMenu("OmiLAXR / 3) Tracking Behaviours / Mouse Tracking Behaviour")]
+    [AddComponentMenu("OmiLAXR / 3) Tracking Behaviours / Mouse Tracking Behaviour"),
+     Description("Tracks mouse clicks and wheel."),
+    ]
     public class MouseTrackingBehaviour : TrackingBehaviour
     {
         public struct MouseTrackingBehaviourArgs
@@ -17,11 +21,22 @@ namespace OmiLAXR.TrackingBehaviours.Learner
                 mousePosition = position;
             }
         }
+
+        [Gesture("Mouse"), Action("Click")]
+        public TrackingBehaviourEvent<MouseTrackingBehaviourArgs> OnClicked =
+            new TrackingBehaviourEvent<MouseTrackingBehaviourArgs>();
+
+        [Gesture("Mouse"), Action("Press")]
+        public TrackingBehaviourEvent<MouseTrackingBehaviourArgs> OnPressedDown =
+            new TrackingBehaviourEvent<MouseTrackingBehaviourArgs>();
         
-        public event TrackingBehaviourAction<MouseTrackingBehaviourArgs> OnClicked;
-        public event TrackingBehaviourAction<MouseTrackingBehaviourArgs> OnPressedDown;
-        public event TrackingBehaviourAction<MouseTrackingBehaviourArgs, float> OnScrolledWheel;
-        public event TrackingBehaviourAction<Vector3> OnMousePositionChanged; 
+        [Gesture("Mouse"), Action("Scroll")]
+        public TrackingBehaviourEvent<MouseTrackingBehaviourArgs, float> OnScrolledWheel =
+            new TrackingBehaviourEvent<MouseTrackingBehaviourArgs, float>();
+        
+        [Gesture("Mouse"), Action("Move")]
+        public TrackingBehaviourEvent<Vector3> OnMousePositionChanged =
+            new TrackingBehaviourEvent<Vector3>();
         
         private bool _isLeftDown;
         private bool _isRightDown;

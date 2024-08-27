@@ -1,11 +1,12 @@
 {
     "name": "OmiLAXR.Editor",
-    "rootNamespace": "",
-    "references": [],
-    "includePlatforms": [],
-    "excludePlatforms": [
-        "Editor"
+    "rootNamespace": "OmiLAXR.Editor",
+    "references": [
+        "GUID:92238810d69db43818b28b85251b4b3c",
+        "GUID:71ad480b66ce6a244838fbe2a6b004e0"
     ],
+    "includePlatforms": [],
+    "excludePlatforms": [],
     "allowUnsafeCode": false,
     "overrideReferences": false,
     "precompiledReferences": [],

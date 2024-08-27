@@ -1,4 +1,3 @@
-using System;
 using UnityEngine;
 using UnityEngine.UI;
 using Object = UnityEngine.Object;
@@ -8,9 +7,13 @@ namespace OmiLAXR.TrackingBehaviours.Learner
     [AddComponentMenu("OmiLAXR / 3) Tracking Behaviours / UI Tracking Behaviour")]
     public class UiTrackingBehaviour : TrackingBehaviour
     {
-        public event TrackingBehaviourAction<Button> OnClickedButton;
-        public event TrackingBehaviourAction<Slider, float> OnChangedSlider;
+        [Gesture("UI"), Action("Click")]
+        public TrackingBehaviourEvent<Button> OnClickedButton = new TrackingBehaviourEvent<Button>();
 
+        [Gesture("UI"), Action("Change")]
+        public TrackingBehaviourEvent<Slider, float> OnChangedSlider =
+            new TrackingBehaviourEvent<Slider, float>();
+        
         protected override void AfterFilteredObjects(Object[] objects)
         {
             var selectables = Select<Selectable>(objects);
@@ -22,7 +25,7 @@ namespace OmiLAXR.TrackingBehaviours.Learner
                 if (type == typeof(Button))
                 {
                     var button = (Button)selectable;
-                    button.onClick.AddListener(() =>
+                    OnClickedButton.Bind(button.onClick, () =>
                     {
                         OnClickedButton?.Invoke(this, button);
                     });
@@ -30,9 +33,9 @@ namespace OmiLAXR.TrackingBehaviours.Learner
                 else if (type == typeof(Slider))
                 {
                     var slider = (Slider)selectable;
-                    slider.onValueChanged.AddListener((value) =>
+                    OnChangedSlider.Bind(slider.onValueChanged, value =>
                     {
-                        OnChangedSlider?.Invoke(this, slider, value);
+                        OnChangedSlider.Invoke(this, slider, value);
                     });
                 }
             }

@@ -1,10 +1,13 @@
+using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Reflection;
 using OmiLAXR.Composers;
 using OmiLAXR.Listeners;
 using OmiLAXR.Filters;
 using OmiLAXR.TrackingBehaviours;
 using UnityEngine;
+using Object = UnityEngine.Object;
 
 namespace OmiLAXR
 {
@@ -21,6 +24,9 @@ namespace OmiLAXR
         public readonly List<DataProvider> DataProviders = new List<DataProvider>();
         public readonly List<TrackingBehaviour> TrackingBehaviours = new List<TrackingBehaviour>();
         public readonly List<Filter> Filters = new List<Filter>();
+
+        public readonly Dictionary<string, List<EventInfo>> Actions = new Dictionary<string, List<EventInfo>>();
+        public readonly Dictionary<string, List<EventInfo>> Gestures = new Dictionary<string, List<EventInfo>>();
         
         public static T GetPipeline<T>() where T : Pipeline
             => FindObjectOfType<T>();
@@ -47,8 +53,7 @@ namespace OmiLAXR
         public event System.Action<IStatement> AfterComposedObjects; 
         public event System.Action<IStatement> BeforeSendObjects; 
         public event System.Action<IStatement> AfterSendObjects;
-        public event System.Action OnStartedPipeline;
-        public event System.Action OnStoppedPipeline; 
+        public event System.Action<Pipeline> BeforeStoppedPipeline; 
 
         public readonly List<Object> trackingObjects = new List<Object>();
 
@@ -87,11 +92,45 @@ namespace OmiLAXR
             AfterInit?.Invoke(this);
         }
 
-        protected void Log(string message, params object[] ps)
-            => DebugLog.OmiLAXR.Print($"(Pipeline {name}) " + message);
-
-        private void Start()
+        protected void CollectGesturesAndActions()
         {
+            var tbs = TrackingBehaviours.ToArray();
+
+            foreach (var ts in tbs)
+            {
+                var events = GetType().GetEvents(BindingFlags.Public | BindingFlags.Instance);
+                    
+                foreach (var ev in events)
+                {
+                    var actionAttrs = ev.GetCustomAttributes<ActionAttribute>();
+                    var gestureAttrs = ev.GetCustomAttributes<GestureAttribute>();
+
+                    foreach (var actionAttr in actionAttrs)
+                    {
+                        if (Actions.ContainsKey(actionAttr.Name))
+                            Actions[actionAttr.Name].Add(ev);
+                        else 
+                            Actions.Add(actionAttr.Name, new List<EventInfo>() { ev });
+                    }
+
+                    foreach (var gestureAttr in gestureAttrs)
+                    {
+                        if (Gestures.ContainsKey(gestureAttr.Name))
+                            Gestures[gestureAttr.Name].Add(ev);
+                        else 
+                            Gestures.Add(gestureAttr.Name, new List<EventInfo>() { ev });
+                    }
+                }
+            }
+        }
+
+        protected void Log(string message, params object[] ps)
+            => DebugLog.OmiLAXR.Print($"<{GetType().Name}> " + message);
+
+        private void OnEnable()
+        {
+            CollectGesturesAndActions();
+
             // 1) Start listening for events
             foreach (var listener in Listeners.Where(l => l.enabled))
             {
@@ -99,22 +138,25 @@ namespace OmiLAXR
                 listener.StartListening();
             }
             
-            AfterStarted?.Invoke(this);
+            Log($"Started Pipeline with {trackingObjects.Count} tracking target objects...");
         }
 
-        private void FoundObjects(UnityEngine.Object[] objects)
+        private void OnDisable()
+        {
+            BeforeStoppedPipeline?.Invoke(this);
+
+            Log("Stopped Pipeline!");
+        }
+
+        private void FoundObjects(Object[] objects)
         {
             AfterFoundObjects?.Invoke(objects);
 
-            var found = objects.Length;
-            Log($"Found {found} objects.");
-
             // 2) apply all filters
-            objects = Filters.Aggregate(objects, (gos, filter) => filter.Pass(gos));
+            objects = Filters.Where(f => f.enabled).Aggregate(objects, (gos, filter) => filter.Pass(gos));
             AfterFilteredObjects?.Invoke(objects);
             
-            Log($"Filtered {found - objects.Length} objects.");
-            
+            trackingObjects.Clear();
             trackingObjects.AddRange(objects);
         }
 

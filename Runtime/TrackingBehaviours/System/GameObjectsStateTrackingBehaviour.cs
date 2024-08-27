@@ -1,5 +1,5 @@
-using System;
 using UnityEngine;
+using UnityEngine.Events;
 using Object = UnityEngine.Object;
 
 namespace OmiLAXR.TrackingBehaviours.System
@@ -8,18 +8,16 @@ namespace OmiLAXR.TrackingBehaviours.System
     {
         public class GameObjectStateListener : MonoBehaviour
         {
-            public event Action<GameObject> OnDestroyed;
+            public UnityEvent<GameObject> onDestroyed;
 
             private void OnDestroy()
             {
-                OnDestroyed?.Invoke(gameObject);
+                onDestroyed?.Invoke(gameObject);
             }
-            
-            // todo more is possible
         }
 
         public bool watchOnDestroyed;
-        public event TrackingBehaviourAction<GameObject> OnDestroyedGameObject; 
+        public TrackingBehaviourEvent<GameObjectStateListener, GameObject> OnDestroyedGameObject; 
         
         protected override void AfterFilteredObjects(Object[] objects)
         {
@@ -29,7 +27,12 @@ namespace OmiLAXR.TrackingBehaviours.System
                 var goStateListener = go.AddComponent<GameObjectStateListener>();
                 
                 if (watchOnDestroyed)
-                    goStateListener.OnDestroyed += g => OnDestroyedGameObject?.Invoke(this, g);
+                {
+                    OnDestroyedGameObject.Bind(goStateListener.onDestroyed, g =>
+                    {
+                        OnDestroyedGameObject?.Invoke(this, goStateListener, g);
+                    });
+                }
             }
         }
     }

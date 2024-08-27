@@ -1,4 +1,5 @@
 using System.Linq;
+using System.Reflection;
 using UnityEngine;
 
 namespace OmiLAXR.TrackingBehaviours
@@ -21,10 +22,38 @@ namespace OmiLAXR.TrackingBehaviours
             
             pipeline.AfterFoundObjects += AfterFoundObjects;
             pipeline.AfterFilteredObjects += AfterFilteredObjects;
+            pipeline.BeforeStoppedPipeline += (p) => Dispose(p.trackingObjects.ToArray());
         }
         
         protected virtual void AfterFoundObjects(Object[] objects) {}
         protected abstract void AfterFilteredObjects(Object[] objects);
+
+        protected void DisposeAllTrackingEvents()
+        {
+            // Get all fields of type ITrackingBehaviourEvent
+            var fields = GetOwnTrackingBehaviourEvents();
+
+            foreach (var field in fields)
+            {
+                // Get the value of the field from the current instance
+                var fieldValue = field.GetValue(this) as ITrackingBehaviourEvent;
+
+                // Call Dispose if the field is not null
+                fieldValue?.UnbindAll();
+            }
+        }
+        
+        protected virtual void Dispose(Object[] objects)
+        {
+            DisposeAllTrackingEvents();
+        }
+        
+        private FieldInfo[] GetOwnTrackingBehaviourEvents()
+        {
+            return GetType().GetFields(BindingFlags.Instance | BindingFlags.NonPublic | BindingFlags.Public)
+                .Where(f => typeof(ITrackingBehaviourEvent).IsAssignableFrom(f.FieldType))
+                .ToArray();
+        }
         
         protected void Log(string message, params object[] ps)
             => DebugLog.OmiLAXR.Print($"(Pipeline '{pipeline.name}') " + message);

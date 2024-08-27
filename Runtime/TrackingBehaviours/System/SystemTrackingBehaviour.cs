@@ -6,8 +6,8 @@ namespace OmiLAXR.TrackingBehaviours.System
     [AddComponentMenu("OmiLAXR / 3) Tracking Behaviours / System Tracking Behaviour")]
     public class SystemTrackingBehaviour : TrackingBehaviour
     {
-        public event TrackingBehaviourAction OnGameStarted;
-        public event TrackingBehaviourAction OnGameQuit;
+        public TrackingBehaviourEvent OnGameStarted = new TrackingBehaviourEvent();
+        public TrackingBehaviourEvent OnGameQuit = new TrackingBehaviourEvent();
         
         [RuntimeInitializeOnLoadMethod]
         private static void GameStarted()
