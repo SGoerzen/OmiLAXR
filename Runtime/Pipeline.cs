@@ -76,7 +76,7 @@ namespace OmiLAXR
         public void Add(TrackingBehaviour trackingBehaviour)
             => TrackingBehaviours.Add(trackingBehaviour);
         
-        private void Awake()
+        protected void Awake()
         {
             if (actor == null)
                 actor = GetComponent<Actor>();

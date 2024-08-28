@@ -11,7 +11,7 @@ namespace OmiLAXR
     where T : Pipeline
     {
         protected T Pipeline;
-        private void Awake()
+        protected void Awake()
         {
             Pipeline = FindObjectOfType<T>(true);
             Pipeline.OnCollect += pipeline =>
