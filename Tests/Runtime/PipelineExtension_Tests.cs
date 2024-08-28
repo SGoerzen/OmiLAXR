@@ -10,6 +10,47 @@ namespace OmiLAXR.Tests
 {
     public class PipelineExtension_Tests
     {
+        
+        public class MockFilter : Filter
+        {
+            public override Object[] Pass(Object[] gos)
+            {
+                return gos;
+            }
+        }
+        public class MockListener : Listener
+        {
+            public override void StartListening()
+            {
+            
+            }
+        }
+        public class MockTrackingBehaviour : TrackingBehaviour
+        {
+            protected override void AfterFilteredObjects(Object[] objects)
+            {
+            
+            }
+        }
+        
+        // Mock classes to simulate the Pipeline and other components
+        public class MockPipeline : Pipeline
+        {
+            public void TestAwake() => Awake();
+        }
+
+        public class MockPipelineExtension : PipelineExtension<MockPipeline>
+        {
+            protected override PipelineComponent[] OnExtend()
+            {
+                return new PipelineComponent[]
+                {
+                    gameObject.AddComponent<MockFilter>(),
+                    gameObject.AddComponent<MockListener>()
+                };
+            }
+        }
+        
         private GameObject _pipelineObject;
         private GameObject _pipelineExtObject;
         private MockPipeline _pipeline;
@@ -52,44 +93,8 @@ namespace OmiLAXR.Tests
         }
     }
 
-    // Mock classes to simulate the Pipeline and other components
-    public class MockPipeline : Pipeline
-    {
-        public void TestAwake() => Awake();
-    }
+    
 
-    public class MockPipelineExtension : PipelineExtension<MockPipeline>
-    {
-        protected override PipelineComponent[] OnExtend()
-        {
-            return new PipelineComponent[]
-            {
-                gameObject.AddComponent<MockFilter>(),
-                gameObject.AddComponent<MockListener>()
-            };
-        }
-    }
-
-    public class MockFilter : Filter
-    {
-        public override Object[] Pass(Object[] gos)
-        {
-            return gos;
-        }
-    }
-    public class MockListener : Listener
-    {
-        public override void StartListening()
-        {
-            
-        }
-    }
-    public class MockTrackingBehaviour : TrackingBehaviour
-    {
-        protected override void AfterFilteredObjects(Object[] objects)
-        {
-            
-        }
-    }
+    
 
 }

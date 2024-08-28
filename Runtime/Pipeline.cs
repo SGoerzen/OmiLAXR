@@ -45,26 +45,26 @@ namespace OmiLAXR
         public T GetListener<T>() where T : Listener
             => Listeners.OfType<T>().Select(listener => listener as T).FirstOrDefault();
 
-        public event System.Action<Pipeline> AfterInit;
-        public event System.Action<Pipeline> AfterStarted;
-        public event System.Action<Pipeline> OnCollect; 
-        public event System.Action<Object[]> AfterFoundObjects;
-        public event System.Action<Object[]> AfterFilteredObjects;
-        public event System.Action<IStatement> AfterComposedObjects; 
-        public event System.Action<IStatement> BeforeSendObjects; 
-        public event System.Action<IStatement> AfterSendObjects;
-        public event System.Action<Pipeline> BeforeStoppedPipeline; 
+        public event Action<Pipeline> AfterInit;
+        public event Action<Pipeline> AfterStarted;
+        public event Action<Pipeline> OnCollect; 
+        public event Action<Object[]> AfterFoundObjects;
+        public event Action<Object[]> AfterFilteredObjects;
+        public event Action<IStatement> AfterComposedObjects; 
+        public event Action<IStatement> BeforeSendObjects; 
+        public event Action<IStatement> AfterSendObjects;
+        public event Action<Pipeline> BeforeStoppedPipeline; 
 
         public readonly List<Object> trackingObjects = new List<Object>();
 
         public void Add(PipelineComponent comp)
         {
             var type = comp.GetType();
-            if (type == typeof(Listener))
+            if (type == typeof(Listener) || type.IsSubclassOf(typeof(Listener)))
                 Listeners.Add(comp as Listener);
-            else if (type == typeof(Filter))
+            else if (type == typeof(Filter) || type.IsSubclassOf(typeof(Filter)))
                 Filters.Add(comp as Filter);
-            else if (type == typeof(TrackingBehaviour))
+            else if (type == typeof(TrackingBehaviour) || type.IsSubclassOf(typeof(TrackingBehaviour)))
                 TrackingBehaviours.Add(comp as TrackingBehaviour);
         }
         public void Add(Listener listener)
@@ -101,14 +101,16 @@ namespace OmiLAXR
             
             AfterInit?.Invoke(this);
         }
-
+        
         protected void CollectGesturesAndActions()
         {
             var tbs = TrackingBehaviours.ToArray();
+            Actions.Clear();
+            Gestures.Clear();
 
             foreach (var ts in tbs)
             {
-                var events = GetType().GetEvents(BindingFlags.Public | BindingFlags.Instance);
+                var events = ts.GetType().GetEvents(BindingFlags.Public | BindingFlags.Instance);
                     
                 foreach (var ev in events)
                 {
