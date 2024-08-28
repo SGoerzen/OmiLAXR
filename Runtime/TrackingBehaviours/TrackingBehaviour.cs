@@ -31,7 +31,7 @@ namespace OmiLAXR.TrackingBehaviours
         protected void DisposeAllTrackingEvents()
         {
             // Get all fields of type ITrackingBehaviourEvent
-            var fields = GetOwnTrackingBehaviourEvents();
+            var fields = GetTrackingBehaviourEvents();
 
             foreach (var field in fields)
             {
@@ -48,7 +48,7 @@ namespace OmiLAXR.TrackingBehaviours
             DisposeAllTrackingEvents();
         }
         
-        private FieldInfo[] GetOwnTrackingBehaviourEvents()
+        public FieldInfo[] GetTrackingBehaviourEvents()
         {
             return GetType().GetFields(BindingFlags.Instance | BindingFlags.NonPublic | BindingFlags.Public)
                 .Where(f => typeof(ITrackingBehaviourEvent).IsAssignableFrom(f.FieldType))

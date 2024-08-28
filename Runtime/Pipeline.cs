@@ -18,6 +18,7 @@ namespace OmiLAXR
     [DefaultExecutionOrder(0)]
     public class Pipeline : MonoBehaviour
     {
+        public bool IsRunning => gameObject.activeSelf;
         public Actor actor;
 
         public readonly List<Listener> Listeners = new List<Listener>();
@@ -25,8 +26,10 @@ namespace OmiLAXR
         public readonly List<TrackingBehaviour> TrackingBehaviours = new List<TrackingBehaviour>();
         public readonly List<Filter> Filters = new List<Filter>();
 
-        public readonly Dictionary<string, List<EventInfo>> Actions = new Dictionary<string, List<EventInfo>>();
-        public readonly Dictionary<string, List<EventInfo>> Gestures = new Dictionary<string, List<EventInfo>>();
+        public readonly Dictionary<string, List<ITrackingBehaviourEvent>> Actions = new Dictionary<string, List<ITrackingBehaviourEvent>>();
+        public readonly Dictionary<string, List<ITrackingBehaviourEvent>> Gestures = new Dictionary<string, List<ITrackingBehaviourEvent>>();
+
+        public List<PipelineExtension> Extensions = new List<PipelineExtension>();
         
         public static T GetPipeline<T>() where T : Pipeline
             => FindObjectOfType<T>();
@@ -66,13 +69,19 @@ namespace OmiLAXR
                 Filters.Add(comp as Filter);
             else if (type == typeof(TrackingBehaviour) || type.IsSubclassOf(typeof(TrackingBehaviour)))
                 TrackingBehaviours.Add(comp as TrackingBehaviour);
+            else if (type == typeof(PipelineExtension) || type.IsSubclassOf(typeof(PipelineExtension)))
+                Extensions.Add(comp as PipelineExtension);
+        }
+
+        public void Add(PipelineExtension ext)
+        {
+            ext.Extend(this);
+            Extensions.Add(ext);
         }
         public void Add(Listener listener)
             => Listeners.Add(listener);
-
         public void Add(Filter filter)
             => Filters.Add(filter);
-
         public void Add(TrackingBehaviour trackingBehaviour)
             => TrackingBehaviours.Add(trackingBehaviour);
         
@@ -110,19 +119,20 @@ namespace OmiLAXR
 
             foreach (var ts in tbs)
             {
-                var events = ts.GetType().GetEvents(BindingFlags.Public | BindingFlags.Instance);
+                var properties = ts.GetTrackingBehaviourEvents();
                     
-                foreach (var ev in events)
+                foreach (var p in properties)
                 {
-                    var actionAttrs = ev.GetCustomAttributes<ActionAttribute>();
-                    var gestureAttrs = ev.GetCustomAttributes<GestureAttribute>();
+                    var ev = p.GetValue(ts) as ITrackingBehaviourEvent;
+                    var actionAttrs = p.GetCustomAttributes<ActionAttribute>();
+                    var gestureAttrs = p.GetCustomAttributes<GestureAttribute>();
 
                     foreach (var actionAttr in actionAttrs)
                     {
                         if (Actions.ContainsKey(actionAttr.Name))
                             Actions[actionAttr.Name].Add(ev);
                         else 
-                            Actions.Add(actionAttr.Name, new List<EventInfo>() { ev });
+                            Actions.Add(actionAttr.Name, new List<ITrackingBehaviourEvent>() { ev });
                     }
 
                     foreach (var gestureAttr in gestureAttrs)
@@ -130,7 +140,7 @@ namespace OmiLAXR
                         if (Gestures.ContainsKey(gestureAttr.Name))
                             Gestures[gestureAttr.Name].Add(ev);
                         else 
-                            Gestures.Add(gestureAttr.Name, new List<EventInfo>() { ev });
+                            Gestures.Add(gestureAttr.Name, new List<ITrackingBehaviourEvent>() { ev });
                     }
                 }
             }
@@ -170,6 +180,22 @@ namespace OmiLAXR
         public void StopPipeline()
         {
             gameObject.SetActive(false);
+        }
+
+        public void SetDisabledActions(bool disabled, IEnumerable<string> names = null)
+        {
+            foreach (var pair in Actions.Where(p => names == null || names.Contains(p.Key)))
+            {
+                pair.Value.ForEach(v => v.IsDisabled = disabled);
+            }
+        }
+        
+        public void SetDisabledGestures(bool disabled, IEnumerable<string> names = null)
+        {
+            foreach (var pair in Gestures.Where(p => names == null || names.Contains(p.Key)))
+            {
+                pair.Value.ForEach(v => v.IsDisabled = disabled);
+            }
         }
 
         private void FoundObjects(Object[] objects)

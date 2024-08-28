@@ -5,6 +5,7 @@ using OmiLAXR.Filters;
 using OmiLAXR.Listeners;
 using OmiLAXR.TrackingBehaviours;
 using UnityEngine;
+using UnityEngine.Events;
 using Object = UnityEngine.Object;
 
 namespace OmiLAXR.Tests
@@ -41,10 +42,10 @@ namespace OmiLAXR.Tests
         public class MockTrackingBehaviour : TrackingBehaviour
         {
             [Action("MockAction")]
-            public event Action MockAction;
+            public TrackingBehaviourEvent MockAction;
 
             [Gesture("MockGesture")]
-            public event Action MockGesture;
+            public TrackingBehaviourEvent MockGesture;
 
             protected override void AfterFilteredObjects(Object[] objects)
             {

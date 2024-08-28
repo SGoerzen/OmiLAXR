@@ -38,18 +38,13 @@ namespace OmiLAXR.Tests.Attributes
         {
             // Arrange
             var fieldInfo = typeof(MockClass).GetField("TestField");
-            var eventInfo = typeof(MockClass).GetEvent("TestEvent");
 
             // Act
             var fieldAttribute = (ActionAttribute)Attribute.GetCustomAttribute(fieldInfo, typeof(ActionAttribute));
-            var eventAttribute = (ActionAttribute)Attribute.GetCustomAttribute(eventInfo, typeof(ActionAttribute));
 
             // Assert
             Assert.IsNotNull(fieldAttribute);
             Assert.AreEqual("FieldAction", fieldAttribute.Name);
-
-            Assert.IsNotNull(eventAttribute);
-            Assert.AreEqual("EventAction", eventAttribute.Name);
         }
 
         // Mock class to demonstrate the usage of ActionAttribute
@@ -57,9 +52,6 @@ namespace OmiLAXR.Tests.Attributes
         {
             [Action("FieldAction")]
             public string TestField;
-
-            [Action("EventAction")]
-            public event Action TestEvent;
 
             [Action("Action1")]
             [Action("Action2")]

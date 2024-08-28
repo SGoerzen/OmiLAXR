@@ -38,18 +38,13 @@ namespace OmiLAXR.Tests.Attributes
         {
             // Arrange
             var fieldInfo = typeof(MockClass).GetField("TestField");
-            var eventInfo = typeof(MockClass).GetEvent("TestEvent");
 
             // Act
             var fieldAttribute = (GestureAttribute)Attribute.GetCustomAttribute(fieldInfo, typeof(GestureAttribute));
-            var eventAttribute = (GestureAttribute)Attribute.GetCustomAttribute(eventInfo, typeof(GestureAttribute));
 
             // Assert
             Assert.IsNotNull(fieldAttribute);
             Assert.AreEqual("FieldGesture", fieldAttribute.Name);
-
-            Assert.IsNotNull(eventAttribute);
-            Assert.AreEqual("EventGesture", eventAttribute.Name);
         }
 
         // Mock class to demonstrate the usage of GestureAttribute
@@ -57,9 +52,6 @@ namespace OmiLAXR.Tests.Attributes
         {
             [Gesture("FieldGesture")]
             public string TestField;
-
-            [Gesture("EventGesture")]
-            public event Action TestEvent;
 
             [Gesture("Gesture1")]
             [Gesture("Gesture2")]

@@ -39,16 +39,9 @@ namespace OmiLAXR.Tests
             public void TestAwake() => Awake();
         }
 
-        public class MockPipelineExtension : PipelineExtension<MockPipeline>
+        public class MockPipelineExtension : PipelineExtension
         {
-            protected override PipelineComponent[] OnExtend()
-            {
-                return new PipelineComponent[]
-                {
-                    gameObject.AddComponent<MockFilter>(),
-                    gameObject.AddComponent<MockListener>()
-                };
-            }
+            
         }
         
         private GameObject _pipelineObject;
@@ -63,8 +56,13 @@ namespace OmiLAXR.Tests
             _pipelineExtObject = new GameObject("Pipeline Extension");
             _pipeline = _pipelineObject.AddComponent<MockPipeline>();
             _pipelineObject.AddComponent<Actor>();
+            
             _pipelineExtension = _pipelineExtObject.AddComponent<MockPipelineExtension>();
+            _pipelineExtension.gameObject.AddComponent<MockFilter>();
+            _pipelineExtension.gameObject.AddComponent<MockListener>();
 
+            _pipeline.Add(_pipelineExtension);
+            
             // Trigger the Awake method manually for testing
             _pipeline.TestAwake();
         }
@@ -80,8 +78,8 @@ namespace OmiLAXR.Tests
         public void PipelineExtension_Tests_Awake_ShouldFindPipelineAndRegisterExtensions()
         {
             // Assert
-            Assert.IsNotNull(_pipelineExtension.GetPipeline());
-            Assert.AreEqual(_pipeline, _pipelineExtension.GetPipeline());
+            Assert.IsNotNull(_pipelineExtension.Pipeline);
+            Assert.AreEqual(_pipeline, _pipelineExtension.Pipeline);
             
             var extensions = _pipeline.GetComponents<Extension>();
             var mockFilter = _pipelineExtension.GetComponent(typeof(MockFilter));

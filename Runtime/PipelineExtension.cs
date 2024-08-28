@@ -1,3 +1,5 @@
+using System;
+using System.Linq;
 using OmiLAXR.Extensions;
 using OmiLAXR.Listeners;
 using OmiLAXR.Filters;
@@ -7,39 +9,28 @@ using UnityEngine;
 namespace OmiLAXR
 {
     [DefaultExecutionOrder(-1)]
-    public abstract class PipelineExtension<T> : PipelineComponent, IPipelineExtension
-    where T : Pipeline
+    public abstract class PipelineExtension : PipelineComponent
     {
-        protected T Pipeline;
-        protected void Awake()
+        public Pipeline Pipeline { get; private set; }
+        public void Extend(Pipeline pipeline)
         {
-            Pipeline = FindObjectOfType<T>(true);
-            Pipeline.OnCollect += pipeline =>
+            var listeners = gameObject.GetComponentsInChildren<Listener>();
+            var tbs = gameObject.GetComponentsInChildren<TrackingBehaviour>();
+            var filters = gameObject.GetComponentsInChildren<Filter>();
+            var extensions = Array.Empty<PipelineComponent>();
+            extensions = extensions.Concat(listeners).Concat(tbs).Concat(filters).ToArray();
+            foreach (var ext in extensions)
             {
-                var extensions = OnExtend();
-                foreach (var ext in extensions)
-                {
-                    // add to lists
-                    pipeline.Add(ext);
-                    // register in pipeline, just fyi
-                    var extWrapper = pipeline.gameObject.AddComponent<Extension>();
-                    extWrapper.extensionComponent = ext;
-                    extWrapper.pipelineExtension = this;
-                }    
-            }; 
-            DebugLog.OmiLAXR.Print("Extended pipeline " + typeof(T));
+                // register in pipeline, just fyi
+                var extWrapper = pipeline.gameObject.AddComponent<Extension>();
+                extWrapper.extensionComponent = ext;
+                extWrapper.pipelineExtension = this;
+                pipeline.Add(ext);
+            }
+
+            Pipeline = pipeline;
+            DebugLog.OmiLAXR.Print("Extended pipeline " + pipeline);
         }
-
-        protected void Add(Listener listener)
-            => Pipeline.Add(listener);
-
-        protected void Add(Filter filter)
-            => Pipeline.Add(filter);
-
-        protected void Add(TrackingBehaviour trackingBehaviour)
-            => Pipeline.Add(trackingBehaviour);
-
-        protected abstract PipelineComponent[] OnExtend();
-        public Pipeline GetPipeline() => Pipeline;
+        
     }
 }
