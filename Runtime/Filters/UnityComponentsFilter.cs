@@ -1,17 +1,21 @@
 using System;
 using System.Linq;
+using OmiLAXR.Filters;
 using TMPro;
 using UnityEngine;
 using UnityEngine.EventSystems;
 using Object = UnityEngine.Object;
 
-namespace OmiLAXR.Filters
+namespace OmiLAXR.Tests.Filters
 {
     [AddComponentMenu("OmiLAXR / 2) Filters / Unity Components Filter")]
     public class UnityComponentsFilter : Filter
     {
         private static readonly Type[] ForbiddenTypes = new []
         {
+            typeof(PipelineComponent),
+            typeof(Pipeline),
+            typeof(Light),
             typeof(EventSystem),
             typeof(StandaloneInputModule),
             typeof(Canvas),
@@ -24,7 +28,9 @@ namespace OmiLAXR.Filters
         }
 
         public static bool IsAllowedType(Type type)
-            => !ForbiddenTypes.Contains(type);
+        {
+            return !ForbiddenTypes.Any(t => type == t || type.IsSubclassOf(t));
+        }
 
         public static bool IsAllowedObject(Object obj)
         {
@@ -39,8 +45,7 @@ namespace OmiLAXR.Filters
                 return false;
             
             var components = go.GetComponents<Component>();
-            return components.Any(c => IsAllowedType(c.GetType()));
-
+            return components.All(c => c != null && IsAllowedType(c.GetType()));
         }
     }
 }

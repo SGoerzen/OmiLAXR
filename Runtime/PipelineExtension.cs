@@ -31,13 +31,13 @@ namespace OmiLAXR
         }
 
         protected void Add(Listener listener)
-            => this.Pipeline.Add(listener);
+            => Pipeline.Add(listener);
 
         protected void Add(Filter filter)
-            => this.Pipeline.Add(filter);
+            => Pipeline.Add(filter);
 
         protected void Add(TrackingBehaviour trackingBehaviour)
-            => this.Pipeline.Add(trackingBehaviour);
+            => Pipeline.Add(trackingBehaviour);
 
         protected abstract PipelineComponent[] OnExtend();
         public Pipeline GetPipeline() => Pipeline;

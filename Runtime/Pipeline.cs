@@ -97,7 +97,7 @@ namespace OmiLAXR
             
             OnCollect?.Invoke(this);
             
-            DebugLog.OmiLAXR.Print($"Initialized Pipeline {name} with {Listeners.Count} listeners, {Filters.Count} filters, {composersCount} composers, {hooksCount} hooks and {DataProviders.Count} data providers" );
+            Log($"Initialized with {Listeners.Count} listeners, {Filters.Count} filters, {composersCount} composers, {hooksCount} hooks and {DataProviders.Count} data providers" );
             
             AfterInit?.Invoke(this);
         }
@@ -140,6 +140,7 @@ namespace OmiLAXR
         private void OnEnable()
         {
             CollectGesturesAndActions();
+            trackingObjects.Clear();
 
             // 1) Start listening for events
             foreach (var listener in Listeners.Where(l => l.enabled))
@@ -177,7 +178,6 @@ namespace OmiLAXR
             objects = Filters.Where(f => f.enabled).Aggregate(objects, (gos, filter) => filter.Pass(gos));
             AfterFilteredObjects?.Invoke(objects);
             
-            trackingObjects.Clear();
             trackingObjects.AddRange(objects);
         }
 
