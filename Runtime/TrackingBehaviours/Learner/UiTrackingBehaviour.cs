@@ -14,6 +14,10 @@ namespace OmiLAXR.TrackingBehaviours.Learner
         public TrackingBehaviourEvent<Slider, float> OnChangedSlider =
             new TrackingBehaviourEvent<Slider, float>();
         
+        [Gesture("UI"), Action("Change")]
+        public TrackingBehaviourEvent<Dropdown, int> OnChangedDropdown =
+            new TrackingBehaviourEvent<Dropdown, int>();
+        
         protected override void AfterFilteredObjects(Object[] objects)
         {
             var selectables = Select<Selectable>(objects);
@@ -36,6 +40,13 @@ namespace OmiLAXR.TrackingBehaviours.Learner
                     OnChangedSlider.Bind(slider.onValueChanged, value =>
                     {
                         OnChangedSlider.Invoke(this, slider, value);
+                    });
+                } else if (type == typeof(Dropdown))
+                {
+                    var dropdown = (Dropdown)selectable;
+                    OnChangedDropdown.Bind(dropdown.onValueChanged, value =>
+                    {
+                        OnChangedDropdown.Invoke(this, dropdown, value);
                     });
                 }
             }
