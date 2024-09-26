@@ -74,6 +74,9 @@ PrefabInstance:
       addedObject: {fileID: 8213776949877144091}
     - targetCorrespondingSourceObject: {fileID: 3854916294279326203, guid: 3406909dc7d1f436c8728e682dd9f930, type: 3}
       insertIndex: -1
+      addedObject: {fileID: 3812673878226825099}
+    - targetCorrespondingSourceObject: {fileID: 3854916294279326203, guid: 3406909dc7d1f436c8728e682dd9f930, type: 3}
+      insertIndex: -1
       addedObject: {fileID: 8088093857528866451}
   m_SourcePrefab: {fileID: 100100000, guid: 3406909dc7d1f436c8728e682dd9f930, type: 3}
 --- !u!1 &1979082838932935360 stripped
@@ -124,6 +127,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   actor: {fileID: 4928581912976695948}
+  Extensions: []
 --- !u!1 &4149237911242758892 stripped
 GameObject:
   m_CorrespondingSourceObject: {fileID: 4770899615232931255, guid: 3406909dc7d1f436c8728e682dd9f930, type: 3}
@@ -172,6 +176,18 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   movementThreshold: 3
   mouseWheelThreshold: 0.5
+--- !u!114 &3812673878226825099
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 5683481138607589024}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 09ee261f8e2341dcb702d4a037e4c5b1, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!114 &8088093857528866451
 MonoBehaviour:
   m_ObjectHideFlags: 0
