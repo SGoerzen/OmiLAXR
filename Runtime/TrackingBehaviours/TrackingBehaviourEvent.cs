@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using UnityEngine;
 using UnityEngine.Events;
 
 namespace OmiLAXR.TrackingBehaviours
@@ -79,25 +80,25 @@ namespace OmiLAXR.TrackingBehaviours
             _unityBinds.Clear();
         }
     }
-    public class TrackingBehaviourEvent<TSender> : ITrackingBehaviourEvent
+    public class TrackingBehaviourEvent<T> : ITrackingBehaviourEvent
     {
-        public readonly List<TrackingBehaviourAction<TSender>> Actions = new List<TrackingBehaviourAction<TSender>>();
-        public event TrackingBehaviourAction<TSender> Action;
+        public readonly List<TrackingBehaviourAction<T>> Actions = new List<TrackingBehaviourAction<T>>();
+        public event TrackingBehaviourAction<T> Action;
         private Dictionary<UnityEvent, UnityAction> _unityBinds =
             new Dictionary<UnityEvent, UnityAction>();
         public bool IsDisabled { get; set; } = false;
 
-        public void AddHandler(TrackingBehaviourAction<TSender> action)
+        public void AddHandler(TrackingBehaviourAction<T> action)
         {
             Action += action;
             Actions.Add(action);
         }
 
-        public void Invoke(TrackingBehaviour owner, TSender sender)
+        public void Invoke(TrackingBehaviour owner, T arg)
         {
             if (IsDisabled)
                 return;
-            Action?.Invoke(owner, sender);
+            Action?.Invoke(owner, arg);
         }
 
         public void ClearActions()
