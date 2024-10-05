@@ -11,13 +11,13 @@ namespace OmiLAXR.Endpoints
         [Header("Name of file that is located in Assets folder (data path).")]
         public string filename = "credentials.json";
 
-        public Endpoint targetEndpoint;
+        public BasicAuthEndpoint targetEndpoint;
         
         private void OnEnable()
         {
             if (!targetEndpoint)
             {
-                targetEndpoint = GetComponent<Endpoint>();
+                targetEndpoint = GetComponent<BasicAuthEndpoint>();
             }
             LoadConfig();
         }

@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using System.ComponentModel;
 using OmiLAXR.Composers;
@@ -16,8 +17,6 @@ namespace OmiLAXR.Endpoints
         
         private BackgroundWorker _sendWorker;
         private readonly Queue<IStatement> _queuedStatements = new Queue<IStatement>();
-        
-        public BasicAuthCredentials credentials = new BasicAuthCredentials("https://lrs.elearn.rwth-aachen.de/data/xAPI", "", "");
         
         private void SendWorkerOnDoWork(object sender, DoWorkEventArgs e)
         {
@@ -41,6 +40,8 @@ namespace OmiLAXR.Endpoints
                         StopSending();
                         break;
                     case TransferCode.Error:
+                        break;
+                    default:
                         break;
                 }
                 
@@ -105,12 +106,8 @@ namespace OmiLAXR.Endpoints
 
         protected abstract TransferCode HandleSending(IStatement statement);
         
-        private TransferCode TransferStatement()
+        protected virtual TransferCode TransferStatement()
         {
-            // Check credentials
-            if (!credentials.IsValid)
-                return TransferCode.InvalidCredentials;
-            
             lock (_queuedStatements)
             {
                 if (_queuedStatements.Count < 1)
