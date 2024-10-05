@@ -1,3 +1,4 @@
+#if UNITY_EDITOR
 using UnityEditor;
 
 namespace OmiLAXR.Editor
@@ -9,3 +10,4 @@ namespace OmiLAXR.Editor
         private static void CreateNewPipeline() {}
     }
 }
+#endif
