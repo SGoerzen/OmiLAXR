@@ -11,11 +11,14 @@ namespace OmiLAXR.Endpoints
         [Header("Name of file that is located in Assets folder (data path).")]
         public string filename = "credentials.json";
 
-        private Endpoint _endpoint;
+        public Endpoint targetEndpoint;
         
         private void OnEnable()
         {
-            _endpoint = GetComponent<Endpoint>();
+            if (!targetEndpoint)
+            {
+                targetEndpoint = GetComponent<Endpoint>();
+            }
             LoadConfig();
         }
 
@@ -33,7 +36,7 @@ namespace OmiLAXR.Endpoints
                 var jsonContent = File.ReadAllText(filePath);
                 var credentials = JsonUtility.FromJson<BasicAuthCredentials>(jsonContent);
 
-                _endpoint.credentials = credentials;
+                targetEndpoint.credentials = credentials;
 
                 Debug.Log($"Loaded '{filename}' successfully.");
             }
