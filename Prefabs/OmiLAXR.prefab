@@ -9,6 +9,8 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 3220772463875552635}
+  - component: {fileID: 2862706625674710629}
+  - component: {fileID: 5142120668608055721}
   m_Layer: 0
   m_Name: OmiLAXR
   m_TagString: Untagged
@@ -33,6 +35,31 @@ Transform:
   - {fileID: 4909313547908966288}
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &2862706625674710629
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 4849332239243691096}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 61071fa4e6df43d19149041224245020, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  language: 2
+--- !u!114 &5142120668608055721
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 4849332239243691096}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: fea6349409d342408a3873dcb2321330, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!1001 &680444189854626026
 PrefabInstance:
   m_ObjectHideFlags: 0
