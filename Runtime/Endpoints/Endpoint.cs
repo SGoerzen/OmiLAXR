@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.ComponentModel;
 using OmiLAXR.Composers;
@@ -12,11 +13,12 @@ namespace OmiLAXR.Endpoints
         public EndpointAction onPausedSending;
         public EndpointAction<IStatement> onSentStatement;
         public EndpointAction<IStatement> onFailedSendingStatement;
-
-        private bool _isSending;
+        
+        public bool IsSending { get; private set; }
+        public bool IsTransferring { get; private set; }
         
         private BackgroundWorker _sendWorker;
-        private readonly Queue<IStatement> _queuedStatements = new Queue<IStatement>();
+        private readonly ConcurrentQueue<IStatement> _queuedStatements = new ConcurrentQueue<IStatement>();
         
         private void SendWorkerOnDoWork(object sender, DoWorkEventArgs e)
         {
@@ -41,6 +43,8 @@ namespace OmiLAXR.Endpoints
                         break;
                     case TransferCode.Error:
                         break;
+                    case TransferCode.Busy:
+                        break;
                     default:
                         break;
                 }
@@ -52,7 +56,7 @@ namespace OmiLAXR.Endpoints
         public void StartSending()
         {
             // Reset tracking time
-            _isSending = true;
+            IsSending = true;
 
             _sendWorker = new BackgroundWorker();
             _sendWorker.DoWork += SendWorkerOnDoWork;
@@ -63,7 +67,7 @@ namespace OmiLAXR.Endpoints
 
         public void PauseSending()
         {
-            _isSending = false;
+            IsSending = false;
             _sendWorker.CancelAsync();
             onPausedSending.Invoke(this);
         }
@@ -77,7 +81,7 @@ namespace OmiLAXR.Endpoints
                 _sendWorker = null;
             }
 
-            _isSending = false;
+            IsSending = false;
             onStoppedSending?.Invoke(this);
         }
 
@@ -98,38 +102,32 @@ namespace OmiLAXR.Endpoints
 
         public virtual void SendStatement(IStatement statement)
         {
-            lock (_queuedStatements)
-            {
-                _queuedStatements.Enqueue(statement);
-            }
+            _queuedStatements.Enqueue(statement);
         }
 
         protected abstract TransferCode HandleSending(IStatement statement);
         
         protected virtual TransferCode TransferStatement()
         {
-            lock (_queuedStatements)
+            if (!_queuedStatements.TryDequeue(out var statement))
+                return TransferCode.NoStatements;
+
+            IsTransferring = true;
+            var result = HandleSending(statement);
+            IsTransferring = false;
+            
+            if (result != TransferCode.Success)
             {
-                if (_queuedStatements.Count < 1)
-                    return TransferCode.NoStatements;
-
-                var statement = _queuedStatements.Dequeue();
-
-                var result = HandleSending(statement);
-
-                if (result != TransferCode.Success)
-                {
-                    onFailedSendingStatement?.Invoke(this, statement);
-                    // enqueue again
-                    _queuedStatements.Enqueue(statement);
-                }
-                else
-                {
-                    onSentStatement?.Invoke(this, statement);
-                }
-
-                return result;
+                onFailedSendingStatement?.Invoke(this, statement);
+                // enqueue again
+                _queuedStatements.Enqueue(statement);
             }
+            else
+            {
+                onSentStatement?.Invoke(this, statement);
+            }
+
+            return result;
         }
 
     }
