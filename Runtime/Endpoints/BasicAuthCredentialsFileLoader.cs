@@ -24,12 +24,7 @@ namespace OmiLAXR.Endpoints
 
         private void LoadConfig()
         {
-            string filePath;
-#if UNITY_EDITOR
-            filePath = Path.Combine(Application.dataPath, filename);
-#else
-            filePath = Path.Combine(Application.dataPath, "../" + filename);
-#endif
+            var filePath = Path.Combine(Application.streamingAssetsPath, filename);
 
             if (File.Exists(filePath))
             {
