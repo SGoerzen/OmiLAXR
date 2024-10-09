@@ -22,5 +22,10 @@ namespace OmiLAXR.Endpoints
         public bool IsValid => !string.IsNullOrEmpty(endpoint) 
                                && !string.IsNullOrEmpty(username) 
                                && !string.IsNullOrEmpty(password);
+
+        public override string ToString()
+        {
+            return $"[BasicAuthCredentials endpoint={endpoint}, username={username}, password={password}]";
+        }
     }
 }

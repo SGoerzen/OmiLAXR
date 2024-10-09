@@ -55,6 +55,9 @@ namespace OmiLAXR.Endpoints
 
         public void StartSending()
         {
+            if (IsSending)
+                return;
+            
             // Reset tracking time
             IsSending = true;
 
@@ -67,6 +70,8 @@ namespace OmiLAXR.Endpoints
 
         public void PauseSending()
         {
+            if (!IsSending)
+                return;
             IsSending = false;
             _sendWorker.CancelAsync();
             onPausedSending.Invoke(this);
@@ -74,6 +79,9 @@ namespace OmiLAXR.Endpoints
 
         public void StopSending()
         {
+            if (!IsSending)
+                return;
+            
             if (_sendWorker != null)
             {
                 _sendWorker.CancelAsync();
@@ -85,12 +93,12 @@ namespace OmiLAXR.Endpoints
             onStoppedSending?.Invoke(this);
         }
 
-        private void OnEnable()
+        protected virtual void OnEnable()
         {
             StartSending();
         }
         
-        private void OnDisable()
+        protected virtual void OnDisable()
         {
             StopSending();
         }
