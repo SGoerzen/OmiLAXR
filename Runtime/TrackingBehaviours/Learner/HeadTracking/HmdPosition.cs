@@ -15,14 +15,6 @@ namespace OmiLAXR.TrackingBehaviours.Learner
         private HmdPosition()
         {
             _mMainCamera = Camera.main;
-            try
-            {
-                
-            }
-            catch (Exception e)
-            {
-                _mMainCamera = null;
-            }
         }
         public static HmdPosition SharedInstance => _instance ??= new HmdPosition();
 
