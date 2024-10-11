@@ -1,25 +1,45 @@
-using System;
 using OmiLAXR.TrackingBehaviours;
 using UnityEngine;
 
 namespace OmiLAXR.Composers
 {
-    public abstract class Composer : PipelineComponent
+    public interface IComposer
     {
+        event ComposerAction<IStatement> AfterComposed;
+        bool IsHigherComposer { get; }
+        bool IsEnabled { get; }
+        Author GetAuthor();
+    }
+
+    public abstract class Composer<T> : PipelineComponent, IComposer
+        where T : TrackingBehaviour
+    {
+        [HideInInspector] public T trackingBehaviour;
+
         private void OnEnable()
         {
-            
         }
-        
-        protected abstract Author GetAuthor();
+
+        public bool IsEnabled => enabled;
+
+        public abstract Author GetAuthor();
         public virtual bool IsHigherComposer => false;
         public event ComposerAction<IStatement> AfterComposed;
-        protected static T GetTrackingBehaviour<T>(bool includeInactive = false) where T : TrackingBehaviour => FindObjectOfType<T>(includeInactive);
-        protected static T GetPipeline<T>() where T : Pipeline => FindObjectOfType<T>(true);
-        
+
+        protected static TB GetTrackingBehaviour<TB>(bool includeInactive = false)
+            where TB : TrackingBehaviour => FindObjectOfType<TB>(includeInactive);
+
         protected void SendStatement(IStatement statement)
         {
             AfterComposed?.Invoke(this, statement);
         }
+
+        protected virtual void Awake()
+        {
+            trackingBehaviour = GetTrackingBehaviour<T>(true);
+            Compose(trackingBehaviour);
+        }
+
+        protected abstract void Compose(T tb);
     }
 }

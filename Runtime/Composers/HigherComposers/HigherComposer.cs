@@ -1,13 +1,14 @@
-using System;
 using System.Collections.Generic;
 using System.Linq;
 
 namespace OmiLAXR.Composers.HigherComposers
 {
-    public abstract class HigherComposer<T> : Composer
+    public abstract class HigherComposer<T> : PipelineComponent, IComposer
         where T : IStatement
     {
         protected abstract Dictionary<string, MatchCondition<T>> Conditions();
+        protected static TP GetPipeline<TP>()
+            where TP : Pipeline => FindObjectOfType<TP>(true);
         
         protected struct MatchCondition<T0>
             where T0 : IStatement
@@ -33,7 +34,11 @@ namespace OmiLAXR.Composers.HigherComposers
             }
             
         }
-        public override bool IsHigherComposer => true;
+
+        public event ComposerAction<IStatement> AfterComposed;
+        public bool IsHigherComposer => true;
+        public bool IsEnabled => enabled;
+        public abstract Author GetAuthor();
 
         public void LookFor(IStatement statement)
         {
