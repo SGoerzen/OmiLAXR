@@ -12,7 +12,7 @@ namespace OmiLAXR
     [DefaultExecutionOrder(-1)]
     public class DataProvider : MonoBehaviour
     {
-        public readonly List<Composer> Composers = new List<Composer>();
+        public readonly List<IComposer> Composers = new List<IComposer>();
 
         public readonly List<HigherComposer<IStatement>> HigherComposers =
             new List<HigherComposer<IStatement>>();
@@ -20,17 +20,18 @@ namespace OmiLAXR
         public readonly List<Hook> Hooks = new List<Hook>();
         public readonly List<Endpoint> Endpoints = new List<Endpoint>();   
         
-        public T GetComposer<T>() where T : Composer
-            => Composers.OfType<T>().Select(composer => composer as T).FirstOrDefault();
+        public T GetComposer<T>() where T : IComposer
+            => Composers.OfType<T>().FirstOrDefault();
         
         protected virtual void Awake()
         {
             // Find available composers
-            var composers = GetComponentsInChildren<Composer>().Where(c => c.enabled);
+            var composers = GetComponentsInChildren<IComposer>().Where(c => c.IsEnabled);
             Composers.AddRange(composers);
             
             // Find available higher composers
-            HigherComposers.AddRange(Composers.Where(c => c.IsHigherComposer).Select(c => c as HigherComposer<IStatement>));
+            HigherComposers.AddRange(Composers.Where(c => c.IsHigherComposer)
+                .Select(c => c as HigherComposer<IStatement>));
             
             // Find available hooks
             Hooks.AddRange(GetComponentsInChildren<Hook>().Where(c => c.enabled));
@@ -48,7 +49,7 @@ namespace OmiLAXR
             }
         }
 
-        private void HandleStatement(Composer sender, IStatement statement)
+        private void HandleStatement(IComposer sender, IStatement statement)
         {
             // 4.1) Start listening for higher composers
             foreach (var composer in HigherComposers)
@@ -56,12 +57,16 @@ namespace OmiLAXR
                 composer.LookFor(statement);   
             }
             
+            Debug.Log(statement, this);
+            
             foreach (var hook in Hooks.Where(hook => hook.enabled))
             {
                 statement = hook.AfterCompose(statement);
                 if (statement.IsDiscarded())
                     return;
             }
+            
+            Debug.Log(statement, this);
 
             foreach (var dp in Endpoints)
             {

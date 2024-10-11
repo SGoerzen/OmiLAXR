@@ -95,7 +95,7 @@ namespace OmiLAXR
         protected void Awake()
         {
             if (actor == null)
-                actor = GetComponent<Actor>();
+                actor = FindActor();
             
             TrackingBehaviours.AddRange(GetComponentsInChildren<TrackingBehaviour>());
             

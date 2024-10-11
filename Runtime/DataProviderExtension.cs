@@ -17,7 +17,7 @@ namespace OmiLAXR
             DebugLog.OmiLAXR.Print("Extended data provider " + typeof(T));
         }
 
-        protected void Add(Composer composer)  
+        protected void Add(IComposer composer)  
             => this.DataProvider.Composers.Add(composer);
         
         protected void Add(Hook hook)
