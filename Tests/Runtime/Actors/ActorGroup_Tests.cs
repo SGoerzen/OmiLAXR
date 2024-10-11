@@ -28,8 +28,8 @@ namespace OmiLAXR.Tests.Actors
         public void ActorGroup_Tests_Has_Default_Values()
         {
             // Assert
-            Assert.AreEqual("Group", _actorGroup.groupName);
-            Assert.AreEqual("group@omilaxr.dev", _actorGroup.groupEmail);
+            Assert.AreEqual("Group", _actorGroup.actorName);
+            Assert.AreEqual("group@omilaxr.dev", _actorGroup.actorEmail);
             Assert.IsEmpty(_actorGroup.GetMembers());  // By default, the members array should be null
         }
 
@@ -37,11 +37,9 @@ namespace OmiLAXR.Tests.Actors
         public void ActorGroup_Tests_Can_Set_Members()
         {
             // Arrange
-            var member1 = new GameObject("Member1").AddComponent<Actor>();
-            var member2 = new GameObject("Member2").AddComponent<Actor>();
-
-            _actorGroup.AddMembers(member1, member2);
-
+            var member1 = _actorGroup.gameObject.AddComponent<Actor>();
+            var member2 = _actorGroup.gameObject.AddComponent<Actor>();
+            
             var members = _actorGroup.GetMembers();
             Array.Sort(members, (actor, actor1) => string.CompareOrdinal(actor.actorName, actor1.actorName));
 
@@ -55,12 +53,12 @@ namespace OmiLAXR.Tests.Actors
         public void ActorGroup_Tests_Can_Set_ActorName_And_Email()
         {
             // Act
-            _actorGroup.groupName = "Test Group Name";
-            _actorGroup.groupEmail = "testgroup@example.com";
+            _actorGroup.actorName = "Test Group Name";
+            _actorGroup.actorEmail = "testgroup@example.com";
 
             // Assert
-            Assert.AreEqual("Test Group Name", _actorGroup.groupName);
-            Assert.AreEqual("testgroup@example.com", _actorGroup.groupEmail);
+            Assert.AreEqual("Test Group Name", _actorGroup.actorName);
+            Assert.AreEqual("testgroup@example.com", _actorGroup.actorEmail);
         }
 
         [Test]
@@ -78,12 +76,12 @@ namespace OmiLAXR.Tests.Actors
         public void ActorGroup_Tests_ActorGroup_Inherits_Actor_Properties()
         {
             // Act
-            _actorGroup.groupName = "Group Name";
-            _actorGroup.groupEmail = "group@example.com";
+            _actorGroup.actorName = "Group Name";
+            _actorGroup.actorEmail = "group@example.com";
 
             // Assert
-            Assert.AreEqual("Group Name", _actorGroup.groupName);
-            Assert.AreEqual("group@example.com", _actorGroup.groupEmail);
+            Assert.AreEqual("Group Name", _actorGroup.actorName);
+            Assert.AreEqual("group@example.com", _actorGroup.actorEmail);
         }
     }
 }

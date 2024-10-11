@@ -85,6 +85,12 @@ namespace OmiLAXR
             => Filters.Add(filter);
         public void Add(TrackingBehaviour trackingBehaviour)
             => TrackingBehaviours.Add(trackingBehaviour);
+
+        private Actor FindActor()
+        {
+            var actorGroup = GetComponent<ActorGroup>();
+            return actorGroup ?? GetComponent<Actor>();
+        }
         
         protected void Awake()
         {

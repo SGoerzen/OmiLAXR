@@ -4,23 +4,18 @@ using UnityEngine;
 namespace OmiLAXR
 {
     [AddComponentMenu("OmiLAXR / Actors / Actor Group")]
-    public class ActorGroup : PipelineComponent
+    [RequireComponent(typeof(Actor))]
+    public class ActorGroup : Actor
     {
-        public string groupName = "Group";
-        public string groupEmail = "group@omilaxr.dev";
-        
-        public Actor[] GetMembers() => FindObjectsByType<Actor>(FindObjectsSortMode.InstanceID)
-            .Where(actor => this.Equals(actor.group)).ToArray();
+        public Actor[] GetMembers() => GetComponents<Actor>()
+            .Where(a => a.GetType() != typeof(ActorGroup)).ToArray();
 
-        public void AddMember(Actor actor)
-        {
-            actor.group = this;
-        }
+        public override bool IsGroup => true;
 
-        public void AddMembers(params Actor[] actors)
+        private void Reset()
         {
-            foreach (var a in actors)
-                a.group = this;
+            actorName = "Group";
+            actorEmail = "group@omilaxr.dev";
         }
     }
 }
