@@ -2,7 +2,7 @@ using UnityEngine;
 
 namespace OmiLAXR
 {
-    [AddComponentMenu("OmiLAXR / Custom Tracking Name")]
+    [AddComponentMenu("OmiLAXR / Game Objects / Custom Tracking Name")]
     public class CustomTrackingName : MonoBehaviour
     {
         [Tooltip("Alternative tracking name.")]

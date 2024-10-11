@@ -2,7 +2,7 @@ using UnityEngine;
 
 namespace OmiLAXR
 {
-    [AddComponentMenu("OmiLAXR / 0) Pipelines / Actor")]
+    [AddComponentMenu("OmiLAXR / Actors / Actor")]
     public class Actor : PipelineComponent
     {
         public ActorGroup group;

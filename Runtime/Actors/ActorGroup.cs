@@ -3,7 +3,7 @@ using UnityEngine;
 
 namespace OmiLAXR
 {
-    [AddComponentMenu("OmiLAXR / 0) Pipelines / Actor Group")]
+    [AddComponentMenu("OmiLAXR / Actors / Actor Group")]
     public class ActorGroup : PipelineComponent
     {
         public string groupName = "Group";

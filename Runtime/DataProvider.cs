@@ -8,7 +8,7 @@ using UnityEngine;
 
 namespace OmiLAXR
 {
-    [AddComponentMenu("OmiLAXR / 0) Pipelines / Data Provider")]
+    [AddComponentMenu("OmiLAXR / 0) Data Providers / Data Provider")]
     [DefaultExecutionOrder(-1)]
     public class DataProvider : MonoBehaviour
     {
