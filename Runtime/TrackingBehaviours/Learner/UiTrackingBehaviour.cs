@@ -2,6 +2,7 @@ using System;
 using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
+using Action = Unity.Plastic.Antlr3.Runtime.Misc.Action;
 using Object = UnityEngine.Object;
 
 namespace OmiLAXR.TrackingBehaviours.Learner
@@ -23,6 +24,9 @@ namespace OmiLAXR.TrackingBehaviours.Learner
 
         [Gesture("UI"), Action("Change")] public TrackingBehaviourEvent<Selectable, string> OnChangedInputField =
             new TrackingBehaviourEvent<Selectable, string>();
+
+        [Gesture("UI"), Action("Change")] public TrackingBehaviourEvent<Scrollbar, float> OnChangedScrollbar =
+            new TrackingBehaviourEvent<Scrollbar, float>();
 
         protected override void AfterFilteredObjects(Object[] objects)
         {
@@ -66,6 +70,12 @@ namespace OmiLAXR.TrackingBehaviours.Learner
                     var inputField = (TMP_InputField)selectable;
                     OnChangedInputField.Bind(inputField.onValueChanged,
                         value => { OnChangedInputField.Invoke(this, inputField, value); });
+                }
+                else if (type == typeof(Scrollbar))
+                {
+                    var scrollbar = (Scrollbar)selectable;
+                    OnChangedScrollbar.Bind(scrollbar.onValueChanged,
+                        value => { OnChangedScrollbar.Invoke(this, scrollbar, value); });
                 }
             }
         }
