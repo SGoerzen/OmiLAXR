@@ -18,7 +18,7 @@ namespace OmiLAXR.Context
         private static PlatformInformation _instance;
         public static PlatformInformation Instance
             => _instance ??= FindObjectOfType<PlatformInformation>();
-        private const string OmiLAXR_Version = "2.0.6";
+        private const string OmiLAXR_Version = "2.0.7";
 
         // This will store the value in the inspector
         [SerializeField] 
