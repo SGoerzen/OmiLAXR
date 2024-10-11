@@ -1,8 +1,8 @@
-using System;
+using System.Collections.Generic;
+using System.Linq;
 using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
-using Action = Unity.Plastic.Antlr3.Runtime.Misc.Action;
 using Object = UnityEngine.Object;
 
 namespace OmiLAXR.TrackingBehaviours.Learner
@@ -16,8 +16,9 @@ namespace OmiLAXR.TrackingBehaviours.Learner
         [Gesture("UI"), Action("Change")] public TrackingBehaviourEvent<Slider, float> OnChangedSlider =
             new TrackingBehaviourEvent<Slider, float>();
 
-        [Gesture("UI"), Action("Change")] public TrackingBehaviourEvent<Dropdown, int> OnChangedDropdown =
-            new TrackingBehaviourEvent<Dropdown, int>();
+        [Gesture("UI"), Action("Change")]
+        public TrackingBehaviourEvent<Selectable, int, string[]> OnChangedDropdown =
+            new TrackingBehaviourEvent<Selectable, int, string[]>();
 
         [Gesture("UI"), Action("Change")] public TrackingBehaviourEvent<Toggle, bool> OnChangedToggle =
             new TrackingBehaviourEvent<Toggle, bool>();
@@ -50,8 +51,16 @@ namespace OmiLAXR.TrackingBehaviours.Learner
                 else if (type == typeof(Dropdown))
                 {
                     var dropdown = (Dropdown)selectable;
+                    var options = dropdown.options.Select(o => o.text).ToArray();
                     OnChangedDropdown.Bind(dropdown.onValueChanged,
-                        value => { OnChangedDropdown.Invoke(this, dropdown, value); });
+                        value => { OnChangedDropdown.Invoke(this, dropdown, value, options); });
+                }
+                else if (type == typeof(TMP_Dropdown))
+                {
+                    var dropdown = (TMP_Dropdown)selectable;
+                    var options = dropdown.options.Select(o => o.text).ToArray();
+                    OnChangedDropdown.Bind(dropdown.onValueChanged,
+                        value => { OnChangedDropdown.Invoke(this, dropdown, value, options); });
                 }
                 else if (type == typeof(Toggle))
                 {
@@ -59,15 +68,9 @@ namespace OmiLAXR.TrackingBehaviours.Learner
                     OnChangedToggle.Bind(toggle.onValueChanged,
                         value => { OnChangedToggle.Invoke(this, toggle, value); });
                 }
-                else if (type == typeof(InputField))
+                else if (type == typeof(InputField) || type == typeof(TMP_InputField))
                 {
                     var inputField = (InputField)selectable;
-                    OnChangedInputField.Bind(inputField.onValueChanged,
-                        value => { OnChangedInputField.Invoke(this, inputField, value); });
-                }
-                else if (type == typeof(TMP_InputField))
-                {
-                    var inputField = (TMP_InputField)selectable;
                     OnChangedInputField.Bind(inputField.onValueChanged,
                         value => { OnChangedInputField.Invoke(this, inputField, value); });
                 }

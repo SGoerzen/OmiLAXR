@@ -12,6 +12,7 @@ namespace OmiLAXR.TrackingBehaviours.System
         public readonly TrackingBehaviourEvent<DateTime, bool> OnFocusedGame = new TrackingBehaviourEvent<DateTime, bool>();
         public readonly TrackingBehaviourEvent<DateTime, bool> OnPausedGame = new TrackingBehaviourEvent<DateTime, bool>();
 
+        [DefaultExecutionOrder(-10000)]
         protected static class SystemStartController
         {
             public static DateTime StartTime;
