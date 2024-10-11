@@ -1,3 +1,5 @@
+using System;
+using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
 using Object = UnityEngine.Object;
@@ -18,6 +20,9 @@ namespace OmiLAXR.TrackingBehaviours.Learner
 
         [Gesture("UI"), Action("Change")] public TrackingBehaviourEvent<Toggle, bool> OnChangedToggle =
             new TrackingBehaviourEvent<Toggle, bool>();
+
+        [Gesture("UI"), Action("Change")] public TrackingBehaviourEvent<Selectable, string> OnChangedInputField =
+            new TrackingBehaviourEvent<Selectable, string>();
 
         protected override void AfterFilteredObjects(Object[] objects)
         {
@@ -49,6 +54,18 @@ namespace OmiLAXR.TrackingBehaviours.Learner
                     var toggle = (Toggle)selectable;
                     OnChangedToggle.Bind(toggle.onValueChanged,
                         value => { OnChangedToggle.Invoke(this, toggle, value); });
+                }
+                else if (type == typeof(InputField))
+                {
+                    var inputField = (InputField)selectable;
+                    OnChangedInputField.Bind(inputField.onValueChanged,
+                        value => { OnChangedInputField.Invoke(this, inputField, value); });
+                }
+                else if (type == typeof(TMP_InputField))
+                {
+                    var inputField = (TMP_InputField)selectable;
+                    OnChangedInputField.Bind(inputField.onValueChanged,
+                        value => { OnChangedInputField.Invoke(this, inputField, value); });
                 }
             }
         }
