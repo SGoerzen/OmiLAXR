@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
 using OmiLAXR.Composers;
+using OmiLAXR.Endpoints;
 using OmiLAXR.Listeners;
 using OmiLAXR.Filters;
 using OmiLAXR.TrackingBehaviours;
@@ -53,9 +54,9 @@ namespace OmiLAXR
         public event Action<Pipeline> OnCollect; 
         public event Action<Object[]> AfterFoundObjects;
         public event Action<Object[]> AfterFilteredObjects;
-        public event Action<IStatement> AfterComposedObjects; 
-        public event Action<IStatement> BeforeSendObjects; 
-        public event Action<IStatement> AfterSendObjects;
+        public event ComposerAction<IStatement> AfterComposedStatement; 
+        public event EndpointAction<IStatement> BeforeSendStatement; 
+        public event EndpointAction<IStatement> AfterSendStatement;
         public event Action<Pipeline> BeforeStoppedPipeline; 
 
         public readonly List<Object> trackingObjects = new List<Object>();
@@ -100,6 +101,29 @@ namespace OmiLAXR
             
             // Find available data providers
             DataProviders.AddRange(FindObjectsOfType<DataProvider>());
+            
+            // Bind after and before send events
+            foreach (var dp in DataProviders)
+            {
+                foreach (var c in dp.Composers)
+                {
+                    c.AfterComposed += (composer, statement) =>
+                    {
+                        AfterComposedStatement?.Invoke(composer, statement);
+                    };
+                }
+                foreach (var ep in dp.Endpoints)
+                {
+                    ep.OnSendingStatement += (endpoint, statement) =>
+                    {
+                        BeforeSendStatement?.Invoke(endpoint, statement);
+                    };
+                    ep.OnSentStatement += (endpoint, statement) =>
+                    {
+                        AfterSendStatement?.Invoke(endpoint, statement);
+                    };
+                }
+            }
 
             var composersCount = DataProviders.Aggregate(0, (i, provider) => i + provider.Composers.Count);
             var hooksCount = DataProviders.Aggregate(0, (i, provider) => i + provider.Hooks.Count);
@@ -207,16 +231,6 @@ namespace OmiLAXR
             AfterFilteredObjects?.Invoke(objects);
             
             trackingObjects.AddRange(objects);
-        }
-
-        protected virtual void OnAfterComposedObjects(IStatement obj)
-        {
-            AfterComposedObjects?.Invoke(obj);
-        }
-
-        protected virtual void OnBeforeSendObjects(IStatement obj)
-        {
-            BeforeSendObjects?.Invoke(obj);
         }
     }
 }

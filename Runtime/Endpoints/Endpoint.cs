@@ -3,16 +3,19 @@ using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.ComponentModel;
 using OmiLAXR.Composers;
+using UnityEngine;
 
 namespace OmiLAXR.Endpoints
 {
+    [DefaultExecutionOrder(1)]
     public abstract class Endpoint : PipelineComponent
     {
-        public EndpointAction onStartedSending;
-        public EndpointAction onStoppedSending;
-        public EndpointAction onPausedSending;
-        public EndpointAction<IStatement> onSentStatement;
-        public EndpointAction<IStatement> onFailedSendingStatement;
+        public event EndpointAction OnStartedSending;
+        public event EndpointAction OnStoppedSending;
+        public event EndpointAction OnPausedSending;
+        public event EndpointAction<IStatement> OnSendingStatement;
+        public event EndpointAction<IStatement> OnSentStatement;
+        public event EndpointAction<IStatement> OnFailedSendingStatement;
         
         public bool IsSending { get; private set; }
         public bool IsTransferring { get; private set; }
@@ -65,7 +68,7 @@ namespace OmiLAXR.Endpoints
             _sendWorker.DoWork += SendWorkerOnDoWork;
             _sendWorker.WorkerSupportsCancellation = true;
             _sendWorker.RunWorkerAsync();
-            onStartedSending?.Invoke(this);
+            OnStartedSending?.Invoke(this);
         }
 
         public void PauseSending()
@@ -74,7 +77,7 @@ namespace OmiLAXR.Endpoints
                 return;
             IsSending = false;
             _sendWorker.CancelAsync();
-            onPausedSending.Invoke(this);
+            OnPausedSending.Invoke(this);
         }
 
         public void StopSending()
@@ -90,7 +93,7 @@ namespace OmiLAXR.Endpoints
             }
 
             IsSending = false;
-            onStoppedSending?.Invoke(this);
+            OnStoppedSending?.Invoke(this);
         }
 
         protected virtual void OnEnable()
@@ -121,18 +124,19 @@ namespace OmiLAXR.Endpoints
                 return TransferCode.NoStatements;
 
             IsTransferring = true;
+            OnSendingStatement?.Invoke(this, statement);
             var result = HandleSending(statement);
             IsTransferring = false;
             
             if (result != TransferCode.Success)
             {
-                onFailedSendingStatement?.Invoke(this, statement);
+                OnFailedSendingStatement?.Invoke(this, statement);
                 // enqueue again
                 _queuedStatements.Enqueue(statement);
             }
             else
             {
-                onSentStatement?.Invoke(this, statement);
+                OnSentStatement?.Invoke(this, statement);
             }
 
             return result;

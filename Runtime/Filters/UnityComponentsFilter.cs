@@ -1,12 +1,11 @@
 using System;
 using System.Linq;
-using OmiLAXR.Filters;
 using TMPro;
 using UnityEngine;
 using UnityEngine.EventSystems;
 using Object = UnityEngine.Object;
 
-namespace OmiLAXR.Tests.Filters
+namespace OmiLAXR.Filters
 {
     [AddComponentMenu("OmiLAXR / 2) Filters / Unity Components Filter")]
     public class UnityComponentsFilter : Filter

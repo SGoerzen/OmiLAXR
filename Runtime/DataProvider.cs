@@ -44,11 +44,11 @@ namespace OmiLAXR
             // 4 & 4.1) Start listening for composers
             foreach (var composer in Composers)
             {
-                composer.afterComposed += HandleStatement;
+                composer.AfterComposed += HandleStatement;
             }
         }
 
-        private void HandleStatement(IStatement statement)
+        private void HandleStatement(Composer sender, IStatement statement)
         {
             // 4.1) Start listening for higher composers
             foreach (var composer in HigherComposers)
