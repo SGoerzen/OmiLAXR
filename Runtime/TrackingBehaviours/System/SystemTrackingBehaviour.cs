@@ -1,3 +1,4 @@
+using System;
 using UnityEngine;
 using Object = UnityEngine.Object;
 
@@ -6,32 +7,43 @@ namespace OmiLAXR.TrackingBehaviours.System
     [AddComponentMenu("OmiLAXR / 3) Tracking Behaviours / System Tracking Behaviour")]
     public class SystemTrackingBehaviour : TrackingBehaviour
     {
-        public TrackingBehaviourEvent OnGameStarted = new TrackingBehaviourEvent();
-        public TrackingBehaviourEvent OnGameQuit = new TrackingBehaviourEvent();
-        
-        [RuntimeInitializeOnLoadMethod]
-        private static void GameStarted()
+        public readonly TrackingBehaviourEvent<DateTime> OnStartedGame = new TrackingBehaviourEvent<DateTime>();
+        public readonly TrackingBehaviourEvent<DateTime> OnQuitGame = new TrackingBehaviourEvent<DateTime>();
+        public readonly TrackingBehaviourEvent<DateTime, bool> OnFocusedGame = new TrackingBehaviourEvent<DateTime, bool>();
+        public readonly TrackingBehaviourEvent<DateTime, bool> OnPausedGame = new TrackingBehaviourEvent<DateTime, bool>();
+
+        protected static class SystemStartController
+        {
+            public static DateTime StartTime;
+            [RuntimeInitializeOnLoadMethod]
+            private static void GameStarted()
+            {
+                StartTime = DateTime.Now;
+            }
+        }
+
+        private void Start()
         {
             var stbs = FindObjectsOfType<SystemTrackingBehaviour>();
             foreach (var stb in stbs)
             {
-                stb.OnGameStarted?.Invoke(stb);
+                stb.OnStartedGame?.Invoke(stb, SystemStartController.StartTime);
             }
         }
 
         private void OnApplicationQuit()
         {
-           OnGameQuit?.Invoke(this);
+           OnQuitGame?.Invoke(this, DateTime.Now);
         }
 
         private void OnApplicationFocus(bool hasFocus)
         {
-            // todo
+            OnFocusedGame?.Invoke(this, DateTime.Now, hasFocus);
         }
 
         private void OnApplicationPause(bool pauseStatus)
         {
-            // todo
+            OnPausedGame?.Invoke(this, DateTime.Now, pauseStatus);
         }
 
         protected override void AfterFilteredObjects(Object[] objects)

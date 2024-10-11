@@ -39,7 +39,7 @@ namespace OmiLAXR.TrackingBehaviours.Learner
                 if (type == typeof(Button))
                 {
                     var button = (Button)selectable;
-                    OnClickedButton.Bind(button.onClick, () => { OnClickedButton?.Invoke(this, button); });
+                    OnClickedButton.Bind(button.onClick, () => { OnClickedButton.Invoke(this, button); });
                 }
                 else if (type == typeof(Slider))
                 {
