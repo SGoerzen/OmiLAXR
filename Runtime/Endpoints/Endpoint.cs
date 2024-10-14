@@ -7,7 +7,6 @@ using UnityEngine;
 
 namespace OmiLAXR.Endpoints
 {
-    [DefaultExecutionOrder(1)]
     public abstract class Endpoint : PipelineComponent
     {
         public event EndpointAction OnStartedSending;
@@ -27,11 +26,11 @@ namespace OmiLAXR.Endpoints
         {
             while (!_sendWorker.CancellationPending)
             {
-                var result = TransferStatement();
+                var result = HandleQueue();
 
                 if (result != TransferCode.Success && result != TransferCode.NoStatements)
                 {
-                    DebugLog.OmiLAXR.Error("Failed to send statements. Error code: " + result);
+                    DebugLog.OmiLAXR.Error("Failed to send statement. Error code: " + result);
                 }
                 
                 // handle codes
@@ -77,7 +76,7 @@ namespace OmiLAXR.Endpoints
                 return;
             IsSending = false;
             _sendWorker.CancelAsync();
-            OnPausedSending.Invoke(this);
+            OnPausedSending?.Invoke(this);
         }
 
         public void StopSending()
@@ -111,23 +110,37 @@ namespace OmiLAXR.Endpoints
             StopSending();
         }
 
+        /// <summary>
+        /// Enqueue statement to asynchronous sending queue
+        /// </summary>
+        /// <param name="statement"></param>
         public virtual void SendStatement(IStatement statement)
         {
+            // Debug.Log("Enqueue " + statement, this);
             _queuedStatements.Enqueue(statement);
+        }
+        /// <summary>
+        /// Send statement immediate without using queue system.
+        /// </summary>
+        /// <param name="statement"></param>
+        public virtual void SendStatementImmediate(IStatement statement)
+        {
+            var code = TransferStatement(statement);
+            if (code != TransferCode.Success && code != TransferCode.NoStatements)
+            {
+                DebugLog.OmiLAXR.Error("Failed to send statement. Error code: " + code);
+            }
         }
 
         protected abstract TransferCode HandleSending(IStatement statement);
-        
-        protected virtual TransferCode TransferStatement()
-        {
-            if (!_queuedStatements.TryDequeue(out var statement))
-                return TransferCode.NoStatements;
 
+        protected virtual TransferCode TransferStatement(IStatement statement)
+        {
             IsTransferring = true;
             OnSendingStatement?.Invoke(this, statement);
             var result = HandleSending(statement);
             IsTransferring = false;
-            
+
             if (result != TransferCode.Success)
             {
                 OnFailedSendingStatement?.Invoke(this, statement);
@@ -141,6 +154,22 @@ namespace OmiLAXR.Endpoints
 
             return result;
         }
+        
+        protected virtual TransferCode HandleQueue()
+        {
+            try
+            {
+                if (!_queuedStatements.TryDequeue(out var statement))
+                    return TransferCode.NoStatements;
 
+                return TransferStatement(statement);
+            }
+            catch (Exception e)
+            {
+                Debug.LogException(e);
+            }
+
+            return TransferCode.Error;
+        }
     }
 }

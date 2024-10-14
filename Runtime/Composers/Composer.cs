@@ -5,7 +5,7 @@ namespace OmiLAXR.Composers
 {
     public interface IComposer
     {
-        event ComposerAction<IStatement> AfterComposed;
+        event ComposerAction<IStatement, bool> AfterComposed;
         bool IsHigherComposer { get; }
         bool IsEnabled { get; }
         Author GetAuthor();
@@ -24,14 +24,14 @@ namespace OmiLAXR.Composers
 
         public abstract Author GetAuthor();
         public virtual bool IsHigherComposer => false;
-        public event ComposerAction<IStatement> AfterComposed;
+        public event ComposerAction<IStatement, bool> AfterComposed;
 
         protected static TB GetTrackingBehaviour<TB>(bool includeInactive = false)
             where TB : TrackingBehaviour => FindObjectOfType<TB>(includeInactive);
 
-        protected void SendStatement(IStatement statement)
+        protected void SendStatement(IStatement statement, bool immediate = false)
         {
-            AfterComposed?.Invoke(this, statement);
+            AfterComposed?.Invoke(this, statement, immediate);
         }
 
         protected virtual void Awake()

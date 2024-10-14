@@ -54,7 +54,7 @@ namespace OmiLAXR
         public event Action<Pipeline> OnCollect; 
         public event Action<Object[]> AfterFoundObjects;
         public event Action<Object[]> AfterFilteredObjects;
-        public event ComposerAction<IStatement> AfterComposedStatement; 
+        public event ComposerAction<IStatement, bool> AfterComposedStatement; 
         public event EndpointAction<IStatement> BeforeSendStatement; 
         public event EndpointAction<IStatement> AfterSendStatement;
         public event Action<Pipeline> BeforeStoppedPipeline; 
@@ -113,9 +113,9 @@ namespace OmiLAXR
             {
                 foreach (var c in dp.Composers)
                 {
-                    c.AfterComposed += (composer, statement) =>
+                    c.AfterComposed += (composer, statement, immediate) =>
                     {
-                        AfterComposedStatement?.Invoke(composer, statement);
+                        AfterComposedStatement?.Invoke(composer, statement, immediate);
                     };
                 }
                 foreach (var ep in dp.Endpoints)

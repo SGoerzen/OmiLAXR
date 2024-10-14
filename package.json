@@ -1,6 +1,6 @@
 {
   "name": "com.rwth.unity.omilaxr",
-  "version": "2.0.6",
+  "version": "2.0.7",
   "displayName": "OmiLAXR",
   "description": "This is the base package for OmiLAXR ecosystem. This package has shareable code for all OmiLAXR packages.",
   "unity": "2021.3",
@@ -10,8 +10,8 @@
   "licensesUrl": "https://gitlab.com/learntech-rwth/omilaxr-ecosystem/v2/omilaxr/-/blob/main/LICENSE",
   "homepage": "https://omilaxr.dev/",
   "dependencies": {
-    "com.unity.textmeshpro": "3.0.6",
-    "com.unity.nuget.newtonsoft-json": "3.0.2"
+    "com.unity.textmeshpro": "3.0.9",
+    "com.unity.nuget.newtonsoft-json": "3.2.1"
   },
   "keywords": [
     "OmiLAXR",

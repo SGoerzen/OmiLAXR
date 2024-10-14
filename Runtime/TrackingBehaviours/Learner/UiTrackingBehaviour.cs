@@ -68,9 +68,15 @@ namespace OmiLAXR.TrackingBehaviours.Learner
                     OnChangedToggle.Bind(toggle.onValueChanged,
                         value => { OnChangedToggle.Invoke(this, toggle, value); });
                 }
-                else if (type == typeof(InputField) || type == typeof(TMP_InputField))
+                else if (type == typeof(InputField))
                 {
                     var inputField = (InputField)selectable;
+                    OnChangedInputField.Bind(inputField.onValueChanged,
+                        value => { OnChangedInputField.Invoke(this, inputField, value); });
+                }
+                else if (type == typeof(TMP_InputField))
+                {
+                    var inputField = (TMP_InputField)selectable;
                     OnChangedInputField.Bind(inputField.onValueChanged,
                         value => { OnChangedInputField.Invoke(this, inputField, value); });
                 }

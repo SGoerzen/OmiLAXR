@@ -4,13 +4,13 @@ namespace OmiLAXR.Endpoints
     {
         public BasicAuthCredentials credentials = new BasicAuthCredentials("https://lrs.elearn.rwth-aachen.de/data/xAPI", "", "");
         
-        protected override TransferCode TransferStatement()
+        protected override TransferCode HandleQueue()
         {
             // Check credentials
             if (!credentials.IsValid)
                 return TransferCode.InvalidCredentials;
             
-            return base.TransferStatement();
+            return base.HandleQueue();
         }
     }
 }

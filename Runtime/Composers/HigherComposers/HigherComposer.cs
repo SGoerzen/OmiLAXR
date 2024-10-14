@@ -35,7 +35,7 @@ namespace OmiLAXR.Composers.HigherComposers
             
         }
 
-        public event ComposerAction<IStatement> AfterComposed;
+        public event ComposerAction<IStatement, bool> AfterComposed;
         public bool IsHigherComposer => true;
         public bool IsEnabled => enabled;
         public abstract Author GetAuthor();

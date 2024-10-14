@@ -5,7 +5,7 @@ namespace OmiLAXR.Endpoints
 {
     [RequireComponent(typeof(Endpoint))]
     [AddComponentMenu("OmiLAXR / 6) Endpoints / Basic Auth Credentials File Loader")]
-    [DefaultExecutionOrder(0)]
+    [DefaultExecutionOrder(-1000)]
     public class BasicAuthCredentialsFileLoader : MonoBehaviour
     {
         [Header("Name of file that is located in Assets folder (data path).")]

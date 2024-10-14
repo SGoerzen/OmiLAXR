@@ -49,7 +49,7 @@ namespace OmiLAXR
             }
         }
 
-        private void HandleStatement(IComposer sender, IStatement statement)
+        private void HandleStatement(IComposer sender, IStatement statement, bool sendImmediate)
         {
             // 4.1) Start listening for higher composers
             foreach (var composer in HigherComposers)
@@ -67,9 +67,15 @@ namespace OmiLAXR
             }
             
             Debug.Log(statement, this);
+            Debug.Log($"Send to {Endpoints.Count} endpoints");
 
             foreach (var dp in Endpoints)
             {
+                if (sendImmediate)
+                {
+                    dp.SendStatementImmediate(statement);
+                    continue;
+                }
                 dp.SendStatement(statement);
             }
         }
