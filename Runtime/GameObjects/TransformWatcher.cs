@@ -1,5 +1,5 @@
-using System;
 using UnityEngine;
+using UnityEngine.Events;
 
 namespace OmiLAXR
 {
@@ -7,7 +7,11 @@ namespace OmiLAXR
     [DisallowMultipleComponent]
     public class TransformWatcher : MonoBehaviour
     {
-        public delegate void TransformChangedEvent(Vector3 newValue, Vector3 oldValue);
+        public struct TransformChange
+        {
+            public Vector3 OldValue;
+            public Vector3 NewValue;
+        }
         
         public float positionThreshold = .5f;
         public float rotationThreshold = 1.0f;
@@ -17,9 +21,9 @@ namespace OmiLAXR
         private Vector3 _lastScale;
         private Vector3 _lastRotation;
 
-        public event TransformChangedEvent OnChangedPosition;
-        public event TransformChangedEvent OnChangedScale;
-        public event TransformChangedEvent OnChangedRotation;
+        public UnityEvent<TransformChange> onChangedPosition = new UnityEvent<TransformChange>();
+        public UnityEvent<TransformChange> onChangedScale = new UnityEvent<TransformChange>();
+        public UnityEvent<TransformChange> onChangedRotation = new UnityEvent<TransformChange>();
 
         private bool DetectChange(ref Vector3 curValue, Vector3 newValue, float threshold)
         {
@@ -38,15 +42,27 @@ namespace OmiLAXR
 
             if (DetectChange(ref _lastPosition, pos, positionThreshold))
             {
-                OnChangedPosition?.Invoke(pos, _lastPosition);
+                onChangedPosition.Invoke(new TransformChange()
+                {
+                    NewValue = pos,
+                    OldValue = _lastPosition
+                });
             }
             if (DetectChange(ref _lastRotation, rotation, rotationThreshold))
             {
-                OnChangedRotation?.Invoke(rotation, _lastRotation);
+                onChangedRotation.Invoke(new TransformChange()
+                {
+                    NewValue = rotation,
+                    OldValue = _lastRotation
+                });
             }
             if (DetectChange(ref _lastScale, scale, scaleThreshold))
             {
-                OnChangedScale?.Invoke(scale, _lastScale);
+                onChangedScale.Invoke(new TransformChange()
+                {
+                    NewValue = scale,
+                    OldValue = _lastScale
+                });
             }
         }
     }

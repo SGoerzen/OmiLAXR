@@ -8,7 +8,7 @@ namespace OmiLAXR.Endpoints
     {
         protected override TransferCode HandleSending(IStatement statement)
         {
-            DebugLog.OmiLAXR.Print("Sent statement: " + statement.ToString());
+            DebugLog.OmiLAXR.Print("Sent statement: " + statement);
             return TransferCode.Success;
         }
     }

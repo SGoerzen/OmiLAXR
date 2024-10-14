@@ -1,4 +1,3 @@
-using System;
 using UnityEngine;
 
 namespace OmiLAXR.Listeners
@@ -9,11 +8,6 @@ namespace OmiLAXR.Listeners
         public override void StartListening()
         {
             Found(FindObjectsOfType<GameObject>());
-        }
-
-        private void OnEnable()
-        {
-            
         }
     }
 }

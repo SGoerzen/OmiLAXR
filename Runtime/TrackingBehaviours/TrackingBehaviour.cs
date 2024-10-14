@@ -1,6 +1,8 @@
+using System;
 using System.Linq;
 using System.Reflection;
 using UnityEngine;
+using Object = UnityEngine.Object;
 
 namespace OmiLAXR.TrackingBehaviours
 {
@@ -27,6 +29,11 @@ namespace OmiLAXR.TrackingBehaviours
         
         protected virtual void AfterFoundObjects(Object[] objects) {}
         protected abstract void AfterFilteredObjects(Object[] objects);
+
+        protected void OnEnable()
+        {
+            
+        }
 
         protected void DisposeAllTrackingEvents()
         {
@@ -59,6 +66,8 @@ namespace OmiLAXR.TrackingBehaviours
             => DebugLog.OmiLAXR.Print($"(Pipeline '{pipeline.name}') " + message);
         
         protected T[] Select<T>(Object[] objects) where T : Object
-            => objects.Where(o => o.GetType().IsSubclassOf(typeof(T))).Select(o => o as T).ToArray();
+            => objects
+                .Where(o => o.GetType().IsSubclassOf(typeof(T)))
+                .Select(o => o as T).ToArray();
     }
 }

@@ -157,6 +157,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   actor: {fileID: 3628335765410413573}
+  Extensions: []
 --- !u!1 &7874748867888974921 stripped
 GameObject:
   m_CorrespondingSourceObject: {fileID: 6978243314795396507, guid: 3406909dc7d1f436c8728e682dd9f930, type: 3}

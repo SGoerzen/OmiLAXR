@@ -1,3 +1,4 @@
+using System;
 using System.Linq;
 using UnityEngine;
 
@@ -7,10 +8,21 @@ namespace OmiLAXR
     [RequireComponent(typeof(Actor))]
     public class ActorGroup : Actor
     {
-        public Actor[] GetMembers() => GetComponents<Actor>()
-            .Where(a => a.GetType() != typeof(ActorGroup)).ToArray();
+        private Actor[] _members;
+        public Actor[] GetMembers() => _members;
 
-        public override bool IsGroup => true;
+        private void Start()
+        {
+            UpdateMemberList();
+        }
+
+        public void UpdateMemberList()
+        {
+            _members = GetComponents<Actor>()
+                .Where(a => a.GetType() != typeof(ActorGroup)).ToArray();
+        }
+
+        public override bool IsGroupActor => true;
 
         private void Reset()
         {

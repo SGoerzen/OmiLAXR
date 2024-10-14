@@ -20,6 +20,7 @@ namespace OmiLAXR.Filters
             typeof(Canvas),
             typeof(TextMeshPro),
             typeof(TextMeshProUGUI),
+            typeof(Camera)
         };
         public override Object[] Pass(Object[] gos)
         {

@@ -1,4 +1,4 @@
-using UnityEngine;
+using System;
 using Object = UnityEngine.Object;
 
 namespace OmiLAXR.Listeners
@@ -14,8 +14,13 @@ namespace OmiLAXR.Listeners
         {
             pipeline = GetComponentInParent<Pipeline>();
         }
-        
-        protected void Found<T>(T[] objects) where T : Object
+
+        protected void OnEnable()
+        {
+            
+        }
+
+        protected void Found<T>(params T[] objects) where T : Object
         {
             onFoundObjects?.Invoke(objects);
         }

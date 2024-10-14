@@ -57,8 +57,6 @@ namespace OmiLAXR
                 composer.LookFor(statement);   
             }
             
-            Debug.Log(statement, this);
-            
             foreach (var hook in Hooks.Where(hook => hook.enabled))
             {
                 statement = hook.AfterCompose(statement);
@@ -66,9 +64,6 @@ namespace OmiLAXR
                     return;
             }
             
-            Debug.Log(statement, this);
-            Debug.Log($"Send to {Endpoints.Count} endpoints");
-
             foreach (var dp in Endpoints)
             {
                 if (sendImmediate)
@@ -78,6 +73,8 @@ namespace OmiLAXR
                 }
                 dp.SendStatement(statement);
             }
+            
+            Debug.Log($"Sent to {Endpoints.Count} endpoints");
         }
 
         public static DataProvider GetAll() => FindObjectOfType<DataProvider>();

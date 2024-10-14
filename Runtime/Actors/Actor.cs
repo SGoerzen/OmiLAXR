@@ -6,8 +6,9 @@ namespace OmiLAXR
     public class Actor : PipelineComponent
     {
         public Team team;
+        public bool HasTeam => team != null;
         public string actorName = "Anonymous";
         public string actorEmail = "anonymous@omilaxr.dev";
-        public virtual bool IsGroup => false;
+        public virtual bool IsGroupActor => false;
     }
 }

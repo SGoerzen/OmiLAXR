@@ -3,7 +3,6 @@ using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.ComponentModel;
 using OmiLAXR.Composers;
-using UnityEngine;
 
 namespace OmiLAXR.Endpoints
 {
@@ -157,19 +156,34 @@ namespace OmiLAXR.Endpoints
         
         protected virtual TransferCode HandleQueue()
         {
-            try
-            {
-                if (!_queuedStatements.TryDequeue(out var statement))
-                    return TransferCode.NoStatements;
+            if (!_queuedStatements.TryDequeue(out var statement))
+                return TransferCode.NoStatements;
 
-                return TransferStatement(statement);
-            }
-            catch (Exception e)
-            {
-                Debug.LogException(e);
-            }
-
-            return TransferCode.Error;
+            return TransferStatement(statement);
         }
+
+        
+        #region MainThreadDispatcher
+        private readonly Queue<Action> _executionQueue = new Queue<Action>();
+        private void Update()
+        {
+            lock (_executionQueue)
+            {
+                while (_executionQueue.Count > 0)
+                {
+                    Action action = null;
+                    action = _executionQueue.Dequeue();
+                    action?.Invoke();
+                }
+            }
+        }
+        protected void Dispatch(Action action)
+        {
+            lock (_executionQueue)
+            {
+                _executionQueue.Enqueue(action);
+            }
+        }
+        #endregion
     }
 }

@@ -11,18 +11,31 @@ namespace OmiLAXR
     {
         public string teamName = "Team";
         public string teamEmail = "team@omilaxr.dev";
-        public Actor[] GetMembers() => FindObjectsByType<Actor>(FindObjectsSortMode.InstanceID)
-            .Where(actor => Equals(actor.team)).ToArray();
+        public Actor[] GetMembers() => _members;
+        private Actor[] _members;
+        
+        private void Start()
+        {
+            UpdateMemberList();
+        }
 
+        public void UpdateMemberList()
+        {
+            _members = FindObjectsByType<Actor>(FindObjectsSortMode.InstanceID)
+                .Where(actor => Equals(actor.team)).ToArray();
+        }
+        
         public void AddMember(Actor actor)
         {
             actor.team = this;
+            UpdateMemberList();
         }
 
         public void AddMembers(params Actor[] actors)
         {
             foreach (var a in actors)
                 a.team = this;
+            UpdateMemberList();
         }
     }
 }
