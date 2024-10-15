@@ -5,6 +5,12 @@ using Object = UnityEngine.Object;
 
 namespace OmiLAXR.TrackingBehaviours
 {
+
+    public abstract class TrackingBehaviour : TrackingBehaviour<Object>
+    {
+        
+    }
+    
     [DefaultExecutionOrder(-1)]
     public abstract class TrackingBehaviour<T> : PipelineComponent, ITrackingBehaviour
     where T : Object
@@ -23,13 +29,15 @@ namespace OmiLAXR.TrackingBehaviours
                 pipeline = pipelineExt.GetPipeline();
             }
             
-            pipeline.AfterFoundObjects += (obj) =>
+            pipeline.AfterFoundObjects += (objects) =>
             {
-                AfterFoundObjects(Select<T>(obj));
+                // Skip Select<T> if not needed
+                AfterFoundObjects(typeof(T) == typeof(Object) ? objects as T[] : Select<T>(objects));
             };
-            pipeline.AfterFilteredObjects += (obj) =>
+            pipeline.AfterFilteredObjects += (objects) =>
             {
-                AfterFilteredObjects(Select<T>(obj));
+                // Skip Select<T> if not needed
+                AfterFilteredObjects(typeof(T) == typeof(Object) ? objects as T[] : Select<T>(objects));
             };
             pipeline.BeforeStoppedPipeline += (p) => Dispose(p.trackingObjects.ToArray());
         }

@@ -42,7 +42,7 @@ namespace OmiLAXR
 
             if (DetectChange(ref _lastPosition, pos, positionThreshold))
             {
-                onChangedPosition.Invoke(new TransformChange()
+                onChangedPosition?.Invoke(new TransformChange()
                 {
                     NewValue = pos,
                     OldValue = _lastPosition
@@ -50,7 +50,7 @@ namespace OmiLAXR
             }
             if (DetectChange(ref _lastRotation, rotation, rotationThreshold))
             {
-                onChangedRotation.Invoke(new TransformChange()
+                onChangedRotation?.Invoke(new TransformChange()
                 {
                     NewValue = rotation,
                     OldValue = _lastRotation
@@ -58,7 +58,7 @@ namespace OmiLAXR
             }
             if (DetectChange(ref _lastScale, scale, scaleThreshold))
             {
-                onChangedScale.Invoke(new TransformChange()
+                onChangedScale?.Invoke(new TransformChange()
                 {
                     NewValue = scale,
                     OldValue = _lastScale

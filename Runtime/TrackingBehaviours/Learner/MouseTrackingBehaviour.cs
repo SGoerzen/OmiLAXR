@@ -3,9 +3,8 @@ using UnityEngine;
 
 namespace OmiLAXR.TrackingBehaviours.Learner
 {
-    [AddComponentMenu("OmiLAXR / 3) Tracking Behaviours / Mouse Tracking Behaviour"),
-     Description("Tracks mouse clicks and wheel."),
-    ]
+    [AddComponentMenu("OmiLAXR / 3) Tracking Behaviours / Mouse Tracking Behaviour")]
+    [Description("Tracks mouse clicks and wheel.")]
     public class MouseTrackingBehaviour : EventTrackingBehaviour
     {
         public struct MouseTrackingBehaviourArgs

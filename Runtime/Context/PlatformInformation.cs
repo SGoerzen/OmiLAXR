@@ -1,10 +1,12 @@
 using System;
+using System.ComponentModel;
 using UnityEngine;
 
 namespace OmiLAXR.Context
 {
     [AddComponentMenu("OmiLAXR / 0) Scenario Context / Platform Information")]
     [DisallowMultipleComponent]
+    [Description("Provides platform information in following format [prefixes:]OmiLAXR:v2.0.8:{OS}[:suffixes].")]
     public class PlatformInformation : LearningContext
     {
         [Serializable]
@@ -18,7 +20,7 @@ namespace OmiLAXR.Context
         private static PlatformInformation _instance;
         public static PlatformInformation Instance
             => _instance ??= FindObjectOfType<PlatformInformation>();
-        private const string OmiLAXR_Version = "2.0.7";
+        private const string OmiLAXR_Version = "v2.0.8";
 
         // This will store the value in the inspector
         [SerializeField] 

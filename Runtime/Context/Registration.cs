@@ -1,4 +1,5 @@
 using System;
+using System.ComponentModel;
 using OmiLAXR.Context;
 using UnityEngine;
 
@@ -6,6 +7,7 @@ namespace OmiLAXR
 {
     [DefaultExecutionOrder(-10000)]
     [DisallowMultipleComponent]
+    [Description("Component for holding a registration UUID.")]
     public class Registration : LearningContext
     {
         private static Registration _instance;

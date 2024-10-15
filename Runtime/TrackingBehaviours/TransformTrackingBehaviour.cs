@@ -1,5 +1,10 @@
+using System.ComponentModel;
+using UnityEngine;
+
 namespace OmiLAXR.TrackingBehaviours
 {
+    [AddComponentMenu("OmiLAXR / 3) Tracking Behaviours / Transform Tracking Behaviour")]
+    [Description("Tracks position, rotation and scale changes in a game object holding <TransformWatcher> component.")]
     public class TransformTrackingBehaviour : TrackingBehaviour<TransformWatcher>
     {
         [Gesture("Movement"), Action("Translation")]

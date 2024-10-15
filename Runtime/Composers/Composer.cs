@@ -3,8 +3,6 @@ using UnityEngine;
 
 namespace OmiLAXR.Composers
 {
-   
-
     public abstract class Composer<T> : PipelineComponent, IComposer
         where T : PipelineComponent, ITrackingBehaviour
     {
