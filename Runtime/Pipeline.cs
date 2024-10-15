@@ -21,6 +21,7 @@ namespace OmiLAXR
     {
         public bool IsRunning => gameObject.activeSelf;
         public Actor actor;
+        public Instructor instructor;
 
         public readonly List<Listener> Listeners = new List<Listener>();
         public readonly List<DataProvider> DataProviders = new List<DataProvider>();
@@ -96,6 +97,9 @@ namespace OmiLAXR
         {
             if (actor == null)
                 actor = FindActor();
+            
+            if (instructor == null)
+                instructor = GetComponent<Instructor>();
             
             TrackingBehaviours.AddRange(GetComponentsInChildren<TrackingBehaviour>());
             
