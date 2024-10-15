@@ -1,8 +1,6 @@
-using UnityEngine;
-
 namespace OmiLAXR.TrackingBehaviours
 {
-    public class TransformTrackingBehaviour : TrackingBehaviour
+    public class TransformTrackingBehaviour : TrackingBehaviour<TransformWatcher>
     {
         [Gesture("Movement"), Action("Translation")]
         public TrackingBehaviourEvent<TransformWatcher, TransformWatcher.TransformChange> OnChangedPosition =
@@ -14,10 +12,8 @@ namespace OmiLAXR.TrackingBehaviours
         public TrackingBehaviourEvent<TransformWatcher, TransformWatcher.TransformChange> OnChangedScale =
             new TrackingBehaviourEvent<TransformWatcher, TransformWatcher.TransformChange>();
         
-        protected override void AfterFilteredObjects(Object[] objects)
+        protected override void AfterFilteredObjects(TransformWatcher[] transformWatchers)
         {
-            var transformWatchers = Select<TransformWatcher>(objects);
-
             foreach (var tw in transformWatchers)
             {
                 OnChangedPosition.Bind(tw.onChangedPosition, tc =>

@@ -48,6 +48,14 @@ PrefabInstance:
       propertyPath: m_LocalEulerAnglesHint.z
       value: 0
       objectReference: {fileID: 0}
+    - target: {fileID: 4595212218988023255, guid: 3406909dc7d1f436c8728e682dd9f930, type: 3}
+      propertyPath: actorName
+      value: Learner
+      objectReference: {fileID: 0}
+    - target: {fileID: 4595212218988023255, guid: 3406909dc7d1f436c8728e682dd9f930, type: 3}
+      propertyPath: actorEmail
+      value: learner@omilaxr.dev
+      objectReference: {fileID: 0}
     - target: {fileID: 6582749516187797561, guid: 3406909dc7d1f436c8728e682dd9f930, type: 3}
       propertyPath: m_Name
       value: Learner Pipeline
@@ -81,6 +89,9 @@ PrefabInstance:
     - targetCorrespondingSourceObject: {fileID: 3854916294279326203, guid: 3406909dc7d1f436c8728e682dd9f930, type: 3}
       insertIndex: -1
       addedObject: {fileID: 3812673878226825099}
+    - targetCorrespondingSourceObject: {fileID: 3854916294279326203, guid: 3406909dc7d1f436c8728e682dd9f930, type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 121891111681147942}
     - targetCorrespondingSourceObject: {fileID: 3854916294279326203, guid: 3406909dc7d1f436c8728e682dd9f930, type: 3}
       insertIndex: -1
       addedObject: {fileID: 8088093857528866451}
@@ -145,6 +156,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   actor: {fileID: 4928581912976695948}
+  instructor: {fileID: 0}
   Extensions: []
 --- !u!1 &4149237911242758892 stripped
 GameObject:
@@ -216,6 +228,18 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 09ee261f8e2341dcb702d4a037e4c5b1, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+--- !u!114 &121891111681147942
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 5683481138607589024}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: f0b9a2e300cc497aaf29e83db96c8fd9, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
 --- !u!114 &8088093857528866451

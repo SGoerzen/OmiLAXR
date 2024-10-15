@@ -30,18 +30,15 @@ namespace OmiLAXR
             Composers.AddRange(composers);
             
             // Find available higher composers
-            HigherComposers.AddRange(Composers.Where(c => c.IsHigherComposer)
+            HigherComposers.AddRange(Composers.Where(c => c.IsEnabled && c.IsHigherComposer)
                 .Select(c => c as HigherComposer<IStatement>));
             
             // Find available hooks
             Hooks.AddRange(GetComponentsInChildren<Hook>().Where(c => c.enabled));
             
             // Find available data endpoints
-            Endpoints.AddRange(GetComponentsInChildren<Endpoint>());
-        }
-
-        protected void Start()
-        {
+            Endpoints.AddRange(GetComponentsInChildren<Endpoint>().Where(ep => ep.enabled));
+            
             // 4 & 4.1) Start listening for composers
             foreach (var composer in Composers)
             {
@@ -57,7 +54,7 @@ namespace OmiLAXR
                 composer.LookFor(statement);   
             }
             
-            foreach (var hook in Hooks.Where(hook => hook.enabled))
+            foreach (var hook in Hooks)
             {
                 statement = hook.AfterCompose(statement);
                 if (statement.IsDiscarded())
@@ -73,8 +70,6 @@ namespace OmiLAXR
                 }
                 dp.SendStatement(statement);
             }
-            
-            Debug.Log($"Sent to {Endpoints.Count} endpoints");
         }
 
         public static DataProvider GetAll() => FindObjectOfType<DataProvider>();

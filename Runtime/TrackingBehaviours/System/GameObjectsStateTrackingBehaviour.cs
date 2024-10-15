@@ -4,7 +4,7 @@ using Object = UnityEngine.Object;
 
 namespace OmiLAXR.TrackingBehaviours.System
 {
-    public class GameObjectsStateTrackingBehaviour : TrackingBehaviour
+    public class GameObjectsStateTrackingBehaviour : TrackingBehaviour<GameObject>
     {
         public class GameObjectStateListener : MonoBehaviour
         {
@@ -19,9 +19,8 @@ namespace OmiLAXR.TrackingBehaviours.System
         public bool watchOnDestroyed;
         public TrackingBehaviourEvent<GameObjectStateListener, GameObject> OnDestroyedGameObject; 
         
-        protected override void AfterFilteredObjects(Object[] objects)
+        protected override void AfterFilteredObjects(GameObject[] gameObjects)
         {
-            var gameObjects = Select<GameObject>(objects);
             foreach (var go in gameObjects)
             {
                 var goStateListener = go.AddComponent<GameObjectStateListener>();

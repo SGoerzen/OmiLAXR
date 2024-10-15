@@ -25,7 +25,7 @@ namespace OmiLAXR
 
         public readonly List<Listener> Listeners = new List<Listener>();
         public readonly List<DataProvider> DataProviders = new List<DataProvider>();
-        public readonly List<TrackingBehaviour> TrackingBehaviours = new List<TrackingBehaviour>();
+        public readonly List<ITrackingBehaviour> TrackingBehaviours = new List<ITrackingBehaviour>();
         public readonly List<Filter> Filters = new List<Filter>();
 
         public readonly Dictionary<string, List<ITrackingBehaviourEvent>> Actions = new Dictionary<string, List<ITrackingBehaviourEvent>>();
@@ -41,7 +41,7 @@ namespace OmiLAXR
         public T GetDataProvider<T>() where T : DataProvider
             => DataProviders.OfType<T>().Select(dp => dp as T).FirstOrDefault();
         
-        public T GetTrackingBehaviour<T>() where T : TrackingBehaviour
+        public T GetTrackingBehaviour<T>() where T : PipelineComponent, ITrackingBehaviour
             => TrackingBehaviours.OfType<T>().Select(dp => dp as T).FirstOrDefault();
         
         public T GetFilters<T>() where T : Filter
@@ -65,27 +65,19 @@ namespace OmiLAXR
         public void Add(PipelineComponent comp)
         {
             var type = comp.GetType();
-            if (type == typeof(Listener) || type.IsSubclassOf(typeof(Listener)))
+            if (type.IsSubclassOf(typeof(Listener)))
                 Listeners.Add(comp as Listener);
-            else if (type == typeof(Filter) || type.IsSubclassOf(typeof(Filter)))
+            else if (type.IsSubclassOf(typeof(Filter)))
                 Filters.Add(comp as Filter);
-            else if (type == typeof(TrackingBehaviour) || type.IsSubclassOf(typeof(TrackingBehaviour)))
-                TrackingBehaviours.Add(comp as TrackingBehaviour);
-            else if (type == typeof(PipelineExtension) || type.IsSubclassOf(typeof(PipelineExtension)))
-                Extensions.Add(comp as PipelineExtension);
+            else if (type.IsSubclassOf(typeof(ITrackingBehaviour)))
+                TrackingBehaviours.Add(comp as ITrackingBehaviour);
+            else if (type.IsSubclassOf(typeof(PipelineExtension)))
+            {
+                var ext = comp as PipelineExtension;
+                ext!.Extend(this);
+                Extensions.Add(ext);
+            }
         }
-
-        public void Add(PipelineExtension ext)
-        {
-            ext.Extend(this);
-            Extensions.Add(ext);
-        }
-        public void Add(Listener listener)
-            => Listeners.Add(listener);
-        public void Add(Filter filter)
-            => Filters.Add(filter);
-        public void Add(TrackingBehaviour trackingBehaviour)
-            => TrackingBehaviours.Add(trackingBehaviour);
 
         private Actor FindActor()
         {
@@ -98,7 +90,7 @@ namespace OmiLAXR
             if (actor == null)
                 actor = FindActor();
             
-            TrackingBehaviours.AddRange(GetComponentsInChildren<TrackingBehaviour>());
+            TrackingBehaviours.AddRange(GetComponentsInChildren<ITrackingBehaviour>());
             
             // Find available listeners
             Listeners.AddRange(GetComponentsInChildren<Listener>());

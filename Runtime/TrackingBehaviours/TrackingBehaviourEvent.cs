@@ -27,7 +27,7 @@ namespace OmiLAXR.TrackingBehaviours
             Actions.Add(action);
         }
 
-        public void Invoke(TrackingBehaviour owner)
+        public void Invoke(ITrackingBehaviour owner)
         {
             if (IsDisabled)
                 return;
@@ -94,7 +94,7 @@ namespace OmiLAXR.TrackingBehaviours
             Actions.Add(action);
         }
 
-        public void Invoke(TrackingBehaviour owner, T arg)
+        public void Invoke(ITrackingBehaviour owner, T arg)
         {
             if (IsDisabled)
                 return;
@@ -164,7 +164,7 @@ namespace OmiLAXR.TrackingBehaviours
             Actions.Add(action);
         }
 
-        public void Invoke(TrackingBehaviour owner, TSender sender, TValue value)
+        public void Invoke(ITrackingBehaviour owner, TSender sender, TValue value)
         {
             if (IsDisabled)
                 return;
@@ -232,7 +232,7 @@ namespace OmiLAXR.TrackingBehaviours
             Actions.Add(action);
         }
 
-        public void Invoke(TrackingBehaviour owner, TSender sender, TValue value, TArgs args)
+        public void Invoke(ITrackingBehaviour owner, TSender sender, TValue value, TArgs args)
         {
             if (IsDisabled)
                 return;

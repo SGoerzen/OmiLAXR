@@ -3,6 +3,7 @@ using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.ComponentModel;
 using OmiLAXR.Composers;
+using UnityEngine;
 
 namespace OmiLAXR.Endpoints
 {
@@ -135,23 +136,31 @@ namespace OmiLAXR.Endpoints
 
         protected virtual TransferCode TransferStatement(IStatement statement)
         {
-            IsTransferring = true;
-            OnSendingStatement?.Invoke(this, statement);
-            var result = HandleSending(statement);
-            IsTransferring = false;
-
-            if (result != TransferCode.Success)
+            try
             {
-                OnFailedSendingStatement?.Invoke(this, statement);
-                // enqueue again
-                _queuedStatements.Enqueue(statement);
+                IsTransferring = true;
+                OnSendingStatement?.Invoke(this, statement);
+                var result = HandleSending(statement);
+                IsTransferring = false;
+
+                if (result != TransferCode.Success)
+                {
+                    OnFailedSendingStatement?.Invoke(this, statement);
+                    // enqueue again
+                    _queuedStatements.Enqueue(statement);
+                }
+                else
+                {
+                    OnSentStatement?.Invoke(this, statement);
+                }
+                return result;
             }
-            else
+            catch (Exception ex)
             {
-                OnSentStatement?.Invoke(this, statement);
+                Debug.LogException(ex);
             }
 
-            return result;
+            return TransferCode.Error;
         }
         
         protected virtual TransferCode HandleQueue()

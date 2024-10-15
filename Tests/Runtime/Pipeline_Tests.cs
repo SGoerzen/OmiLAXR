@@ -39,18 +39,13 @@ namespace OmiLAXR.Tests
             }
         }
 
-        public class MockTrackingBehaviour : TrackingBehaviour
+        public class MockTrackingBehaviour : EventTrackingBehaviour
         {
             [Action("MockAction")]
             public TrackingBehaviourEvent MockAction;
 
             [Gesture("MockGesture")]
             public TrackingBehaviourEvent MockGesture;
-
-            protected override void AfterFilteredObjects(Object[] objects)
-            {
-                
-            }
         }
         
         private GameObject _pipelineObject;
@@ -106,8 +101,6 @@ namespace OmiLAXR.Tests
             Assert.Contains(trackingBehaviour, _pipeline.TrackingBehaviours);
             
             // Additional
-            _pipeline.Add((PipelineComponent)filter);
-            _pipeline.Add((PipelineComponent)trackingBehaviour);
             _pipeline.Add((PipelineComponent)listener);
             Assert.AreEqual(2, _pipeline.Listeners.Count);
             Assert.AreEqual(2, _pipeline.Filters.Count);

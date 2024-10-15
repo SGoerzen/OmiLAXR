@@ -1,11 +1,10 @@
 using System;
 using UnityEngine;
-using Object = UnityEngine.Object;
 
 namespace OmiLAXR.TrackingBehaviours.System
 {
     [AddComponentMenu("OmiLAXR / 3) Tracking Behaviours / System Tracking Behaviour")]
-    public class SystemTrackingBehaviour : TrackingBehaviour
+    public class SystemTrackingBehaviour : EventTrackingBehaviour
     {
         public readonly TrackingBehaviourEvent<DateTime> OnStartedGame = new TrackingBehaviourEvent<DateTime>();
         public readonly TrackingBehaviourEvent<DateTime> OnQuitGame = new TrackingBehaviourEvent<DateTime>();
@@ -45,11 +44,6 @@ namespace OmiLAXR.TrackingBehaviours.System
         private void OnApplicationPause(bool pauseStatus)
         {
             OnPausedGame?.Invoke(this, DateTime.Now, pauseStatus);
-        }
-
-        protected override void AfterFilteredObjects(Object[] objects)
-        {
-            
         }
     }
 }

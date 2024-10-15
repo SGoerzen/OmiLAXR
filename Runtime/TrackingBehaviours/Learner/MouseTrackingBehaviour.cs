@@ -1,13 +1,12 @@
 using System.ComponentModel;
 using UnityEngine;
-using Object = UnityEngine.Object;
 
 namespace OmiLAXR.TrackingBehaviours.Learner
 {
     [AddComponentMenu("OmiLAXR / 3) Tracking Behaviours / Mouse Tracking Behaviour"),
      Description("Tracks mouse clicks and wheel."),
     ]
-    public class MouseTrackingBehaviour : TrackingBehaviour
+    public class MouseTrackingBehaviour : EventTrackingBehaviour
     {
         public struct MouseTrackingBehaviourArgs
         {
@@ -99,11 +98,6 @@ namespace OmiLAXR.TrackingBehaviours.Learner
                 _lastMousePosition = Input.mousePosition;
                 OnMousePositionChanged?.Invoke(this, Input.mousePosition);
             }
-        }
-
-        protected override void AfterFilteredObjects(Object[] objects)
-        {
-            
         }
     }
 }
