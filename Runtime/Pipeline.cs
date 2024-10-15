@@ -98,9 +98,6 @@ namespace OmiLAXR
             if (actor == null)
                 actor = FindActor();
             
-            if (instructor == null)
-                instructor = GetComponent<Instructor>();
-            
             TrackingBehaviours.AddRange(GetComponentsInChildren<TrackingBehaviour>());
             
             // Find available listeners

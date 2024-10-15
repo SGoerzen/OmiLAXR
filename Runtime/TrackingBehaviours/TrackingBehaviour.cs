@@ -11,6 +11,7 @@ namespace OmiLAXR.TrackingBehaviours
     {
         protected Pipeline pipeline { get; private set; }
         public Actor GetActor() => pipeline.actor;
+        public Instructor GetInstructor() => pipeline.instructor;
         protected virtual void Awake()
         {
             pipeline = GetComponentInParent<Pipeline>(true);
