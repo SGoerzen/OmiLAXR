@@ -10,7 +10,7 @@ namespace OmiLAXR.TrackingBehaviours.System
         public readonly TrackingBehaviourEvent<DateTime> OnQuitGame = new TrackingBehaviourEvent<DateTime>();
         public readonly TrackingBehaviourEvent<DateTime, bool> OnFocusedGame = new TrackingBehaviourEvent<DateTime, bool>();
         public readonly TrackingBehaviourEvent<DateTime, bool> OnPausedGame = new TrackingBehaviourEvent<DateTime, bool>();
-
+        
         [DefaultExecutionOrder(-10000)]
         protected static class SystemStartController
         {
@@ -22,6 +22,8 @@ namespace OmiLAXR.TrackingBehaviours.System
             }
         }
 
+        private bool _isFirstRun = true;
+        
         private void Start()
         {
             var stbs = FindObjectsOfType<SystemTrackingBehaviour>();
@@ -43,6 +45,11 @@ namespace OmiLAXR.TrackingBehaviours.System
 
         private void OnApplicationPause(bool pauseStatus)
         {
+            if (_isFirstRun)
+            {
+                _isFirstRun = false;
+                return;
+            }
             OnPausedGame?.Invoke(this, DateTime.Now, pauseStatus);
         }
     }
