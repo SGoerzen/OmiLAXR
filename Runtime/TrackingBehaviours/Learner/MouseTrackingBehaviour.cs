@@ -32,8 +32,8 @@ namespace OmiLAXR.TrackingBehaviours.Learner
             new TrackingBehaviourEvent<MouseTrackingBehaviourArgs, float>();
         
         [Gesture("Mouse"), Action("Move")]
-        public TrackingBehaviourEvent<Vector3> OnMousePositionChanged =
-            new TrackingBehaviourEvent<Vector3>();
+        public TrackingBehaviourEvent<Vector3, Vector3> OnMousePositionChanged =
+            new TrackingBehaviourEvent<Vector3, Vector3>();
         
         private bool _isLeftDown;
         private bool _isRightDown;
@@ -94,8 +94,8 @@ namespace OmiLAXR.TrackingBehaviours.Learner
             if (distance > movementThreshold)
             {
                 // Update last mouse position
+                OnMousePositionChanged?.Invoke(this, Input.mousePosition, _lastMousePosition);
                 _lastMousePosition = Input.mousePosition;
-                OnMousePositionChanged?.Invoke(this, Input.mousePosition);
             }
         }
     }
