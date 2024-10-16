@@ -1,9 +1,11 @@
 using System;
+using System.ComponentModel;
 using UnityEngine;
 
 namespace OmiLAXR.TrackingBehaviours.System
 {
     [AddComponentMenu("OmiLAXR / 3) Tracking Behaviours / System Tracking Behaviour")]
+    [Description("Tracks states of game (started, quit, paused, resumed, focused, unfocused) and detects state changes.")]
     public class SystemTrackingBehaviour : EventTrackingBehaviour
     {
         public readonly TrackingBehaviourEvent<DateTime> OnStartedGame = new TrackingBehaviourEvent<DateTime>();

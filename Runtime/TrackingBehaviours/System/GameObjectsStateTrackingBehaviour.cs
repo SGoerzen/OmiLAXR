@@ -1,9 +1,11 @@
+using System.ComponentModel;
 using UnityEngine;
 using UnityEngine.Events;
-using Object = UnityEngine.Object;
 
 namespace OmiLAXR.TrackingBehaviours.System
 {
+    [AddComponentMenu("OmiLAXR / 3) Tracking Behaviours / Game Objects State Tracking Behaviour")]
+    [Description("Tracks if a game object state is changed (e.g. is destroyed).")]
     public class GameObjectsStateTrackingBehaviour : TrackingBehaviour<GameObject>
     {
         public class GameObjectStateListener : MonoBehaviour
