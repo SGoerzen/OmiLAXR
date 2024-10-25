@@ -82,7 +82,7 @@ namespace OmiLAXR.TrackingBehaviours
         
         protected TS[] Select<TS>(Object[] objects) where TS : Object
             => objects
-                .Where(o => o.GetType().IsSubclassOf(typeof(TS)))
+                .Where(o => o.GetType() == typeof(TS) || o.GetType().IsSubclassOf(typeof(TS)))
                 .Select(o => o as TS).ToArray();
     }
 }
