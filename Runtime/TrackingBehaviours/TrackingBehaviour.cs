@@ -1,4 +1,3 @@
-using System;
 using System.Linq;
 using System.Reflection;
 using UnityEngine;
@@ -6,11 +5,19 @@ using Object = UnityEngine.Object;
 
 namespace OmiLAXR.TrackingBehaviours
 {
+
+    public abstract class TrackingBehaviour : TrackingBehaviour<Object>
+    {
+        
+    }
+    
     [DefaultExecutionOrder(-1)]
-    public abstract class TrackingBehaviour : PipelineComponent
+    public abstract class TrackingBehaviour<T> : PipelineComponent, ITrackingBehaviour
+    where T : Object
     {
         protected Pipeline pipeline { get; private set; }
         public Actor GetActor() => pipeline.actor;
+        public Instructor GetInstructor() => pipeline.instructor;
         protected virtual void Awake()
         {
             pipeline = GetComponentInParent<Pipeline>(true);
@@ -22,13 +29,21 @@ namespace OmiLAXR.TrackingBehaviours
                 pipeline = pipelineExt.GetPipeline();
             }
             
-            pipeline.AfterFoundObjects += AfterFoundObjects;
-            pipeline.AfterFilteredObjects += AfterFilteredObjects;
+            pipeline.AfterFoundObjects += (objects) =>
+            {
+                // Skip Select<T> if not needed
+                AfterFoundObjects(typeof(T) == typeof(Object) ? objects as T[] : Select<T>(objects));
+            };
+            pipeline.AfterFilteredObjects += (objects) =>
+            {
+                // Skip Select<T> if not needed
+                AfterFilteredObjects(typeof(T) == typeof(Object) ? objects as T[] : Select<T>(objects));
+            };
             pipeline.BeforeStoppedPipeline += (p) => Dispose(p.trackingObjects.ToArray());
         }
         
-        protected virtual void AfterFoundObjects(Object[] objects) {}
-        protected abstract void AfterFilteredObjects(Object[] objects);
+        protected virtual void AfterFoundObjects(T[] objects) {}
+        protected abstract void AfterFilteredObjects(T[] objects);
 
         protected void OnEnable()
         {
@@ -65,9 +80,9 @@ namespace OmiLAXR.TrackingBehaviours
         protected void Log(string message, params object[] ps)
             => DebugLog.OmiLAXR.Print($"(Pipeline '{pipeline.name}') " + message);
         
-        protected T[] Select<T>(Object[] objects) where T : Object
+        protected TS[] Select<TS>(Object[] objects) where TS : Object
             => objects
-                .Where(o => o.GetType().IsSubclassOf(typeof(T)))
-                .Select(o => o as T).ToArray();
+                .Where(o => o.GetType() == typeof(TS) || o.GetType().IsSubclassOf(typeof(TS)))
+                .Select(o => o as TS).ToArray();
     }
 }

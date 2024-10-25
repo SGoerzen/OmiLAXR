@@ -3,16 +3,8 @@ using UnityEngine;
 
 namespace OmiLAXR.Composers
 {
-    public interface IComposer
-    {
-        event ComposerAction<IStatement, bool> AfterComposed;
-        bool IsHigherComposer { get; }
-        bool IsEnabled { get; }
-        Author GetAuthor();
-    }
-
     public abstract class Composer<T> : PipelineComponent, IComposer
-        where T : TrackingBehaviour
+        where T : PipelineComponent, ITrackingBehaviour
     {
         [HideInInspector] public T trackingBehaviour;
 
@@ -27,12 +19,14 @@ namespace OmiLAXR.Composers
         public event ComposerAction<IStatement, bool> AfterComposed;
 
         protected static TB GetTrackingBehaviour<TB>(bool includeInactive = false)
-            where TB : TrackingBehaviour => FindObjectOfType<TB>(includeInactive);
+            where TB : Object, ITrackingBehaviour => FindObjectOfType<TB>(includeInactive);
 
         protected void SendStatement(IStatement statement, bool immediate = false)
         {
             AfterComposed?.Invoke(this, statement, immediate);
         }
+        protected void SendStatementImmediate(IStatement statement)
+            => SendStatement(statement, immediate: true);
 
         protected virtual void Awake()
         {

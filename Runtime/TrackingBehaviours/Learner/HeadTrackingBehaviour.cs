@@ -1,11 +1,10 @@
 using System;
 using System.Collections.Generic;
 using UnityEngine;
-using Object = UnityEngine.Object;
 
 namespace OmiLAXR.TrackingBehaviours.Learner
 {
-    public class HeadTrackingBehaviour : TrackingBehaviour
+    public class HeadTrackingBehaviour : EventTrackingBehaviour
     {
         public struct HeadTrackingBehaviourArgs
         {
@@ -73,11 +72,6 @@ namespace OmiLAXR.TrackingBehaviours.Learner
         private readonly TimeSpan _continuousTimeBetweenNods = new TimeSpan(0, 0, 0, 1, 0);
         private readonly TimeSpan _continuousTimeBetweenShakes = new TimeSpan(0, 0, 0, 1, 0);
         private readonly TimeSpan _minTimeForGestures = new TimeSpan(0, 0, 0, 1, 0);
-        
-        protected override void AfterFilteredObjects(Object[] objects)
-        {
-            
-        }
 
         // Start is called before the first frame update
         private void Start()

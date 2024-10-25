@@ -1,13 +1,11 @@
 using System.ComponentModel;
 using UnityEngine;
-using Object = UnityEngine.Object;
 
 namespace OmiLAXR.TrackingBehaviours.Learner
 {
-    [AddComponentMenu("OmiLAXR / 3) Tracking Behaviours / Mouse Tracking Behaviour"),
-     Description("Tracks mouse clicks and wheel."),
-    ]
-    public class MouseTrackingBehaviour : TrackingBehaviour
+    [AddComponentMenu("OmiLAXR / 3) Tracking Behaviours / Mouse Tracking Behaviour")]
+    [Description("Tracks mouse clicks and wheel.")]
+    public class MouseTrackingBehaviour : EventTrackingBehaviour
     {
         public struct MouseTrackingBehaviourArgs
         {
@@ -34,8 +32,8 @@ namespace OmiLAXR.TrackingBehaviours.Learner
             new TrackingBehaviourEvent<MouseTrackingBehaviourArgs, float>();
         
         [Gesture("Mouse"), Action("Move")]
-        public TrackingBehaviourEvent<Vector3> OnMousePositionChanged =
-            new TrackingBehaviourEvent<Vector3>();
+        public TrackingBehaviourEvent<Vector3, Vector3> OnMousePositionChanged =
+            new TrackingBehaviourEvent<Vector3, Vector3>();
         
         private bool _isLeftDown;
         private bool _isRightDown;
@@ -96,14 +94,9 @@ namespace OmiLAXR.TrackingBehaviours.Learner
             if (distance > movementThreshold)
             {
                 // Update last mouse position
+                OnMousePositionChanged?.Invoke(this, Input.mousePosition, _lastMousePosition);
                 _lastMousePosition = Input.mousePosition;
-                OnMousePositionChanged?.Invoke(this, Input.mousePosition);
             }
-        }
-
-        protected override void AfterFilteredObjects(Object[] objects)
-        {
-            
         }
     }
 }

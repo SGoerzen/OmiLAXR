@@ -1,4 +1,3 @@
-using System;
 using Object = UnityEngine.Object;
 
 namespace OmiLAXR.Listeners
@@ -7,7 +6,7 @@ namespace OmiLAXR.Listeners
     {
         protected Pipeline pipeline { get; private set; }
         public Actor GetActor() => pipeline.actor;
-        public event System.Action<Object[]> onFoundObjects;
+        public event System.Action<Object[]> OnFoundObjects;
         public abstract void StartListening();
         
         protected virtual void Awake()
@@ -22,7 +21,7 @@ namespace OmiLAXR.Listeners
 
         protected void Found<T>(params T[] objects) where T : Object
         {
-            onFoundObjects?.Invoke(objects);
+            OnFoundObjects?.Invoke(objects);
         }
     }
 }

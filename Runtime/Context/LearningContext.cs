@@ -1,8 +1,6 @@
-using UnityEngine;
-
 namespace OmiLAXR.Context
 {
-    public abstract class LearningContext : MonoBehaviour
+    public abstract class LearningContext : PipelineComponent
     {
         
     }

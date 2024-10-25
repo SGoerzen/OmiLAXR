@@ -15,10 +15,10 @@ namespace OmiLAXR
         public void Extend(Pipeline pipeline)
         {
             var listeners = gameObject.GetComponentsInChildren<Listener>();
-            var tbs = gameObject.GetComponentsInChildren<TrackingBehaviour>();
+            var tbs = gameObject.GetComponentsInChildren<ITrackingBehaviour>();
             var filters = gameObject.GetComponentsInChildren<Filter>();
             var extensions = Array.Empty<PipelineComponent>();
-            extensions = extensions.Concat(listeners).Concat(tbs).Concat(filters).ToArray();
+            extensions = extensions.Concat(listeners).Concat(tbs as PipelineComponent[]).Concat(filters).ToArray();
             foreach (var ext in extensions)
             {
                 // register in pipeline, just fyi

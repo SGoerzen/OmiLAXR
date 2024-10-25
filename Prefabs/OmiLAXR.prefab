@@ -11,6 +11,7 @@ GameObject:
   - component: {fileID: 3220772463875552635}
   - component: {fileID: 2862706625674710629}
   - component: {fileID: 5142120668608055721}
+  - component: {fileID: 6278588221442981647}
   m_Layer: 0
   m_Name: OmiLAXR
   m_TagString: Untagged
@@ -58,6 +59,21 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: fea6349409d342408a3873dcb2321330, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  appendix:
+    suffixes: []
+    prefixes: []
+--- !u!114 &6278588221442981647
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 4849332239243691096}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 91f2021e90c24d76ad281d49eeb69b83, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
 --- !u!1001 &680444189854626026

@@ -1,21 +1,22 @@
 using System;
+using System.ComponentModel;
 using UnityEngine;
-using Object = UnityEngine.Object;
 
 namespace OmiLAXR.TrackingBehaviours.System
 {
     [AddComponentMenu("OmiLAXR / 3) Tracking Behaviours / System Tracking Behaviour")]
-    public class SystemTrackingBehaviour : TrackingBehaviour
+    [Description("Tracks states of game (started, quit, paused, resumed, focused, unfocused) and detects state changes.")]
+    public class SystemTrackingBehaviour : EventTrackingBehaviour
     {
         public readonly TrackingBehaviourEvent<DateTime> OnStartedGame = new TrackingBehaviourEvent<DateTime>();
         public readonly TrackingBehaviourEvent<DateTime> OnQuitGame = new TrackingBehaviourEvent<DateTime>();
         public readonly TrackingBehaviourEvent<DateTime, bool> OnFocusedGame = new TrackingBehaviourEvent<DateTime, bool>();
         public readonly TrackingBehaviourEvent<DateTime, bool> OnPausedGame = new TrackingBehaviourEvent<DateTime, bool>();
-
+        
         [DefaultExecutionOrder(-10000)]
         protected static class SystemStartController
         {
-            public static DateTime StartTime;
+            public static DateTime? StartTime;
             [RuntimeInitializeOnLoadMethod]
             private static void GameStarted()
             {
@@ -23,13 +24,23 @@ namespace OmiLAXR.TrackingBehaviours.System
             }
         }
 
+        private bool _isFirstRun = true;
+        private bool _sendStartSignal = false;
+        
         private void Start()
         {
-            var stbs = FindObjectsOfType<SystemTrackingBehaviour>();
-            foreach (var stb in stbs)
-            {
-                stb.OnStartedGame?.Invoke(stb, SystemStartController.StartTime);
-            }
+            SendStartSignal();
+        }
+
+        private void SendStartSignal()
+        {
+            if (_sendStartSignal)
+                return;
+            
+            var now = SystemStartController.StartTime.HasValue ? SystemStartController.StartTime.Value : DateTime.Now;
+            OnStartedGame?.Invoke(this, now);
+
+            _sendStartSignal = true;
         }
 
         private void OnApplicationQuit()
@@ -39,17 +50,18 @@ namespace OmiLAXR.TrackingBehaviours.System
 
         private void OnApplicationFocus(bool hasFocus)
         {
+            SendStartSignal();
             OnFocusedGame?.Invoke(this, DateTime.Now, hasFocus);
         }
 
         private void OnApplicationPause(bool pauseStatus)
         {
+            if (_isFirstRun)
+            {
+                _isFirstRun = false;
+                return;
+            }
             OnPausedGame?.Invoke(this, DateTime.Now, pauseStatus);
-        }
-
-        protected override void AfterFilteredObjects(Object[] objects)
-        {
-            
         }
     }
 }

@@ -25,12 +25,8 @@ namespace OmiLAXR.Tests
             
             }
         }
-        public class MockTrackingBehaviour : TrackingBehaviour
+        public class MockTrackingBehaviour : EventTrackingBehaviour
         {
-            protected override void AfterFilteredObjects(Object[] objects)
-            {
-            
-            }
         }
         
         // Mock classes to simulate the Pipeline and other components

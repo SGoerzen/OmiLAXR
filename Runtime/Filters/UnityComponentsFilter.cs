@@ -1,13 +1,16 @@
 using System;
+using System.ComponentModel;
 using System.Linq;
 using TMPro;
 using UnityEngine;
 using UnityEngine.EventSystems;
+using Component = UnityEngine.Component;
 using Object = UnityEngine.Object;
 
 namespace OmiLAXR.Filters
 {
     [AddComponentMenu("OmiLAXR / 2) Filters / Unity Components Filter")]
+    [Description("Filters out system relevant components that do need to be tracked.")]
     public class UnityComponentsFilter : Filter
     {
         private static readonly Type[] ForbiddenTypes = new []
@@ -20,7 +23,6 @@ namespace OmiLAXR.Filters
             typeof(Canvas),
             typeof(TextMeshPro),
             typeof(TextMeshProUGUI),
-            typeof(Camera)
         };
         public override Object[] Pass(Object[] gos)
         {
