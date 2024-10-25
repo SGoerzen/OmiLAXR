@@ -4,5 +4,7 @@ namespace OmiLAXR.Composers
     {
         public bool IsDiscarded();
         public void Discard();
+
+        public string ToDataStandardString();
     }
 }

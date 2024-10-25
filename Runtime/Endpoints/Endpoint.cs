@@ -20,7 +20,7 @@ namespace OmiLAXR.Endpoints
         public bool IsTransferring { get; private set; }
         
         private BackgroundWorker _sendWorker;
-        private readonly ConcurrentQueue<IStatement> _queuedStatements = new ConcurrentQueue<IStatement>();
+        protected readonly ConcurrentQueue<IStatement> QueuedStatements = new ConcurrentQueue<IStatement>();
         
         private void SendWorkerOnDoWork(object sender, DoWorkEventArgs e)
         {
@@ -53,6 +53,16 @@ namespace OmiLAXR.Endpoints
                 
                 
             }
+        }
+
+        private void OnApplicationQuit()
+        {
+            OnDispose();
+        }
+
+        protected virtual void OnDispose()
+        {
+            // do nothing
         }
 
         public void StartSending()
@@ -117,7 +127,7 @@ namespace OmiLAXR.Endpoints
         public virtual void SendStatement(IStatement statement)
         {
             // Debug.Log("Enqueue " + statement, this);
-            _queuedStatements.Enqueue(statement);
+            QueuedStatements.Enqueue(statement);
         }
         /// <summary>
         /// Send statement immediate without using queue system.
@@ -147,7 +157,7 @@ namespace OmiLAXR.Endpoints
                 {
                     OnFailedSendingStatement?.Invoke(this, statement);
                     // enqueue again
-                    _queuedStatements.Enqueue(statement);
+                    QueuedStatements.Enqueue(statement);
                 }
                 else
                 {
@@ -165,7 +175,7 @@ namespace OmiLAXR.Endpoints
         
         protected virtual TransferCode HandleQueue()
         {
-            if (!_queuedStatements.TryDequeue(out var statement))
+            if (!QueuedStatements.TryDequeue(out var statement))
                 return TransferCode.NoStatements;
 
             return TransferStatement(statement);

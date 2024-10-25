@@ -1,4 +1,4 @@
-using System;
+using System.ComponentModel;
 using System.IO;
 using UnityEngine;
 
@@ -9,7 +9,7 @@ namespace OmiLAXR.Endpoints
     [DefaultExecutionOrder(-1000)]
     public class BasicAuthCredentialsFileLoader : MonoBehaviour
     {
-        [Header("Name of file that is located in Assets folder (data path).")]
+        [Header("Name of file that is located in StreamingAssets path.")]
         public string filename = "credentials.json";
 
         public BasicAuthEndpoint targetEndpoint;

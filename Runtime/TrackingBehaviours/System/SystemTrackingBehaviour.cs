@@ -16,7 +16,7 @@ namespace OmiLAXR.TrackingBehaviours.System
         [DefaultExecutionOrder(-10000)]
         protected static class SystemStartController
         {
-            public static DateTime StartTime;
+            public static DateTime? StartTime;
             [RuntimeInitializeOnLoadMethod]
             private static void GameStarted()
             {
@@ -25,14 +25,22 @@ namespace OmiLAXR.TrackingBehaviours.System
         }
 
         private bool _isFirstRun = true;
+        private bool _sendStartSignal = false;
         
         private void Start()
         {
-            var stbs = FindObjectsOfType<SystemTrackingBehaviour>();
-            foreach (var stb in stbs)
-            {
-                stb.OnStartedGame?.Invoke(stb, SystemStartController.StartTime);
-            }
+            SendStartSignal();
+        }
+
+        private void SendStartSignal()
+        {
+            if (_sendStartSignal)
+                return;
+            
+            var now = SystemStartController.StartTime.HasValue ? SystemStartController.StartTime.Value : DateTime.Now;
+            OnStartedGame?.Invoke(this, now);
+
+            _sendStartSignal = true;
         }
 
         private void OnApplicationQuit()
@@ -42,6 +50,7 @@ namespace OmiLAXR.TrackingBehaviours.System
 
         private void OnApplicationFocus(bool hasFocus)
         {
+            SendStartSignal();
             OnFocusedGame?.Invoke(this, DateTime.Now, hasFocus);
         }
 

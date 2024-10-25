@@ -3,7 +3,7 @@ using UnityEngine;
 
 namespace OmiLAXR.Listeners
 {
-    [AddComponentMenu("OmiLAXR / 1) Listeners / <Transform Watcher> Objects Listener")]
+    [AddComponentMenu("OmiLAXR / 1) Listeners / <TransformWatcher> Objects Listener")]
     [Description("Provides all <TransformWatcher> components to pipeline.")]
     public class TransformWatcherListener : Listener
     {

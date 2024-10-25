@@ -59,6 +59,7 @@ namespace OmiLAXR
         public event EndpointAction<IStatement> BeforeSendStatement; 
         public event EndpointAction<IStatement> AfterSendStatement;
         public event Action<Pipeline> BeforeStoppedPipeline; 
+        public event Action<Pipeline> AfterStoppedPipeline; 
 
         public readonly List<Object> trackingObjects = new List<Object>();
 
@@ -180,7 +181,7 @@ namespace OmiLAXR
             // 1) Start listening for events
             foreach (var listener in Listeners.Where(l => l.enabled))
             {
-                listener.onFoundObjects += FoundObjects;
+                listener.OnFoundObjects += FoundObjects;
                 listener.StartListening();
             }
             
@@ -191,8 +192,18 @@ namespace OmiLAXR
         private void OnDisable()
         {
             BeforeStoppedPipeline?.Invoke(this);
+            
+            trackingObjects.Clear();
+            
+            // clear listenings
+            foreach (var listener in Listeners.Where(l => l.enabled))
+            {
+                listener.OnFoundObjects -= FoundObjects;
+            }
 
             Log("Stopped Pipeline!");
+            
+            AfterStoppedPipeline?.Invoke(this);
         }
 
         public void StartPipeline()
