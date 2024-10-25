@@ -23,6 +23,8 @@ namespace OmiLAXR.Composers
 
         protected void SendStatement(IStatement statement, bool immediate = false)
         {
+            if (!IsEnabled)
+                return;
             AfterComposed?.Invoke(this, statement, immediate);
         }
         protected void SendStatementImmediate(IStatement statement)
@@ -30,8 +32,11 @@ namespace OmiLAXR.Composers
 
         protected virtual void Awake()
         {
-            trackingBehaviour = GetTrackingBehaviour<T>(true);
-            Compose(trackingBehaviour);
+            if (!IsEnabled)
+                return;
+            trackingBehaviour = GetTrackingBehaviour<T>(false);
+            if (trackingBehaviour) 
+                Compose(trackingBehaviour);
         }
 
         protected abstract void Compose(T tb);

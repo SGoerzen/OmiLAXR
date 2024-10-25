@@ -91,28 +91,28 @@ namespace OmiLAXR
             if (actor == null)
                 actor = FindActor();
             
-            TrackingBehaviours.AddRange(GetComponentsInChildren<ITrackingBehaviour>());
+            TrackingBehaviours.AddRange(GetComponentsInChildren<ITrackingBehaviour>(false));
             
             // Find available listeners
-            Listeners.AddRange(GetComponentsInChildren<Listener>());
+            Listeners.AddRange(GetComponentsInChildren<Listener>(false));
             
             // Find available data providers
-            Filters.AddRange(GetComponentsInChildren<Filter>());
+            Filters.AddRange(GetComponentsInChildren<Filter>(false));
             
             // Find available data providers
-            DataProviders.AddRange(FindObjectsOfType<DataProvider>());
+            DataProviders.AddRange(FindObjectsOfType<DataProvider>(false));
             
             // Bind after and before send events
             foreach (var dp in DataProviders)
             {
-                foreach (var c in dp.Composers)
+                foreach (var c in dp.Composers.Where(c => c.IsEnabled))
                 {
                     c.AfterComposed += (composer, statement, immediate) =>
                     {
                         AfterComposedStatement?.Invoke(composer, statement, immediate);
                     };
                 }
-                foreach (var ep in dp.Endpoints)
+                foreach (var ep in dp.Endpoints.Where(e => e.enabled))
                 {
                     ep.OnSendingStatement += (endpoint, statement) =>
                     {

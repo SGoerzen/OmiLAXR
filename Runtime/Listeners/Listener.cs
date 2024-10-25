@@ -11,7 +11,7 @@ namespace OmiLAXR.Listeners
         
         protected virtual void Awake()
         {
-            pipeline = GetComponentInParent<Pipeline>();
+            pipeline = GetComponentInParent<Pipeline>(true);
         }
 
         protected void OnEnable()
@@ -21,6 +21,8 @@ namespace OmiLAXR.Listeners
 
         protected void Found<T>(params T[] objects) where T : Object
         {
+            if (!enabled)
+                return;
             OnFoundObjects?.Invoke(objects);
         }
     }
