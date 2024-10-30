@@ -9,21 +9,23 @@ namespace OmiLAXR.Simulators
     public class EyeTrackingBehaviourSimulator : EyeTrackingBehaviour
     {
         public double exampleViewingAngle = 45.0;
-        
-        private float nextBlinkTime = 0f;    // Time for the next blink
-        private float minBlinkInterval = 3f; // Minimum interval between blinks in seconds
-        private float maxBlinkInterval = 5f; // Maximum interval between blinks in seconds
+
+        private float _nextBlinkTime = 0f; // Time for the next blink
+        public float minBlinkInterval = 3f; // Minimum interval between blinks in seconds
+        public float maxBlinkInterval = 5f; // Maximum interval between blinks in seconds
+
+        private bool _enabledEyeFixation = false;
         
         private void Start()
         {
             // Set the initial time for the first blink
             ScheduleNextBlink();
         }
-        
+
         private void FixedUpdate()
         {
             // Check if it's time to simulate a blink
-            if (Time.time >= nextBlinkTime)
+            if (Time.time >= _nextBlinkTime)
             {
                 SimulateBlinkEvent();
                 ScheduleNextBlink(); // Schedule the next blink
@@ -32,99 +34,61 @@ namespace OmiLAXR.Simulators
 
         private void SimulateBlinkEvent()
         {
+            var randomEye = Random.Range(0, 2);
+            var eye = new[] { BlinkData.BlinkEye.Both, BlinkData.BlinkEye.Left, BlinkData.BlinkEye.Right };
             var durationInMilliseconds = Random.Range(100, 300); // Typical blink duration in ms
-            var blinkData = new BlinkData(BlinkData.BlinkEye.Both, new Duration(durationInMilliseconds, Duration.DurationUnit.Milliseconds));
+            var blinkData = new BlinkData(eye[randomEye],
+                new Duration(durationInMilliseconds, Duration.DurationUnit.Milliseconds));
 
-            eyeTrackingBehaviour.OnBlinked.Invoke(this, blinkData);
+            OnBlinked.Invoke(this, blinkData);
             Debug.Log($"Simulated Blink Event: Duration = {durationInMilliseconds} ms");
         }
 
         private void ScheduleNextBlink()
         {
             // Set the time for the next blink using a random interval
-            nextBlinkTime = Time.time + Random.Range(minBlinkInterval, maxBlinkInterval);
+            _nextBlinkTime = Time.time + Random.Range(minBlinkInterval, maxBlinkInterval);
         }
-        
+
         public override PupilDilationData? GetPupilDilationData()
         {
             throw new System.NotImplementedException();
         }
 
         public override double? GetViewingAngle() => exampleViewingAngle;
-
-        public EyeTrackingBehaviour eyeTrackingBehaviour;
-
-    private void OnGUI()
-    {
-        // Set button dimensions
-        const float buttonWidth = 150f;
-        const float buttonHeight = 50f;
-        const float padding = 10f;
-        const float startX = 10f;
-        const float startY = 10f;
-
-        // Fixation Button
-        if (GUI.Button(new Rect(startX, startY, buttonWidth, buttonHeight), "Simulate Fixation"))
+        
+        // Detect collisions to simulate a fixation event on collision
+        private void OnCollisionEnter(Collision collision)
         {
-            // var fixationData = new FixationData
-            // {
-            //     GazeCoordinates = new Vector3(Random.Range(-5f, 5f), Random.Range(-5f, 5f), 0),
-            //     Duration = Random.Range(500, 1500) // Duration in ms
-            // };
-            // eyeTrackingBehaviour.OnFixated.Invoke(fixationData);
-            Debug.Log("Simulated Fixation Event");
+            if (!_enabledEyeFixation)
+                return;
+            // Get collision point data
+            var collisionPoint = collision.contacts[0].point;
+            SimulateFixationEvent(collision.gameObject, collisionPoint, Random.Range(500, 1500)); // Random duration for fixation
         }
 
-        // Saccade Button
-        if (GUI.Button(new Rect(startX, startY + (buttonHeight + padding), buttonWidth, buttonHeight), "Simulate Saccade"))
+        private void SimulateFixationEvent(GameObject target, Vector3 fixationPoint, int durationMilliseconds)
         {
-            // var saccadeData = new SaccadeData
-            // {
-            //     StartGazeCoordinates = new Vector3(Random.Range(-5, 5), Random.Range(-5, 5), 0),
-            //     EndGazeCoordinates = new Vector3(Random.Range(-5, 5), Random.Range(-5, 5), 0),
-            //     SaccadeAmplitudeDegrees = Random.Range(5.0f, 20.0f)
-            // };
-            // eyeTrackingBehaviour.OnSaccaded.Invoke(saccadeData);
-            Debug.Log("Simulated Saccade Event");
+            var fixationData = new FixationData(target, fixationPoint, Duration.FromMilliseconds(durationMilliseconds));
+
+            OnFixated.Invoke(this, fixationData);
+            Debug.Log($"Simulated Fixation Event: Position = {fixationPoint}, Duration = {durationMilliseconds} ms");
         }
 
-        // Micro Saccade Button
-        if (GUI.Button(new Rect(startX, startY + 2 * (buttonHeight + padding), buttonWidth, buttonHeight), "Simulate Micro Saccade"))
+        private void OnGUI()
         {
-            // var microSaccadeData = new MicroSaccadeData
-            // {
-            //     AmplitudeInDegrees = Random.Range(0.1f, 0.5f),
-            //     DirectionInDegrees = Random.Range(0.0f, 360.0f),
-            //     DurationInMilliseconds = Random.Range(10, 50)
-            // };
-            // eyeTrackingBehaviour.OnMicroSaccaded.Invoke(microSaccadeData);
-            Debug.Log("Simulated Micro Saccade Event");
-        }
+            // Set button dimensions
+            const float buttonWidth = 150f;
+            const float buttonHeight = 50f;
+            const float padding = 10f;
+            const float startX = 10f;
+            const float startY = 10f;
 
-        // Blink Button
-        if (GUI.Button(new Rect(startX, startY + 3 * (buttonHeight + padding), buttonWidth, buttonHeight), "Simulate Blink"))
-        {
-            // var blinkData = new BlinkData
-            // {
-            //     DurationInMilliseconds = Random.Range(100, 300)
-            // };
-            // eyeTrackingBehaviour.OnBlinked.Invoke(blinkData);
-            Debug.Log("Simulated Blink Event");
+            // Fixation Button
+            if (GUI.Button(new Rect(startX, startY, buttonWidth, buttonHeight), (_enabledEyeFixation ? "Start" : "Stop") + " Simulation Eye Fixation"))
+            {
+                _enabledEyeFixation = !_enabledEyeFixation;
+            }
         }
-
-        // Pupil Dilation Button
-        if (GUI.Button(new Rect(startX, startY + 4 * (buttonHeight + padding), buttonWidth, buttonHeight), "Simulate Pupil Dilation"))
-        {
-            // var pupilDilationData = new PupilDilationData
-            // {
-            //     PupilDiameterStart = 3.1f,
-            //     PupilDiameterEnd = Random.Range(3.5f, 4.5f),
-            //     DilationChange = pupilDilationData.PupilDiameterEnd - pupilDilationData.PupilDiameterStart,
-            //     DurationInMilliseconds = Random.Range(500, 1500)
-            // };
-            // eyeTrackingBehaviour.OnPupilDilation.Invoke(pupilDilationData);
-            Debug.Log("Simulated Pupil Dilation Event");
-        }
-    }
     }
 }

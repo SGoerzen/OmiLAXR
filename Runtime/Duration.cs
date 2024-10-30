@@ -27,6 +27,46 @@ namespace OmiLAXR
             Value = value;
             Unit = unit;
         }
+        
+        /// <summary>
+        /// Creates a Duration from a given number of milliseconds.
+        /// </summary>
+        /// <param name="ms">The duration in milliseconds.</param>
+        /// <returns>A new Duration representing the given milliseconds.</returns>
+        public static Duration FromMilliseconds(long ms) 
+            => new Duration(ms, DurationUnit.Milliseconds);
+        
+        /// <summary>
+        /// Creates a Duration from a given number of seconds.
+        /// </summary>
+        /// <param name="seconds">The duration in seconds.</param>
+        /// <returns>A new Duration representing the given seconds.</returns>
+        public static Duration FromSeconds(long seconds) 
+            => new Duration(seconds, DurationUnit.Seconds);
+        
+        /// <summary>
+        /// Creates a Duration from a given number of minutes.
+        /// </summary>
+        /// <param name="minutes">The duration in minutes.</param>
+        /// <returns>A new Duration representing the given minutes.</returns>
+        public static Duration FromMinutes(long minutes) 
+            => new Duration(minutes, DurationUnit.Minutes);
+        
+        /// <summary>
+        /// Creates a Duration from a given number of hours.
+        /// </summary>
+        /// <param name="hours">The duration in hours.</param>
+        /// <returns>A new Duration representing the given hours.</returns>
+        public static Duration FromHours(long hours) 
+            => new Duration(hours, DurationUnit.Hours);
+        
+        /// <summary>
+        /// Creates a Duration from a given number of days.
+        /// </summary>
+        /// <param name="days">The duration in days.</param>
+        /// <returns>A new Duration representing the given days.</returns>
+        public static Duration FromDays(long days) 
+            => new Duration(days, DurationUnit.Days);
 
         /// <summary>
         /// Converts the duration to an ISO 8601 formatted string.
@@ -34,7 +74,7 @@ namespace OmiLAXR
         /// <returns>A string representing the duration in ISO 8601 format.</returns>
         public override string ToString()
         {
-            TimeSpan timeSpan = Unit switch
+            var timeSpan = Unit switch
             {
                 DurationUnit.Milliseconds => TimeSpan.FromMilliseconds(Value),
                 DurationUnit.Seconds => TimeSpan.FromSeconds(Value),
