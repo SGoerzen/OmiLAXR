@@ -2,7 +2,6 @@ using System;
 using UnityEngine;
 using System.Collections.Generic;
 using System.ComponentModel;
-using Object = UnityEngine.Object;
 
 namespace OmiLAXR.TrackingBehaviours.Learner
 {

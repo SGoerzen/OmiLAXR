@@ -1,4 +1,5 @@
-using System.Numerics;
+using UnityEngine;
+using Vector2 = System.Numerics.Vector2;
 
 namespace OmiLAXR.TrackingBehaviours.Learner.EyeTracking
 {
@@ -8,9 +9,11 @@ namespace OmiLAXR.TrackingBehaviours.Learner.EyeTracking
         public readonly double DirectionInDegrees;
         public readonly Vector2? StartPosition; // Optional
         public readonly Vector2? EndPosition;    // Optional
+        public readonly GameObject Target;
         
-        public MicroSaccadeData(double amplitudeInDegrees, double directionInDegrees, Vector2? startPosition, Vector2? endPosition)
+        public MicroSaccadeData(GameObject target, double amplitudeInDegrees, double directionInDegrees, Vector2? startPosition, Vector2? endPosition)
         {
+            Target = target;
             AmplitudeInDegrees = amplitudeInDegrees;
             DirectionInDegrees = directionInDegrees;
             StartPosition = startPosition;

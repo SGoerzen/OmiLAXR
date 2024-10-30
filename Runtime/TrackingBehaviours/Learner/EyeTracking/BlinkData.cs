@@ -1,16 +1,22 @@
-using System;
 
 namespace OmiLAXR.TrackingBehaviours.Learner.EyeTracking
 {
     public struct BlinkData
     {
-        public readonly int DurationInMilliseconds;  // Duration of blink in ms
-        public readonly DateTime Timestamp;
-
-        public BlinkData(int durationInMilliseconds, DateTime timestamp)
+        public readonly Duration Duration;  
+        public readonly BlinkEye BlinkedEye;
+        
+        public enum BlinkEye
         {
-            DurationInMilliseconds = durationInMilliseconds;
-            Timestamp = timestamp;
+            Left, 
+            Right, 
+            Both
+        }
+
+        public BlinkData(BlinkEye blinkedEye, Duration duration)
+        {
+            BlinkedEye = blinkedEye;
+            Duration = duration;
         }
     }
 }
