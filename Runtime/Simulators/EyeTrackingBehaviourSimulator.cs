@@ -10,11 +10,41 @@ namespace OmiLAXR.Simulators
     {
         public double exampleViewingAngle = 45.0;
         
+        private float nextBlinkTime = 0f;    // Time for the next blink
+        private float minBlinkInterval = 3f; // Minimum interval between blinks in seconds
+        private float maxBlinkInterval = 5f; // Maximum interval between blinks in seconds
+        
         private void Start()
         {
-            
+            // Set the initial time for the first blink
+            ScheduleNextBlink();
+        }
+        
+        private void FixedUpdate()
+        {
+            // Check if it's time to simulate a blink
+            if (Time.time >= nextBlinkTime)
+            {
+                SimulateBlinkEvent();
+                ScheduleNextBlink(); // Schedule the next blink
+            }
         }
 
+        private void SimulateBlinkEvent()
+        {
+            var durationInMilliseconds = Random.Range(100, 300); // Typical blink duration in ms
+            var blinkData = new BlinkData(BlinkData.BlinkEye.Both, new Duration(durationInMilliseconds, Duration.DurationUnit.Milliseconds));
+
+            eyeTrackingBehaviour.OnBlinked.Invoke(this, blinkData);
+            Debug.Log($"Simulated Blink Event: Duration = {durationInMilliseconds} ms");
+        }
+
+        private void ScheduleNextBlink()
+        {
+            // Set the time for the next blink using a random interval
+            nextBlinkTime = Time.time + Random.Range(minBlinkInterval, maxBlinkInterval);
+        }
+        
         public override PupilDilationData? GetPupilDilationData()
         {
             throw new System.NotImplementedException();

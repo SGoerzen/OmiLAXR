@@ -7,11 +7,11 @@ namespace OmiLAXR
     {
         public enum DurationUnit
         {
-            Millisecond,
-            Second,
-            Minute,
-            Hour,
-            Day
+            Milliseconds,
+            Seconds,
+            Minutes,
+            Hours,
+            Days
         }
 
         public long Value { get; private set; }
@@ -36,11 +36,11 @@ namespace OmiLAXR
         {
             TimeSpan timeSpan = Unit switch
             {
-                DurationUnit.Millisecond => TimeSpan.FromMilliseconds(Value),
-                DurationUnit.Second => TimeSpan.FromSeconds(Value),
-                DurationUnit.Minute => TimeSpan.FromMinutes(Value),
-                DurationUnit.Hour => TimeSpan.FromHours(Value),
-                DurationUnit.Day => TimeSpan.FromDays(Value),
+                DurationUnit.Milliseconds => TimeSpan.FromMilliseconds(Value),
+                DurationUnit.Seconds => TimeSpan.FromSeconds(Value),
+                DurationUnit.Minutes => TimeSpan.FromMinutes(Value),
+                DurationUnit.Hours => TimeSpan.FromHours(Value),
+                DurationUnit.Days => TimeSpan.FromDays(Value),
                 _ => throw new ArgumentOutOfRangeException()
             };
 
