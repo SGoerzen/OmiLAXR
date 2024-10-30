@@ -11,7 +11,7 @@ namespace OmiLAXR.Listeners
         
         protected virtual void Awake()
         {
-            pipeline = GetComponentInParent<Pipeline>();
+            pipeline = GetComponentInParent<Pipeline>(true);
         }
 
         protected void OnEnable()
@@ -19,8 +19,21 @@ namespace OmiLAXR.Listeners
             
         }
 
+        /// <summary>
+        /// Finds a group of objects and provide them to pipeline.
+        /// </summary>
+        /// <param name="includeInactive"></param>
+        /// <typeparam name="T"></typeparam>
+        protected void Detect<T>(bool includeInactive = false) where T : Object
+        {
+            var objects = FindObjectsOfType<T>(includeInactive);
+            Found(objects);
+        }
+        
         protected void Found<T>(params T[] objects) where T : Object
         {
+            if (!enabled || objects == null || objects.Length == 0)
+                return;
             OnFoundObjects?.Invoke(objects);
         }
     }

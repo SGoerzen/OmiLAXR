@@ -31,11 +31,15 @@ namespace OmiLAXR.TrackingBehaviours
             
             pipeline.AfterFoundObjects += (objects) =>
             {
+                if (!enabled)
+                    return;
                 // Skip Select<T> if not needed
                 AfterFoundObjects(typeof(T) == typeof(Object) ? objects as T[] : Select<T>(objects));
             };
             pipeline.AfterFilteredObjects += (objects) =>
             {
+                if (!enabled)
+                    return;
                 // Skip Select<T> if not needed
                 AfterFilteredObjects(typeof(T) == typeof(Object) ? objects as T[] : Select<T>(objects));
             };

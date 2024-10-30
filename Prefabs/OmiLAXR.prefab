@@ -12,6 +12,9 @@ GameObject:
   - component: {fileID: 2862706625674710629}
   - component: {fileID: 5142120668608055721}
   - component: {fileID: 6278588221442981647}
+  - component: {fileID: 9000536879720639053}
+  - component: {fileID: 8505579125575067060}
+  - component: {fileID: 5725171193053841646}
   m_Layer: 0
   m_Name: OmiLAXR
   m_TagString: Untagged
@@ -76,6 +79,47 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 91f2021e90c24d76ad281d49eeb69b83, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  fps: 0
+--- !u!114 &9000536879720639053
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 4849332239243691096}
+  m_Enabled: 0
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 15a955a0bc6b4d8988bb3e6df692d10e, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  uuid: 
+  autoGenerateUuid: 0
+--- !u!114 &8505579125575067060
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 4849332239243691096}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: fb010e45259d491d8f34e025d5641ced, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  provider: {fileID: 5725171193053841646}
+--- !u!114 &5725171193053841646
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 4849332239243691096}
+  m_Enabled: 0
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 49534923aaa4463eb04cebfeed7c75c7, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  heartRate: 0
 --- !u!1001 &680444189854626026
 PrefabInstance:
   m_ObjectHideFlags: 0
