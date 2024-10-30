@@ -15,6 +15,7 @@ namespace OmiLAXR.Simulators
         public float maxBlinkInterval = 5f; // Maximum interval between blinks in seconds
 
         private bool _enabledEyeFixation = false;
+        private GameObject _fixatedGameObject;
         
         private void Start()
         {
@@ -30,6 +31,8 @@ namespace OmiLAXR.Simulators
                 SimulateBlinkEvent();
                 ScheduleNextBlink(); // Schedule the next blink
             }
+            
+            RaycastFromMouse();
         }
 
         private void SimulateBlinkEvent()
@@ -57,16 +60,32 @@ namespace OmiLAXR.Simulators
 
         public override double? GetViewingAngle() => exampleViewingAngle;
         
-        // Detect collisions to simulate a fixation event on collision
-        private void OnCollisionEnter(Collision collision)
+        
+        
+        private void RaycastFromMouse()
         {
-            if (!_enabledEyeFixation)
-                return;
-            // Get collision point data
-            var collisionPoint = collision.contacts[0].point;
-            SimulateFixationEvent(collision.gameObject, collisionPoint, Random.Range(500, 1500)); // Random duration for fixation
+            // Create a ray from the mouse position in world space
+            var ray = Camera.main.ScreenPointToRay(Input.mousePosition);
+        
+            // Variable to store information about what the ray hits
+            if (Physics.Raycast(ray, out RaycastHit hitInfo))
+            {
+                if (!hitInfo.collider.gameObject)
+                {
+                    _fixatedGameObject = null;
+                    return;
+                }
+                
+                if (_fixatedGameObject != hitInfo.collider.gameObject)
+                {
+                    // If raycast hits an object, simulate a fixation on that object
+                    SimulateFixationEvent(hitInfo.collider.gameObject, hitInfo.point, Random.Range(500, 1500));
+                    _fixatedGameObject = null;
+                }
+               
+            }
         }
-
+        
         private void SimulateFixationEvent(GameObject target, Vector3 fixationPoint, int durationMilliseconds)
         {
             var fixationData = new FixationData(target, fixationPoint, Duration.FromMilliseconds(durationMilliseconds));
@@ -78,14 +97,14 @@ namespace OmiLAXR.Simulators
         private void OnGUI()
         {
             // Set button dimensions
-            const float buttonWidth = 150f;
+            const float buttonWidth = 250f;
             const float buttonHeight = 50f;
             const float padding = 10f;
             const float startX = 10f;
             const float startY = 10f;
 
             // Fixation Button
-            if (GUI.Button(new Rect(startX, startY, buttonWidth, buttonHeight), (_enabledEyeFixation ? "Start" : "Stop") + " Simulation Eye Fixation"))
+            if (GUI.Button(new Rect(startX, startY, buttonWidth, buttonHeight), (!_enabledEyeFixation ? "Start" : "Stop") + " Simulation Eye Fixation"))
             {
                 _enabledEyeFixation = !_enabledEyeFixation;
             }
