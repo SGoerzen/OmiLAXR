@@ -1,9 +1,14 @@
+using System;
+using System.ComponentModel;
 using OmiLAXR.Actors.HeartRate;
 using UnityEngine;
 using Random = System.Random;
 
-namespace OmiLAXR.Simulators
+namespace OmiLAXR.Actors.HeartRate
 {
+    [AddComponentMenu("OmiLAXR / 0) Learner / Heart Rate Monitor")]
+    [DisallowMultipleComponent]
+    [Description("Simulates heart rate beats.")]
     public class HeartRateSimulator : HeartRateProvider
     {
         private Random random = new Random();

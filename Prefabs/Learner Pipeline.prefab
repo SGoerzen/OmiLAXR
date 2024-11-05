@@ -70,9 +70,6 @@ PrefabInstance:
       addedObject: {fileID: 6315836573882892069}
     - targetCorrespondingSourceObject: {fileID: 6582749516187797561, guid: 3406909dc7d1f436c8728e682dd9f930, type: 3}
       insertIndex: -1
-      addedObject: {fileID: 4478193326039442264}
-    - targetCorrespondingSourceObject: {fileID: 6582749516187797561, guid: 3406909dc7d1f436c8728e682dd9f930, type: 3}
-      insertIndex: -1
       addedObject: {fileID: 2034370651249271796}
     - targetCorrespondingSourceObject: {fileID: 6978243314795396507, guid: 3406909dc7d1f436c8728e682dd9f930, type: 3}
       insertIndex: -1
@@ -164,19 +161,6 @@ MonoBehaviour:
   actor: {fileID: 4928581912976695948}
   instructor: {fileID: 0}
   Extensions: []
---- !u!114 &4478193326039442264
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 2376266485913577314}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: fb010e45259d491d8f34e025d5641ced, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  provider: {fileID: 0}
 --- !u!114 &2034370651249271796
 MonoBehaviour:
   m_ObjectHideFlags: 0

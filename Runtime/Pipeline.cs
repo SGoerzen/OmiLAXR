@@ -32,7 +32,9 @@ namespace OmiLAXR
         public readonly Dictionary<string, List<ITrackingBehaviourEvent>> Gestures = new Dictionary<string, List<ITrackingBehaviourEvent>>();
 
         public List<PipelineExtension> Extensions = new List<PipelineExtension>();
-        
+
+        public ActorDataProvider[] ActorDataProviders { get; protected set; }
+
         public static T GetPipeline<T>() where T : Pipeline
             => FindObjectOfType<T>();
 
@@ -90,6 +92,8 @@ namespace OmiLAXR
         {
             if (actor == null)
                 actor = FindActor();
+
+            ActorDataProviders = GetComponentsInChildren<ActorDataProvider>(false);
             
             TrackingBehaviours.AddRange(GetComponentsInChildren<ITrackingBehaviour>(false));
             

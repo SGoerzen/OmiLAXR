@@ -19,21 +19,21 @@ namespace OmiLAXR.TrackingBehaviours
         {
             base.Awake();
            
-            pipeline.AfterFoundObjects += (objects) =>
+            Pipeline.AfterFoundObjects += (objects) =>
             {
                 if (!enabled)
                     return;
                 // Skip Select<T> if not needed
                 AfterFoundObjects(typeof(T) == typeof(Object) ? objects as T[] : Select<T>(objects));
             };
-            pipeline.AfterFilteredObjects += (objects) =>
+            Pipeline.AfterFilteredObjects += (objects) =>
             {
                 if (!enabled)
                     return;
                 // Skip Select<T> if not needed
                 AfterFilteredObjects(typeof(T) == typeof(Object) ? objects as T[] : Select<T>(objects));
             };
-            pipeline.BeforeStoppedPipeline += (p) => Dispose(p.trackingObjects.ToArray());
+            Pipeline.BeforeStoppedPipeline += (p) => Dispose(p.trackingObjects.ToArray());
         }
         
         protected virtual void AfterFoundObjects(T[] objects) {}

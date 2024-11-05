@@ -6,5 +6,6 @@ namespace OmiLAXR.Composers
         public void Discard();
 
         public string ToDataStandardString();
+        public PipelineInfo GetSenderPipelineInfo();
     }
 }
