@@ -1,4 +1,4 @@
-using OmiLAXR.Context.HeartRate;
+using OmiLAXR.Actors.HeartRate;
 using UnityEngine;
 using Random = System.Random;
 

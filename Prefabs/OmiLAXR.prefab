@@ -13,8 +13,6 @@ GameObject:
   - component: {fileID: 5142120668608055721}
   - component: {fileID: 6278588221442981647}
   - component: {fileID: 9000536879720639053}
-  - component: {fileID: 8505579125575067060}
-  - component: {fileID: 5725171193053841646}
   m_Layer: 0
   m_Name: OmiLAXR
   m_TagString: Untagged
@@ -94,32 +92,6 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   uuid: 
   autoGenerateUuid: 0
---- !u!114 &8505579125575067060
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 4849332239243691096}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: fb010e45259d491d8f34e025d5641ced, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  provider: {fileID: 5725171193053841646}
---- !u!114 &5725171193053841646
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 4849332239243691096}
-  m_Enabled: 0
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 49534923aaa4463eb04cebfeed7c75c7, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  heartRate: 0
 --- !u!1001 &680444189854626026
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -132,6 +104,10 @@ PrefabInstance:
       propertyPath: m_Name
       value: Learner Pipeline
       objectReference: {fileID: 0}
+    - target: {fileID: 4478193326039442264, guid: 4f668f0f622a648e6be1f89fd531ad8a, type: 3}
+      propertyPath: provider
+      value: 
+      objectReference: {fileID: 1534290645730071326}
     - target: {fileID: 7127387735422903025, guid: 4f668f0f622a648e6be1f89fd531ad8a, type: 3}
       propertyPath: m_LocalPosition.x
       value: 0
@@ -177,6 +153,17 @@ PrefabInstance:
     m_AddedGameObjects: []
     m_AddedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 4f668f0f622a648e6be1f89fd531ad8a, type: 3}
+--- !u!114 &1534290645730071326 stripped
+MonoBehaviour:
+  m_CorrespondingSourceObject: {fileID: 2034370651249271796, guid: 4f668f0f622a648e6be1f89fd531ad8a, type: 3}
+  m_PrefabInstance: {fileID: 680444189854626026}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 0
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 49534923aaa4463eb04cebfeed7c75c7, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!4 &7753224937973273115 stripped
 Transform:
   m_CorrespondingSourceObject: {fileID: 7127387735422903025, guid: 4f668f0f622a648e6be1f89fd531ad8a, type: 3}

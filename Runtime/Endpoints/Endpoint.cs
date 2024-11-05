@@ -7,7 +7,7 @@ using UnityEngine;
 
 namespace OmiLAXR.Endpoints
 {
-    public abstract class Endpoint : PipelineComponent
+    public abstract class Endpoint : DataProviderPipelineComponent
     {
         public event EndpointAction OnStartedSending;
         public event EndpointAction OnStoppedSending;

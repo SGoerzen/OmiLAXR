@@ -12,23 +12,13 @@ namespace OmiLAXR.TrackingBehaviours
     }
     
     [DefaultExecutionOrder(-1)]
-    public abstract class TrackingBehaviour<T> : PipelineComponent, ITrackingBehaviour
+    public abstract class TrackingBehaviour<T> : ActorPipelineComponent, ITrackingBehaviour
     where T : Object
     {
-        protected Pipeline pipeline { get; private set; }
-        public Actor GetActor() => pipeline.actor;
-        public Instructor GetInstructor() => pipeline.instructor;
-        protected virtual void Awake()
+        protected override void Awake()
         {
-            pipeline = GetComponentInParent<Pipeline>(true);
-
-            // cannot find a pipeline. Look for a Pipeline Extension
-            if (!pipeline)
-            {
-                var pipelineExt = GetComponentInParent<IPipelineExtension>();
-                pipeline = pipelineExt.GetPipeline();
-            }
-            
+            base.Awake();
+           
             pipeline.AfterFoundObjects += (objects) =>
             {
                 if (!enabled)
@@ -80,9 +70,6 @@ namespace OmiLAXR.TrackingBehaviours
                 .Where(f => typeof(ITrackingBehaviourEvent).IsAssignableFrom(f.FieldType))
                 .ToArray();
         }
-        
-        protected void Log(string message, params object[] ps)
-            => DebugLog.OmiLAXR.Print($"(Pipeline '{pipeline.name}') " + message);
         
         protected TS[] Select<TS>(Object[] objects) where TS : Object
             => objects
