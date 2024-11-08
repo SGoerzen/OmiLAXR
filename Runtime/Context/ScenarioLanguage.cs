@@ -10,6 +10,6 @@ namespace OmiLAXR.Context
         private static ScenarioLanguage _instance;
         public static ScenarioLanguage Instance => GetInstance(ref _instance);
 
-        public Languages language;
+        public Languages language = Languages.en;
     }
 }

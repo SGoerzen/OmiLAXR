@@ -1,3 +1,5 @@
+using System.Linq;
+using UnityEngine;
 using Object = UnityEngine.Object;
 
 namespace OmiLAXR.Filters
@@ -8,7 +10,7 @@ namespace OmiLAXR.Filters
         {
             
         }
-
-        public abstract Object[] Pass(Object[] gos);
+        
+        public abstract Object[] Pass(Object[] objects);
     }
 }

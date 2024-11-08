@@ -64,8 +64,13 @@ namespace OmiLAXR.TrackingBehaviours
         
         public void Bind(UnityEvent unityEvent, UnityAction invoker)
         {
+#if UNITY_2020 || UNITY_2019
+            if (!_unityBinds.ContainsKey(unityEvent))
+                _unityBinds.Add(unityEvent, invoker);
+#else
             if (!_unityBinds.TryAdd(unityEvent, invoker))
                 return;
+#endif
             unityEvent.AddListener(invoker);
         }
 
@@ -126,8 +131,13 @@ namespace OmiLAXR.TrackingBehaviours
 
         public void Bind(UnityEvent unityEvent, UnityAction invoker)
         {
+#if UNITY_2020 || UNITY_2019
+            if (!_unityBinds.ContainsKey(unityEvent))
+                _unityBinds.Add(unityEvent, invoker);
+#else
             if (!_unityBinds.TryAdd(unityEvent, invoker))
                 return;
+#endif
             unityEvent.AddListener(invoker);
         }
 
@@ -204,8 +214,13 @@ namespace OmiLAXR.TrackingBehaviours
         
         public void Bind(UnityEvent<TValue> unityEvent, UnityAction<TValue> invoker)
         {
+#if UNITY_2020 || UNITY_2019
+            if (!_unityBinds.ContainsKey(unityEvent))
+                _unityBinds.Add(unityEvent, invoker);
+#else
             if (!_unityBinds.TryAdd(unityEvent, invoker))
                 return;
+#endif
             unityEvent.AddListener(invoker);
         }
 
@@ -272,8 +287,13 @@ namespace OmiLAXR.TrackingBehaviours
 
         public void Bind(UnityEvent<TValue> unityEvent, UnityAction<TValue> invoker)
         {
+            #if UNITY_2020 || UNITY_2019
+            if (!_unityBinds.ContainsKey(unityEvent))
+                _unityBinds.Add(unityEvent, invoker);
+            #else
             if (!_unityBinds.TryAdd(unityEvent, invoker))
                 return;
+            #endif
             unityEvent.AddListener(invoker);
         }
 

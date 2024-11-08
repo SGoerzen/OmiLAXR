@@ -33,7 +33,7 @@ namespace OmiLAXR.Context
 
             if (appendix.prefixes.Length > 0)
             {
-#if UNITY_2019
+#if UNITY_2019 || UNITY_2020
                 platformStr = $"{string.Join(":", appendix.prefixes)}:{platformStr}";
 #else
                 platformStr = $"{string.Join(':', appendix.prefixes)}:{platformStr}";
@@ -42,7 +42,7 @@ namespace OmiLAXR.Context
             
             if (appendix.suffixes.Length > 0)
             {
-#if UNITY_2019
+#if UNITY_2019 || UNITY_2020
                 platformStr = $"{platformStr}:{string.Join(":", appendix.suffixes)}";
 #else
                 platformStr = $"{platformStr}:{string.Join(':', appendix.suffixes)}";

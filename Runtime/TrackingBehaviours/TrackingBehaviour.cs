@@ -15,10 +15,8 @@ namespace OmiLAXR.TrackingBehaviours
     public abstract class TrackingBehaviour<T> : ActorPipelineComponent, ITrackingBehaviour
     where T : Object
     {
-        protected override void Awake()
+        protected virtual void Awake()
         {
-            base.Awake();
-           
             Pipeline.AfterFoundObjects += (objects) =>
             {
                 if (!enabled)
