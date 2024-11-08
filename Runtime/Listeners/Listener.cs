@@ -1,3 +1,4 @@
+using System.Linq;
 using Object = UnityEngine.Object;
 
 namespace OmiLAXR.Listeners
@@ -19,7 +20,7 @@ namespace OmiLAXR.Listeners
         /// <typeparam name="T"></typeparam>
         protected void Detect<T>(bool includeInactive = false) where T : Object
         {
-            var objects = FindObjectsOfType<T>(includeInactive);
+            var objects = FindObjects<T>(includeInactive);
             Found(objects);
         }
         
@@ -27,7 +28,7 @@ namespace OmiLAXR.Listeners
         {
             if (!enabled || objects == null || objects.Length == 0)
                 return;
-            OnFoundObjects?.Invoke(objects);
+            OnFoundObjects?.Invoke(objects.Select(o => o as Object).ToArray());
         }
     }
 }

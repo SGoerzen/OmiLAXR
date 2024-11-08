@@ -8,8 +8,8 @@ namespace OmiLAXR.Context
     public class ScenarioLanguage : LearningContext
     {
         private static ScenarioLanguage _instance;
-        public static ScenarioLanguage Instance
-            => _instance ??= FindObjectOfType<ScenarioLanguage>();
+        public static ScenarioLanguage Instance => GetInstance(ref _instance);
+
         public Languages language;
     }
 }

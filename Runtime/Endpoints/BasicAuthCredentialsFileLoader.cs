@@ -1,5 +1,5 @@
-using System.ComponentModel;
 using System.IO;
+using UnityEditor;
 using UnityEngine;
 
 namespace OmiLAXR.Endpoints
@@ -13,7 +13,31 @@ namespace OmiLAXR.Endpoints
         public string filename = "credentials.json";
 
         public BasicAuthEndpoint targetEndpoint;
-
+        
+#if UNITY_EDITOR
+        [MenuItem("OmiLAXR / Create credentials.json file ")]
+        private static void CreateCredentialsFile()
+        {
+            var destFilePath = Path.Combine(Application.streamingAssetsPath, "credentials.json");
+            // interupt, if credentials file exists
+            if (File.Exists(destFilePath))
+            {
+                Debug.LogError($"There is already a file '{destFilePath}'.");
+                return;
+            }
+            
+            // ensure StreamingAssets folder
+            if (!Directory.Exists(Application.streamingAssetsPath))
+            {
+                Directory.CreateDirectory(Application.streamingAssetsPath);
+            }
+            
+            // copy credentials file
+            var credentialsPath = Path.GetFullPath("Packages/com.rwth.unity.omilaxr/Examples/example.credentials.json");
+            File.Copy(credentialsPath, destFilePath, false);
+        }        
+#endif
+        
         private void Start()
         {
             

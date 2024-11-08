@@ -9,8 +9,7 @@ namespace OmiLAXR.Listeners
     {
         public override void StartListening()
         {
-            var gosw = FindObjectsOfType<GameObjectStateWatcher>();
-            Found(gosw);
+            Found(FindObjects<GameObjectStateWatcher>());
         }
     }
 }

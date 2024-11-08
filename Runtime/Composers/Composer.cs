@@ -17,10 +17,10 @@ namespace OmiLAXR.Composers
         public abstract Author GetAuthor();
         public virtual bool IsHigherComposer => false;
         public event ComposerAction<IStatement, bool> AfterComposed;
-
+        
         protected static TB GetTrackingBehaviour<TB>(bool includeInactive = false)
-            where TB : Object, ITrackingBehaviour => FindObjectOfType<TB>(includeInactive);
-
+            where TB : Object, ITrackingBehaviour => FindObject<TB>(includeInactive);
+        
         protected void SendStatement(IStatement statement, bool immediate = false)
         {
             if (!IsEnabled)

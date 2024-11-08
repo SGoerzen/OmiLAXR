@@ -35,10 +35,19 @@ namespace OmiLAXR
 
         public ActorDataProvider[] ActorDataProviders { get; protected set; }
 
+        #if UNITY_6000
+        public static T GetPipeline<T>() where T : Pipeline
+            => FindFirstObjectByType<T>();
+        #else
         public static T GetPipeline<T>() where T : Pipeline
             => FindObjectOfType<T>();
+        #endif
 
+        #if UNITY_6000 
+        public static Pipeline GetAll() => FindFirstObjectByType<Pipeline>();
+        #else
         public static Pipeline GetAll() => FindObjectOfType<Pipeline>();
+        #endif
         
         public T GetDataProvider<T>() where T : DataProvider
             => DataProviders.OfType<T>().Select(dp => dp as T).FirstOrDefault();
@@ -77,8 +86,11 @@ namespace OmiLAXR
             else if (type.IsSubclassOf(typeof(PipelineExtension)))
             {
                 var ext = comp as PipelineExtension;
-                ext!.Extend(this);
-                Extensions.Add(ext);
+                if (ext)
+                {
+                    ext.Extend(this);
+                    Extensions.Add(ext);
+                }
             }
         }
 
@@ -104,7 +116,13 @@ namespace OmiLAXR
             Filters.AddRange(GetComponentsInChildren<Filter>(false));
             
             // Find available data providers
+#if UNITY_2019
+            DataProviders.AddRange(FindObjectsOfType<DataProvider>().Where(d => !d.enabled));
+#elif UNITY_6000
+            DataProviders.AddRange(FindObjectsByType<DataProvider>(FindObjectsInactive.Exclude, FindObjectsSortMode.None));
+#else
             DataProviders.AddRange(FindObjectsOfType<DataProvider>(false));
+#endif
             
             // Bind after and before send events
             foreach (var dp in DataProviders)

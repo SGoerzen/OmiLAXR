@@ -8,9 +8,9 @@ namespace OmiLAXR.Composers.HigherComposers
     {
         protected abstract Dictionary<string, MatchCondition<T>> Conditions();
         protected static TP GetPipeline<TP>()
-            where TP : Pipeline => FindObjectOfType<TP>(true);
+            where TP : Pipeline => FindObject<TP>(true);
         
-        protected struct MatchCondition<T0>
+        protected readonly struct MatchCondition<T0>
             where T0 : IStatement
         {
             public delegate bool MatchConditionHandler(T0 statement);
@@ -32,6 +32,7 @@ namespace OmiLAXR.Composers.HigherComposers
                 if (Condition(statement))
                     MatchingStatements.Add(statement);
             }
+            
             
         }
 

@@ -20,7 +20,7 @@ namespace OmiLAXR.Endpoints
         
         private StreamWriter _streamWriter;
         
-        private void Awake()
+        protected override void Awake()
         {
             if (string.IsNullOrEmpty(storeLocation))
                 storeLocation = TempFolder;

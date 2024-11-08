@@ -10,7 +10,7 @@ namespace OmiLAXR
 {
     [AddComponentMenu("OmiLAXR / 0) Data Providers / Data Provider")]
     [DefaultExecutionOrder(-1)]
-    public class DataProvider : MonoBehaviour
+    public class DataProvider : PipelineComponent
     {
         public readonly List<IComposer> Composers = new List<IComposer>();
 
@@ -72,8 +72,6 @@ namespace OmiLAXR
             }
         }
 
-        public static DataProvider GetAll() => FindObjectOfType<DataProvider>();
-
-      
+        public static DataProvider GetAll() => FindObject<DataProvider>();
     }
 }

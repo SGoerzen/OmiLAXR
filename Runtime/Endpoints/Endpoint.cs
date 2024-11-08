@@ -180,7 +180,6 @@ namespace OmiLAXR.Endpoints
 
             return TransferStatement(statement);
         }
-
         
         #region MainThreadDispatcher
         private readonly Queue<Action> _executionQueue = new Queue<Action>();
