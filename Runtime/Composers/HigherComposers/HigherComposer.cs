@@ -82,5 +82,14 @@ namespace OmiLAXR.Composers.HigherComposers
         {
             
         }
+        
+        protected void SendStatement(IStatement statement, bool immediate = false)
+        {
+            if (!IsEnabled)
+                return;
+            AfterComposed?.Invoke(this, statement, immediate);
+        }
+        protected void SendStatementImmediate(IStatement statement)
+            => SendStatement(statement, immediate: true);
     }
 }
