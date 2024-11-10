@@ -144,8 +144,8 @@ namespace OmiLAXR.TrackingBehaviours.Learner
         {
             // calculate if the difference between the maximum and minimum value of a list of hmdPositions is greater than a specific threshold (minNormalHeadMovements)
             return
-                (HmdPosition.SharedInstance.GetMaxMinPosition("max", axis, hmdPositions).hmdPosition.Position.x
-                - HmdPosition.SharedInstance.GetMaxMinPosition("min", axis, hmdPositions).hmdPosition.Position.x) > minNormalHeadMovements;
+                (HmdPosition.Instance.GetMaxMinPosition("max", axis, hmdPositions).hmdPosition.Position.x
+                - HmdPosition.Instance.GetMaxMinPosition("min", axis, hmdPositions).hmdPosition.Position.x) > minNormalHeadMovements;
         }
 
 

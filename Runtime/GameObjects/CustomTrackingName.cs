@@ -18,13 +18,17 @@ namespace OmiLAXR
             if (t == typeof(GameObject))
             {
                 var go = obj as GameObject;
-                var customTrackingNameComp = go!.GetComponent<CustomTrackingName>();
+                if (go == null)
+                    return "";
+                var customTrackingNameComp = go?.GetComponent<CustomTrackingName>();
                 return customTrackingNameComp ? customTrackingNameComp.customTrackingName : go.name;
             }
             else if (t == typeof(Component) || t.IsSubclassOf(typeof(Component)))
             {
                 var comp = obj as Component;
-                var customTrackingNameComp = comp!.GetComponent<CustomTrackingName>();
+                if (comp == null)
+                    return "";
+                var customTrackingNameComp = comp?.GetComponent<CustomTrackingName>();
                 return customTrackingNameComp ? customTrackingNameComp.customTrackingName : comp.gameObject.name;
             }
 

@@ -1,5 +1,5 @@
-using System.ComponentModel;
 using System.IO;
+using UnityEditor;
 using UnityEngine;
 
 namespace OmiLAXR.Endpoints
@@ -13,7 +13,7 @@ namespace OmiLAXR.Endpoints
         public string filename = "credentials.json";
 
         public BasicAuthEndpoint targetEndpoint;
-
+        
         private void Start()
         {
             

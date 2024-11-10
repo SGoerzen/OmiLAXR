@@ -7,7 +7,7 @@ using UnityEngine;
 
 namespace OmiLAXR.Endpoints
 {
-    public abstract class Endpoint : PipelineComponent
+    public abstract class Endpoint : DataProviderPipelineComponent
     {
         public event EndpointAction OnStartedSending;
         public event EndpointAction OnStoppedSending;
@@ -180,7 +180,6 @@ namespace OmiLAXR.Endpoints
 
             return TransferStatement(statement);
         }
-
         
         #region MainThreadDispatcher
         private readonly Queue<Action> _executionQueue = new Queue<Action>();

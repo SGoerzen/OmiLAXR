@@ -1,18 +1,12 @@
+using System.Linq;
 using Object = UnityEngine.Object;
 
 namespace OmiLAXR.Listeners
 {
-    public abstract class Listener : PipelineComponent
+    public abstract class Listener : ActorPipelineComponent
     {
-        protected Pipeline pipeline { get; private set; }
-        public Actor GetActor() => pipeline.actor;
         public event System.Action<Object[]> OnFoundObjects;
         public abstract void StartListening();
-        
-        protected virtual void Awake()
-        {
-            pipeline = GetComponentInParent<Pipeline>(true);
-        }
 
         protected void OnEnable()
         {
@@ -26,7 +20,7 @@ namespace OmiLAXR.Listeners
         /// <typeparam name="T"></typeparam>
         protected void Detect<T>(bool includeInactive = false) where T : Object
         {
-            var objects = FindObjectsOfType<T>(includeInactive);
+            var objects = FindObjects<T>(includeInactive);
             Found(objects);
         }
         
@@ -34,7 +28,7 @@ namespace OmiLAXR.Listeners
         {
             if (!enabled || objects == null || objects.Length == 0)
                 return;
-            OnFoundObjects?.Invoke(objects);
+            OnFoundObjects?.Invoke(objects.Select(o => o as Object).ToArray());
         }
     }
 }

@@ -9,8 +9,7 @@ namespace OmiLAXR.Context
     public class FpsMonitor : LearningContext
     {
         private static FpsMonitor _instance;
-        public static FpsMonitor Instance
-            => _instance ??= FindObjectOfType<FpsMonitor>();
+        public static FpsMonitor Instance => GetInstance(ref _instance);
         
         [ReadOnly] public int fps = 0;
         

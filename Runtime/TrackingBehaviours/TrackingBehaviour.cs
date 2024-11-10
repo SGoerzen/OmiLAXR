@@ -12,38 +12,26 @@ namespace OmiLAXR.TrackingBehaviours
     }
     
     [DefaultExecutionOrder(-1)]
-    public abstract class TrackingBehaviour<T> : PipelineComponent, ITrackingBehaviour
+    public abstract class TrackingBehaviour<T> : ActorPipelineComponent, ITrackingBehaviour
     where T : Object
     {
-        protected Pipeline pipeline { get; private set; }
-        public Actor GetActor() => pipeline.actor;
-        public Instructor GetInstructor() => pipeline.instructor;
         protected virtual void Awake()
         {
-            pipeline = GetComponentInParent<Pipeline>(true);
-
-            // cannot find a pipeline. Look for a Pipeline Extension
-            if (!pipeline)
-            {
-                var pipelineExt = GetComponentInParent<IPipelineExtension>();
-                pipeline = pipelineExt.GetPipeline();
-            }
-            
-            pipeline.AfterFoundObjects += (objects) =>
+            Pipeline.AfterFoundObjects += (objects) =>
             {
                 if (!enabled)
                     return;
                 // Skip Select<T> if not needed
                 AfterFoundObjects(typeof(T) == typeof(Object) ? objects as T[] : Select<T>(objects));
             };
-            pipeline.AfterFilteredObjects += (objects) =>
+            Pipeline.AfterFilteredObjects += (objects) =>
             {
                 if (!enabled)
                     return;
                 // Skip Select<T> if not needed
                 AfterFilteredObjects(typeof(T) == typeof(Object) ? objects as T[] : Select<T>(objects));
             };
-            pipeline.BeforeStoppedPipeline += (p) => Dispose(p.trackingObjects.ToArray());
+            Pipeline.BeforeStoppedPipeline += (p) => Dispose(p.trackingObjects.ToArray());
         }
         
         protected virtual void AfterFoundObjects(T[] objects) {}
@@ -80,9 +68,6 @@ namespace OmiLAXR.TrackingBehaviours
                 .Where(f => typeof(ITrackingBehaviourEvent).IsAssignableFrom(f.FieldType))
                 .ToArray();
         }
-        
-        protected void Log(string message, params object[] ps)
-            => DebugLog.OmiLAXR.Print($"(Pipeline '{pipeline.name}') " + message);
         
         protected TS[] Select<TS>(Object[] objects) where TS : Object
             => objects
