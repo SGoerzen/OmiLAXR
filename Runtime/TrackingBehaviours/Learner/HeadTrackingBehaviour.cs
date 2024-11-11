@@ -82,7 +82,7 @@ namespace OmiLAXR.TrackingBehaviours.Learner
         // Update is called once per frame
         private void Update()
         {
-            var addHmdPosition = HmdPosition.SharedInstance.GetHmdPosition();
+            var addHmdPosition = HmdPosition.Instance.GetHmdPosition();
             if (Equals(addHmdPosition, default(HmdTimedPosition))) return;
             //add hmdPosition to list of hmdPositions
             _hmdPositions.Add(addHmdPosition);

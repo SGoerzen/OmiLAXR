@@ -12,8 +12,7 @@ namespace OmiLAXR
     public class Registration : LearningContext
     {
         private static Registration _instance;
-        public static Registration Instance
-            => _instance ??= FindObjectOfType<Registration>();
+        public static Registration Instance => GetInstance(ref _instance);
         
         [Header("Must be an UUID according to RFC4122.")]
         public string uuid;

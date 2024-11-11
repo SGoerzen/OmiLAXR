@@ -6,13 +6,13 @@ using UnityEngine;
 namespace OmiLAXR
 {
     [DefaultExecutionOrder(-1)]
-    public abstract class DataProviderExtension<T> : MonoBehaviour
+    public abstract class DataProviderExtension<T> : PipelineComponent
         where T : DataProvider
     {
         protected T DataProvider;
         private void Awake()
         {
-            DataProvider = FindObjectOfType<T>();
+            DataProvider = FindObject<T>();
             Extend(DataProvider);
             DebugLog.OmiLAXR.Print("Extended data provider " + typeof(T));
         }

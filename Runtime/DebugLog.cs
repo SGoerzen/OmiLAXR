@@ -2,7 +2,7 @@ namespace OmiLAXR
 {
     public interface IDebugSender
     {
-        public DebugLog DebugLog { get; }
+        DebugLog DebugLog { get; }
     }
     public delegate string BuildMessageResponse(string prefix = "OmiLAXR");
     public class DebugLog

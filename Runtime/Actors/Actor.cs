@@ -3,7 +3,7 @@ using UnityEngine;
 namespace OmiLAXR
 {
     [AddComponentMenu("OmiLAXR / Actors / Actor")]
-    public class Actor : PipelineComponent
+    public class Actor : ActorPipelineComponent
     {
         public Team team;
         public bool HasTeam => team != null;

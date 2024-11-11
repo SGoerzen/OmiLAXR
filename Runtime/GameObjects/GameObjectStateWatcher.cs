@@ -5,23 +5,23 @@ namespace OmiLAXR
 {
     public class GameObjectStateWatcher : MonoBehaviour
     {
-        public UnityEvent<GameObject> onDestroyed = new UnityEvent<GameObject>();
-        public UnityEvent<GameObject> onEnabled = new UnityEvent<GameObject>();
-        public UnityEvent<GameObject> onDisabled = new UnityEvent<GameObject>();
+        public UnityEvent<GameObject> OnDestroyed = new UnityEvent<GameObject>();
+        public UnityEvent<GameObject> OnEnabled = new UnityEvent<GameObject>();
+        public UnityEvent<GameObject> OnDisabled = new UnityEvent<GameObject>();
         
         private void OnDestroy()
         {
-            onDestroyed.Invoke(gameObject);
+            OnDestroyed?.Invoke(gameObject);
         }
 
         private void OnEnable()
         {
-            onEnabled.Invoke(gameObject);
+            OnEnabled?.Invoke(gameObject);
         }
 
         private void OnDisable()
         {
-            onDisabled.Invoke(gameObject);
+            OnDisabled?.Invoke(gameObject);
         }
     }
 }

@@ -21,8 +21,13 @@ namespace OmiLAXR
 
         public void UpdateMemberList()
         {
+#if UNITY_2022_3_OR_NEWER
             _members = FindObjectsByType<Actor>(FindObjectsSortMode.InstanceID)
                 .Where(actor => Equals(actor.team)).ToArray();
+#else
+            _members = FindObjectsOfType<Actor>()
+                .Where(actor => Equals(actor.team)).ToArray();
+#endif
         }
         
         public void AddMember(Actor actor)

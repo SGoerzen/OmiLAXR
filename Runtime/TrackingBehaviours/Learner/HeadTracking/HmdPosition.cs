@@ -10,13 +10,25 @@ namespace OmiLAXR.TrackingBehaviours.Learner
         private readonly Camera _mMainCamera;
 
         //create singleton to make sure that only one instance of this class is given
-        private static HmdPosition _instance = null;
-
+        private static HmdPosition _instance;
+#if UNITY_2019
+        public static HmdPosition Instance
+        {
+            get
+            {
+                if (_instance == null)
+                    _instance = new HmdPosition();
+                return _instance;
+            }
+        } 
+#else 
+        public static HmdPosition Instance => _instance ??= new HmdPosition();
+#endif
+        
         private HmdPosition()
         {
             _mMainCamera = Camera.main;
         }
-        public static HmdPosition SharedInstance => _instance ??= new HmdPosition();
 
         //collect position of the hmd via a main camera. Does not work when no main camera is given in a project/application
         public HmdTimedPosition GetHmdPosition() => _mMainCamera != null ? new HmdTimedPosition(DateTime.Now, _mMainCamera.transform.position) : default;

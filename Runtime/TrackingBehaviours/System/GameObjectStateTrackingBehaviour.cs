@@ -21,7 +21,7 @@ namespace OmiLAXR.TrackingBehaviours.System
             {
                 if (watchOnDestroyed)
                 {
-                    OnDestroyedGameObject.Bind(go.onDestroyed, g =>
+                    OnDestroyedGameObject.Bind(go.OnDestroyed, g =>
                     {
                         OnDestroyedGameObject.Invoke(this, go, g);
                     });
@@ -29,7 +29,7 @@ namespace OmiLAXR.TrackingBehaviours.System
 
                 if (watchOnEnabled)
                 {
-                    OnEnabledGameObject.Bind(go.onEnabled, g =>
+                    OnEnabledGameObject.Bind(go.OnEnabled, g =>
                     {
                         OnEnabledGameObject.Invoke(this, go, g);
                     });
@@ -37,7 +37,7 @@ namespace OmiLAXR.TrackingBehaviours.System
 
                 if (watchOnDisabled)
                 {
-                    OnDisabledGameObject.Bind(go.onDisabled, g =>
+                    OnDisabledGameObject.Bind(go.OnDisabled, g =>
                     {
                         OnDisabledGameObject.Invoke(this, go, g);
                     });

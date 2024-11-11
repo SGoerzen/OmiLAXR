@@ -9,7 +9,7 @@ namespace OmiLAXR.Listeners
     {
         public override void StartListening()
         {
-            Found(FindObjectsOfType<GameObject>());
+            Found(FindObjects<GameObject>());
         }
     }
 }

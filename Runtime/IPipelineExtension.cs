@@ -2,6 +2,6 @@ namespace OmiLAXR
 {
     public interface IPipelineExtension
     {
-        public Pipeline GetPipeline();
+        Pipeline GetPipeline();
     }
 }
