@@ -1,93 +1,109 @@
-# OmiLAXRv2
+# OmiLAXR (v2)
 
+This is the base package for OmiLAXR holding all core components of the pipeline pattern. Starting from this package you can install further modules (packages) based on your needs.
 
+Just drag and drop the prefab `Resources/Prefab/OmiLAXR` into your scene.
 
-## Getting started
+## Compatibility
 
-To make it easy for you to get started with GitLab, here's a list of recommended next steps.
+Because of the less dependencies and modular design of OmiLAXRv2 this framework is compatible with all XR frameworks. It doesnt matter if you use MRTK, VRTK, SteamVR, UnityXR, ... and it doesnt matter what equipment you use.
 
-Already a pro? Just edit this README.md and make it your own. Want to make it easy? [Use the template at the bottom](#editing-this-readme)!
+You can look for existing modules tracking the behaviour you need. The rest can be easily implemented by you own - and we hope you will share it with the community!
 
-## Add your files
+The only thing we need to consider are the Unity version. We try to support as much as possible upwards of Unity 2019.4.40f1. You are invited to contribute!
 
-- [ ] [Create](https://docs.gitlab.com/ee/user/project/repository/web_editor.html#create-a-file) or [upload](https://docs.gitlab.com/ee/user/project/repository/web_editor.html#upload-a-file) files
-- [ ] [Add files using the command line](https://docs.gitlab.com/ee/gitlab-basics/add-file.html#add-a-file-using-the-command-line) or push an existing Git repository with the following command:
+The compatibility was tested on
 
-```
-cd existing_repo
-git remote add origin https://gitlab.com/learntech-rwth/omilaxr-ecosystem/omilaxrv2.git
-git branch -M main
-git push -uf origin main
-```
+- [ ]  Unity 2019.4.40f1 (LTS)
+- [X]  Unity 2020.3.48f1 (LTS)
+- [X]  Unity 2021.3.15f1 (LTS)
+- [X]  Unity 2021.3.45f1 (LTS)
+- [X]  Unity 2022.3.52f1 (LTS)
+- [X]  Unity 2023.2.20f1 (no LTS)
+- [X]  Unity 6000.0.25f1 (LTS)
 
-## Integrate with your tools
+Please contact us on https://discord.gg/yJgk4ATg if it is not running on your Unity version. We will try to make it possible.
 
-- [ ] [Set up project integrations](https://gitlab.com/learntech-rwth/omilaxr-ecosystem/omilaxrv2/-/settings/integrations)
+## Module dependencies
+The adapter has following third-party dependencies attached:
 
-## Collaborate with your team
+- `TextMeshPro`: We use this package to detect text of ui elements like buttons.
+- `Newtonsoft.JSON`: Is used for (de-)serialize JSON files.
 
-- [ ] [Invite team members and collaborators](https://docs.gitlab.com/ee/user/project/members/)
-- [ ] [Create a new merge request](https://docs.gitlab.com/ee/user/project/merge_requests/creating_merge_requests.html)
-- [ ] [Automatically close issues from merge requests](https://docs.gitlab.com/ee/user/project/issues/managing_issues.html#closing-issues-automatically)
-- [ ] [Enable merge request approvals](https://docs.gitlab.com/ee/user/project/merge_requests/approvals/)
-- [ ] [Set auto-merge](https://docs.gitlab.com/ee/user/project/merge_requests/merge_when_pipeline_succeeds.html)
+## Install by using scoped registry
+1. Ensure in "Project settings" > "Package Manager" that you have the scoped registry with following settings:
+- Name: npmjs
+- URL: http://registry.npmjs.com
+- Scope(s): `com.rwth.unity.omilaxr`
+2. Go to Package Manager.
+3. Click on the (+) button.
+4. Select 'Add package by name'.
+5. Place in 'Name' field: `com.rwth.unity.omilaxr`.
 
-## Test and Deploy
+### Adding scoped registry by using manifest.json (also recommended - quick way)
+1. Alternatively, instead of adding the scoped registry inside Unity editor you can do it by using `manifest.json` file.
+2. Go to you project root and then open `Packages/manifest.json`.
+3. Ensure following entries in your file: `"scopedRegistries": [
+   {
+   "name": "npmjs",
+   "url": "http://registry.npmjs.com/",
+   "scopes": [ 
+   "com.rwth.unity.omilaxr"
+   ]
+   }]`.
+4. Go to the Unity Package Manager to `My registries` and install the package `com.rwth.unity.omilaxr`.
 
-Use the built-in continuous integration in GitLab.
+## Install by using Git url
+1. Go to Package Manager.
+2. Click on the (+) button.
+3. Select 'Add package from git URL'.
+4. Paste `https://gitlab.com/learntech-rwth/omilaxr-ecosystem/v2/heart-rate/omilaxr.hyperate.git` and confirm.
 
-- [ ] [Get started with GitLab CI/CD](https://docs.gitlab.com/ee/ci/quick_start/index.html)
-- [ ] [Analyze your code for known vulnerabilities with Static Application Security Testing (SAST)](https://docs.gitlab.com/ee/user/application_security/sast/)
-- [ ] [Deploy to Kubernetes, Amazon EC2, or Amazon ECS using Auto Deploy](https://docs.gitlab.com/ee/topics/autodevops/requirements.html)
-- [ ] [Use pull-based deployments for improved Kubernetes management](https://docs.gitlab.com/ee/user/clusters/agent/)
-- [ ] [Set up protected environments](https://docs.gitlab.com/ee/ci/environments/protected_environments.html)
+## For Developers
 
-***
+To work with this package we recommend to place it somewhere outside your Unity project (if the package gets an own git repository) or in root of your project.
+Than, you can include the package into your project by going to `Window > Package Manager`, click on `(+)` button and finally import the `package.json` of this project by clicking on `Add package from disk`.
 
-# Editing this README
+For production use we recommend to use `Add package form git URL` or using scoped registries (see below).
 
-When you're ready to make this README your own, just edit this file and use the handy template below (or feel free to structure it however you want - this is just a starting point!). Thanks to [makeareadme.com](https://www.makeareadme.com/) for this template.
+## Default Folder Structure
 
-## Suggestions for a good README
+Here you can see the default structure of the adapter unity packages. The folders surrounding with (FOLDER) are not delivered by default.
 
-Every project is different, so consider which of these sections apply to yours. The sections used in the template are suggestions for most open source projects. Also keep in mind that while a README can be too long and detailed, too long is better than too short. If you think your README is too long, consider utilizing another form of documentation rather than cutting out information.
+- root
+    - (Editor)
+    - Plugins
+    - Resources
+      - Prefabs
+      - StreamingAssets
+      - ...
+    - Runtime
+        - Actors
+        - Composers
+            - HigherComposers
+        - Endpoints
+        - Extensions
+        - Filters
+        - Hooks
+        - Listeners
+        - Pipelines
+        - TrackingBehaviours
+    - Tests
+        - Runtime
+        - (Editor)
 
-## Name
-Choose a self-explaining name for your project.
+## Publication
 
-## Description
-Let people know what your project can do specifically. Provide context and add a link to any reference visitors might be unfamiliar with. A list of Features or a Background subsection can also be added here. If there are alternatives to your project, this is a good place to list differentiating factors.
+You can publish your package at any npm registry.
+It makes sense to publish packages for easier distribution in other projects.
+But we recommend to use `npmjs.com`. [Here](https://docs.npmjs.com/creating-and-publishing-scoped-public-packages) you can get more details.
+But the steps are very easy.
 
-## Badges
-On some READMEs, you may see small images that convey metadata, such as whether or not all the tests are passing for the project. You can use Shields to add some to your README. Many services also have instructions for adding a badge.
-
-## Visuals
-Depending on what you are making, it can be a good idea to include screenshots or even a video (you'll frequently see GIFs rather than actual videos). Tools like ttygif can help, but check out Asciinema for a more sophisticated method.
-
-## Installation
-Within a particular ecosystem, there may be a common way of installing things, such as using Yarn, NuGet, or Homebrew. However, consider the possibility that whoever is reading your README is a novice and would like more guidance. Listing specific steps helps remove ambiguity and gets people to using your project as quickly as possible. If it only runs in a specific context like a particular programming language version or operating system or has dependencies that have to be installed manually, also add a Requirements subsection.
-
-## Usage
-Use examples liberally, and show the expected output if you can. It's helpful to have inline the smallest example of usage that you can demonstrate, while providing links to more sophisticated examples if they are too long to reasonably include in the README.
-
-## Support
-Tell people where they can go to for help. It can be any combination of an issue tracker, a chat room, an email address, etc.
-
-## Roadmap
-If you have ideas for releases in the future, it is a good idea to list them in the README.
-
-## Contributing
-State if you are open to contributions and what your requirements are for accepting them.
-
-For people who want to make changes to your project, it's helpful to have some documentation on how to get started. Perhaps there is a script that they should run or some environment variables that they need to set. Make these steps explicit. These instructions could also be useful to your future self.
-
-You can also document commands to lint the code or run tests. These steps help to ensure high code quality and reduce the likelihood that the changes inadvertently break something. Having instructions for running tests is especially helpful if it requires external setup, such as starting a Selenium server for testing in a browser.
-
-## Authors and acknowledgment
-Show your appreciation to those who have contributed to the project.
-
-## License
-For open source projects, say how it is licensed.
-
-## Project status
-If you have run out of energy or time for your project, put a note at the top of the README saying that development has slowed down or stopped completely. Someone may choose to fork your project or volunteer to step in as a maintainer or owner, allowing your project to keep going. You can also make an explicit request for maintainers.
+1. Create an account on `npmjs.com`.
+2. On demand increase your `version` number in `package.json`.
+3. Commit and push your changes.
+4. Open a terminal.
+5. Go to the root of your project.
+6. Run `npm login` and login via browser (or what else you like).
+7. Run `npm publish --access public`.
+8. Wait until publication is ready.
