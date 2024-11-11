@@ -3,7 +3,7 @@ using UnityEngine;
 
 namespace OmiLAXR.Composers
 {
-    public abstract class Composer<T> : PipelineComponent, IComposer
+    public abstract class Composer<T> : DataProviderPipelineComponent, IComposer
         where T : PipelineComponent, ITrackingBehaviour
     {
         [HideInInspector] public T trackingBehaviour;
@@ -17,21 +17,28 @@ namespace OmiLAXR.Composers
         public abstract Author GetAuthor();
         public virtual bool IsHigherComposer => false;
         public event ComposerAction<IStatement, bool> AfterComposed;
-
+        
         protected static TB GetTrackingBehaviour<TB>(bool includeInactive = false)
-            where TB : Object, ITrackingBehaviour => FindObjectOfType<TB>(includeInactive);
-
+            where TB : Object, ITrackingBehaviour => FindObject<TB>(includeInactive);
+        
         protected void SendStatement(IStatement statement, bool immediate = false)
         {
+            if (!IsEnabled)
+                return;
             AfterComposed?.Invoke(this, statement, immediate);
         }
         protected void SendStatementImmediate(IStatement statement)
             => SendStatement(statement, immediate: true);
 
-        protected virtual void Awake()
+        protected override void Awake()
         {
-            trackingBehaviour = GetTrackingBehaviour<T>(true);
-            Compose(trackingBehaviour);
+            base.Awake();
+            
+            if (!IsEnabled)
+                return;
+            trackingBehaviour = GetTrackingBehaviour<T>(false);
+            if (trackingBehaviour) 
+                Compose(trackingBehaviour);
         }
 
         protected abstract void Compose(T tb);

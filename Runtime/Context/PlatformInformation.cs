@@ -6,7 +6,7 @@ namespace OmiLAXR.Context
 {
     [AddComponentMenu("OmiLAXR / 0) Scenario Context / Platform Information")]
     [DisallowMultipleComponent]
-    [Description("Provides platform information in following format [prefixes:]OmiLAXR:v2.0.8:{OS}[:suffixes].")]
+    [Description("Provides platform information in following format [prefixes:]OmiLAXR:v2.0.10:{OS}[:suffixes].")]
     public class PlatformInformation : LearningContext
     {
         [Serializable]
@@ -17,10 +17,11 @@ namespace OmiLAXR.Context
             [SerializeField] 
             public string[] prefixes;
         }
+        
         private static PlatformInformation _instance;
-        public static PlatformInformation Instance
-            => _instance ??= FindObjectOfType<PlatformInformation>();
-        private const string OmiLAXR_Version = "v2.0.8";
+        public static PlatformInformation Instance => GetInstance(ref _instance);
+        
+        private const string OmiLAXR_Version = "v2.0.10";
 
         // This will store the value in the inspector
         [SerializeField] 
@@ -32,12 +33,20 @@ namespace OmiLAXR.Context
 
             if (appendix.prefixes.Length > 0)
             {
+#if UNITY_2019 || UNITY_2020
+                platformStr = $"{string.Join(":", appendix.prefixes)}:{platformStr}";
+#else
                 platformStr = $"{string.Join(':', appendix.prefixes)}:{platformStr}";
+#endif
             }
             
             if (appendix.suffixes.Length > 0)
             {
+#if UNITY_2019 || UNITY_2020
+                platformStr = $"{platformStr}:{string.Join(":", appendix.suffixes)}";
+#else
                 platformStr = $"{platformStr}:{string.Join(':', appendix.suffixes)}";
+#endif
             }
 
             return platformStr;

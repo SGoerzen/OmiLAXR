@@ -48,7 +48,12 @@ namespace OmiLAXR.TrackingBehaviours.Learner
                     keyCode == KeyCode.Backspace || keyCode == KeyCode.Tab ||
                     keyCode == KeyCode.Escape || keyCode == KeyCode.Delete)
                 {
+                    #if UNITY_2019 || UNITY_2020
+                    if (!_wasDown.ContainsKey(keyCode))
+                        _wasDown.Add(keyCode, false);
+                    #else 
                     _wasDown.TryAdd(keyCode, false);
+                    #endif
                 }
             }
             

@@ -9,8 +9,7 @@ namespace OmiLAXR.Listeners
     {
         public override void StartListening()
         {
-            var tws = FindObjectsOfType<TransformWatcher>();
-            Found(tws);
+            Found(FindObjects<TransformWatcher>());
         }
     }
 }

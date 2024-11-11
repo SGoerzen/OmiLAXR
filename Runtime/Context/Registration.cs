@@ -7,12 +7,12 @@ namespace OmiLAXR
 {
     [DefaultExecutionOrder(-10000)]
     [DisallowMultipleComponent]
+    [AddComponentMenu("OmiLAXR / 0) Scenario Context / Registration")]
     [Description("Component for holding a registration UUID.")]
     public class Registration : LearningContext
     {
         private static Registration _instance;
-        public static Registration Instance
-            => _instance ??= FindObjectOfType<Registration>();
+        public static Registration Instance => GetInstance(ref _instance);
         
         [Header("Must be an UUID according to RFC4122.")]
         public string uuid;

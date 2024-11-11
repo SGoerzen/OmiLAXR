@@ -2,9 +2,10 @@ namespace OmiLAXR.Composers
 {
     public interface IStatement
     {
-        public bool IsDiscarded();
-        public void Discard();
+        bool IsDiscarded();
+        void Discard();
 
-        public string ToDataStandardString();
+        string ToDataStandardString();
+        PipelineInfo GetSenderPipelineInfo();
     }
 }

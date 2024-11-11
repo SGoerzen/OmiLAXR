@@ -32,11 +32,22 @@ namespace OmiLAXR
         public readonly Dictionary<string, List<ITrackingBehaviourEvent>> Gestures = new Dictionary<string, List<ITrackingBehaviourEvent>>();
 
         public List<PipelineExtension> Extensions = new List<PipelineExtension>();
-        
+
+        public ActorDataProvider[] ActorDataProviders { get; protected set; }
+
+        #if UNITY_6000
+        public static T GetPipeline<T>() where T : Pipeline
+            => FindFirstObjectByType<T>();
+        #else
         public static T GetPipeline<T>() where T : Pipeline
             => FindObjectOfType<T>();
+        #endif
 
+        #if UNITY_6000 
+        public static Pipeline GetAll() => FindFirstObjectByType<Pipeline>();
+        #else
         public static Pipeline GetAll() => FindObjectOfType<Pipeline>();
+        #endif
         
         public T GetDataProvider<T>() where T : DataProvider
             => DataProviders.OfType<T>().Select(dp => dp as T).FirstOrDefault();
@@ -75,8 +86,11 @@ namespace OmiLAXR
             else if (type.IsSubclassOf(typeof(PipelineExtension)))
             {
                 var ext = comp as PipelineExtension;
-                ext!.Extend(this);
-                Extensions.Add(ext);
+                if (ext)
+                {
+                    ext.Extend(this);
+                    Extensions.Add(ext);
+                }
             }
         }
 
@@ -90,29 +104,37 @@ namespace OmiLAXR
         {
             if (actor == null)
                 actor = FindActor();
+
+            ActorDataProviders = GetComponentsInChildren<ActorDataProvider>(false);
             
-            TrackingBehaviours.AddRange(GetComponentsInChildren<ITrackingBehaviour>());
+            TrackingBehaviours.AddRange(GetComponentsInChildren<ITrackingBehaviour>(false));
             
             // Find available listeners
-            Listeners.AddRange(GetComponentsInChildren<Listener>());
+            Listeners.AddRange(GetComponentsInChildren<Listener>(false));
             
             // Find available data providers
-            Filters.AddRange(GetComponentsInChildren<Filter>());
+            Filters.AddRange(GetComponentsInChildren<Filter>(false));
             
             // Find available data providers
-            DataProviders.AddRange(FindObjectsOfType<DataProvider>());
+#if UNITY_2019
+            DataProviders.AddRange(FindObjectsOfType<DataProvider>().Where(d => !d.enabled));
+#elif UNITY_6000
+            DataProviders.AddRange(FindObjectsByType<DataProvider>(FindObjectsInactive.Exclude, FindObjectsSortMode.None));
+#else
+            DataProviders.AddRange(FindObjectsOfType<DataProvider>(false));
+#endif
             
             // Bind after and before send events
             foreach (var dp in DataProviders)
             {
-                foreach (var c in dp.Composers)
+                foreach (var c in dp.Composers.Where(c => c.IsEnabled))
                 {
                     c.AfterComposed += (composer, statement, immediate) =>
                     {
                         AfterComposedStatement?.Invoke(composer, statement, immediate);
                     };
                 }
-                foreach (var ep in dp.Endpoints)
+                foreach (var ep in dp.Endpoints.Where(e => e.enabled))
                 {
                     ep.OnSendingStatement += (endpoint, statement) =>
                     {
