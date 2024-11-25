@@ -6,6 +6,42 @@ namespace OmiLAXR.Extensions
     public static class Object_Ext
     {
         /// <summary>
+        /// Gets the full hierarchy path of the GameObject.
+        /// </summary>
+        public static string GetFullHierarchyPath(this Object obj)
+        {
+            GameObject gameObject;
+
+            var isComponent = obj is Component comp;
+            if (isComponent)
+            {
+                gameObject = ((Component)obj).gameObject;
+            }
+            else
+            {
+                gameObject = obj as GameObject;
+            }
+            
+            if (gameObject == null)
+                return string.Empty;
+            
+            var path = gameObject.name;
+            var current = gameObject.transform.parent;
+
+            while (current != null)
+            {
+                path = current.name + "/" + path;
+                current = current.parent;
+            }
+
+            if (isComponent)
+            {
+                path += "/" + ((Component)obj).GetType().Name;
+            }
+
+            return path;
+        }
+        /// <summary>
         /// Removes a specific type T from objects. It checks if the type is equal, if it's a subclass, or if a component of the type exists.
         /// </summary>
         /// <param name="objects">Array of objects to filter</param>
@@ -29,7 +65,6 @@ namespace OmiLAXR.Extensions
                 if (objectType == componentType || objectType.IsSubclassOf(componentType))
                 {
                     var component = o as Component;
-                    var cc = component.GetComponent<T>();
                     if (component && component.GetComponent<T>())
                         return false;
                 }

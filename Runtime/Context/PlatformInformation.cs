@@ -19,8 +19,8 @@ namespace OmiLAXR.Context
         }
         
         private static PlatformInformation _instance;
-        public static PlatformInformation Instance
-            => _instance ??= FindObjectOfType<PlatformInformation>();
+        public static PlatformInformation Instance => GetInstance(ref _instance);
+        
         private const string OmiLAXR_Version = "v2.1.0";
 
         // This will store the value in the inspector
