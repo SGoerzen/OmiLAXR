@@ -1,3 +1,4 @@
+using OmiLAXR.Extensions;
 using UnityEngine;
 
 namespace OmiLAXR
@@ -12,27 +13,24 @@ namespace OmiLAXR
 
     public static class Object_Ext_CustomTrackingName
     {
+        public static CustomTrackingName GetCustomTrackingNameComponent(this Object obj)
+        {
+            if (obj is Component comp)
+            {
+                return comp.GetComponent<CustomTrackingName>();
+            }
+            return ((GameObject)obj).GetComponent<CustomTrackingName>();
+        }
+        
         public static string GetTrackingName(this Object obj)
         {
-            var t = obj.GetType();
-            if (t == typeof(GameObject))
-            {
-                var go = obj as GameObject;
-                if (go == null)
-                    return "";
-                var customTrackingNameComp = go?.GetComponent<CustomTrackingName>();
-                return customTrackingNameComp ? customTrackingNameComp.customTrackingName : go.name;
-            }
-            else if (t == typeof(Component) || t.IsSubclassOf(typeof(Component)))
-            {
-                var comp = obj as Component;
-                if (comp == null)
-                    return "";
-                var customTrackingNameComp = comp?.GetComponent<CustomTrackingName>();
-                return customTrackingNameComp ? customTrackingNameComp.customTrackingName : comp.gameObject.name;
-            }
+            var customTrackingNameComp = GetCustomTrackingNameComponent(obj);
 
-            return obj.name;
+            if (customTrackingNameComp)
+                return customTrackingNameComp.customTrackingName;
+            
+            var trackingNameBehaviour = GlobalSettings.Instance.trackingNameBehaviour;
+            return trackingNameBehaviour == GlobalSettings.TrackingNameBehaviour.HierarchyTreePath ? obj.GetFullHierarchyPath() : obj.name;
         }
     }
 }
