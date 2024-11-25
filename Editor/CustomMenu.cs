@@ -32,7 +32,7 @@ namespace OmiLAXR.Editor
             }
             
             // copy credentials file
-            var credentialsPath = Path.GetFullPath("Packages/com.rwth.unity.omilaxr/Examples/example.credentials.json");
+            var credentialsPath = Path.GetFullPath("Packages/com.rwth.unity.omilaxr/Resources/StreamingAssets/example.credentials.json");
             File.Copy(credentialsPath, destFilePath, false);
         }        
 #endif
