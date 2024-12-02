@@ -37,7 +37,7 @@ namespace OmiLAXR.TrackingBehaviours
         protected virtual void AfterFoundObjects(T[] objects) {}
         protected abstract void AfterFilteredObjects(T[] objects);
 
-        protected void OnEnable()
+        protected virtual void OnEnable()
         {
             
         }
