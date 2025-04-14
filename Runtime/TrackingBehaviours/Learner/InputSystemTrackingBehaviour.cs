@@ -28,7 +28,8 @@ namespace OmiLAXR.TrackingBehaviours.Learner
                 foreach (var control in device.allControls)
                 {
                     // If it's a button control and is pressed
-                    if (control is not ButtonControl button || !button.wasPressedThisFrame) 
+                    var button = control as ButtonControl;
+                    if (button == null || !button.wasPressedThisFrame)
                         continue;
                     // Fire the event
                     OnPressedAnyButton?.Invoke(this, new InputTrackingBehaviourArgs()
