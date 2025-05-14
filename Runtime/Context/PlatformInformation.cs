@@ -6,7 +6,7 @@ namespace OmiLAXR.Context
 {
     [AddComponentMenu("OmiLAXR / 0) Scenario Context / Platform Information")]
     [DisallowMultipleComponent]
-    [Description("Provides platform information in following format [prefixes:]OmiLAXR:v2.0.13:{OS}[:suffixes].")]
+    [Description("Provides platform information in following format [prefixes:]OmiLAXR:v2.0.14:{OS}[:suffixes].")]
     public class PlatformInformation : LearningContext
     {
         [Serializable]
@@ -21,7 +21,7 @@ namespace OmiLAXR.Context
         private static PlatformInformation _instance;
         public static PlatformInformation Instance => GetInstance(ref _instance);
         
-        private const string OmiLAXR_Version = "v2.0.13";
+        private const string OmiLAXR_Version = "v2.0.14";
 
         // This will store the value in the inspector
         [SerializeField] 
