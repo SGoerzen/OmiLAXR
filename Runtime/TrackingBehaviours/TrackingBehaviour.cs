@@ -37,7 +37,7 @@ namespace OmiLAXR.TrackingBehaviours
         protected virtual void AfterFoundObjects(T[] objects) {}
         protected abstract void AfterFilteredObjects(T[] objects);
 
-        protected void OnEnable()
+        protected virtual void OnEnable()
         {
             
         }
@@ -73,5 +73,8 @@ namespace OmiLAXR.TrackingBehaviours
             => objects
                 .Where(o => o.GetType() == typeof(TS) || o.GetType().IsSubclassOf(typeof(TS)))
                 .Select(o => o as TS).ToArray();
+        protected TS First<TS>(Object[] objects) where TS : Object
+            => (TS)objects
+                .FirstOrDefault(o => o.GetType() == typeof(TS) || o.GetType().IsSubclassOf(typeof(TS)));
     }
 }
