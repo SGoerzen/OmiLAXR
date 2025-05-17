@@ -1,13 +1,22 @@
 stages:
   - test
+
 unit-test:
   script:
-    "/home/unity_8R_11_82EIPokw/Unity/Hub/Editor/2022.3.26f1/Unity \
-    -batchmode \
-    -projectPath . \
-    -runTests -testPlatform editmode \
-    -logFile \
-    -testResults ./unit-tests.xml"
+    - '/home/unity_8R_11_82EIPokw/Unity/Hub/Editor/2022.3.26f1/Unity \
+      -batchmode \
+      -projectPath . \
+      -runTests \
+      -testPlatform editmode \
+      -testResults ./unit-tests.xml \
+      -logFile ./unity-unit-test.log'
   stage: test
   tags:
     - unity
+  only:
+    - main
+  artifacts:
+    when: always
+    paths:
+      - ./unit-tests.xml
+      - ./unity-unit-test.log
