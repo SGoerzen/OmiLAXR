@@ -20,6 +20,8 @@ namespace OmiLAXR
         public readonly List<Hook> Hooks = new List<Hook>();
         public readonly List<Endpoint> Endpoints = new List<Endpoint>();   
         
+        public List<IDataProviderExtension> Extensions = new List<IDataProviderExtension>();
+        
         public T GetComposer<T>() where T : IComposer
             => Composers.OfType<T>().FirstOrDefault();
         

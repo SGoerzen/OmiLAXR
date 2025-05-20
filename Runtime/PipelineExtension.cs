@@ -13,7 +13,7 @@ namespace OmiLAXR
     public abstract class PipelineExtension<T> : PipelineComponent, IPipelineExtension
     where T : Pipeline
     {
-        public Pipeline Pipeline { get; protected set; }
+        public T Pipeline { get; protected set; }
         public Pipeline GetPipeline() => Pipeline;
         public readonly List<Listener> Listeners = new List<Listener>();
         public readonly List<ITrackingBehaviour> TrackingBehaviours = new List<ITrackingBehaviour>();
@@ -26,7 +26,7 @@ namespace OmiLAXR
 
         public void Extend(Pipeline pipeline)
         {
-            Pipeline = pipeline;
+            Pipeline = (T)pipeline;
 
             var listeners = gameObject.GetComponentsInChildren<Listener>();
             var tbs = gameObject.GetComponentsInChildren<ITrackingBehaviour>();
