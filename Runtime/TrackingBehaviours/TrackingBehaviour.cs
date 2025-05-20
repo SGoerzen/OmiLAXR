@@ -17,6 +17,8 @@ namespace OmiLAXR.TrackingBehaviours
     {
         protected virtual void Awake()
         {
+            Pipeline.AfterStartedPipeline += OnStartedPipeline;
+            Pipeline.BeforeStoppedPipeline += OnStoppedPipeline;
             Pipeline.AfterFoundObjects += (objects) =>
             {
                 if (!enabled)
@@ -34,6 +36,8 @@ namespace OmiLAXR.TrackingBehaviours
             Pipeline.BeforeStoppedPipeline += (p) => Dispose(p.trackingObjects.ToArray());
         }
         
+        protected virtual void OnStartedPipeline(Pipeline pipeline) {}
+        protected virtual void OnStoppedPipeline(Pipeline pipeline) {}
         protected virtual void AfterFoundObjects(T[] objects) {}
         protected abstract void AfterFilteredObjects(T[] objects);
 

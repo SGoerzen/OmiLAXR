@@ -62,7 +62,8 @@ namespace OmiLAXR
             => Listeners.OfType<T>().Select(listener => listener as T).FirstOrDefault();
 
         public event Action<Pipeline> AfterInit;
-        public event Action<Pipeline> AfterStarted;
+        public event Action<Pipeline> BeforeStartedPipeline;
+        public event Action<Pipeline> AfterStartedPipeline;
         public event Action<Pipeline> OnCollect; 
         public event Action<Object[]> AfterFoundObjects;
         public event Action<Object[]> AfterFilteredObjects;
@@ -221,8 +222,9 @@ namespace OmiLAXR
                 listener.StartListening();
             }
             
+            BeforeStartedPipeline?.Invoke(this);
             Log($"Started Pipeline with {trackingObjects.Count} tracking target objects...");
-            AfterStarted?.Invoke(this);
+            AfterStartedPipeline?.Invoke(this);
         }
 
         private void OnDisable()
@@ -234,6 +236,8 @@ namespace OmiLAXR
             // clear listenings
             foreach (var listener in Listeners.Where(l => l.enabled))
             {
+                if (listener == null)
+                    continue;
                 listener.OnFoundObjects -= FoundObjects;
             }
 

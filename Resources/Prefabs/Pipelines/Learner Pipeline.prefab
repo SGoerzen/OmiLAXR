@@ -100,6 +100,9 @@ PrefabInstance:
       addedObject: {fileID: 6529776104473516314}
     - targetCorrespondingSourceObject: {fileID: 3854916294279326203, guid: 3406909dc7d1f436c8728e682dd9f930, type: 3}
       insertIndex: -1
+      addedObject: {fileID: 1061375823253536262}
+    - targetCorrespondingSourceObject: {fileID: 3854916294279326203, guid: 3406909dc7d1f436c8728e682dd9f930, type: 3}
+      insertIndex: -1
       addedObject: {fileID: 121891111681147942}
     - targetCorrespondingSourceObject: {fileID: 3854916294279326203, guid: 3406909dc7d1f436c8728e682dd9f930, type: 3}
       insertIndex: -1
@@ -178,7 +181,6 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   actor: {fileID: 4928581912976695948}
   instructor: {fileID: 0}
-  Extensions: []
 --- !u!114 &2034370651249271796
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -278,6 +280,18 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   trackNoddingEnabled: 1
   trackShakingEnabled: 1
+--- !u!114 &1061375823253536262
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 5683481138607589024}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 44bf876726f2474cba9728328137290a, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!114 &121891111681147942
 MonoBehaviour:
   m_ObjectHideFlags: 0
