@@ -21,6 +21,9 @@ namespace OmiLAXR.Endpoints
 
         private void Awake()
         {
+            if (!enabled)
+                return;
+            
             if (!targetEndpoint)
             {
                 targetEndpoint = GetComponent<BasicAuthEndpoint>();
