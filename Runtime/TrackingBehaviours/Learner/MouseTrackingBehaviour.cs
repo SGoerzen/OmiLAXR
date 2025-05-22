@@ -9,7 +9,7 @@ namespace OmiLAXR.TrackingBehaviours.Learner
 {
     [AddComponentMenu("OmiLAXR / 3) Tracking Behaviours / Mouse Tracking Behaviour")]
     [Description("Tracks mouse clicks and wheel.")]
-    public class MouseTrackingBehaviour : EventTrackingBehaviour
+    public class MouseTrackingBehaviour : ObjectlessTrackingBehaviour
     {
         public struct MouseTrackingBehaviourArgs
         {
@@ -51,7 +51,7 @@ namespace OmiLAXR.TrackingBehaviours.Learner
 
         private static readonly string[] ButtonNames = { "left", "right", "middle" };
 
-        private void Start()
+        protected virtual void Start()
         {
             _lastMousePosition = GetMousePosition();
         }

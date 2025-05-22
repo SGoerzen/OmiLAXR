@@ -1,10 +1,12 @@
 using System;
+using System.ComponentModel;
 using UnityEngine;
 
 namespace OmiLAXR.TrackingBehaviours.Learner
 {
     [AddComponentMenu("OmiLAXR / 3) Tracking Behaviours / Session Tracking Behaviour")]
-    public class SessionTrackingBehaviour : EventTrackingBehaviour
+    [Description("Tracks the start and end of a session.")]
+    public class SessionTrackingBehaviour : ObjectlessTrackingBehaviour
     {
         public readonly TrackingBehaviourEvent<DateTime> OnSessionStarted = new TrackingBehaviourEvent<DateTime>();
         public readonly TrackingBehaviourEvent<DateTime> OnSessionStopped = new TrackingBehaviourEvent<DateTime>();
@@ -17,6 +19,5 @@ namespace OmiLAXR.TrackingBehaviours.Learner
         {
             OnSessionStopped.Invoke(this, DateTime.Now);
         }
-        
     }
 }
