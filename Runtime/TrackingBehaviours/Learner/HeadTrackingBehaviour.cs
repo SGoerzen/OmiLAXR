@@ -7,7 +7,7 @@ namespace OmiLAXR.TrackingBehaviours.Learner
 {
     [AddComponentMenu("OmiLAXR / 3) Tracking Behaviours / Head Tracking Behaviour"), 
      Description("Detects nodding and shaking of the head by using <Camera>.")]
-    public class HeadTrackingBehaviour : EventTrackingBehaviour
+    public class HeadTrackingBehaviour : ObjectlessTrackingBehaviour
     {
         public struct HeadTrackingBehaviourArgs
         {
@@ -77,13 +77,13 @@ namespace OmiLAXR.TrackingBehaviours.Learner
         private readonly TimeSpan _minTimeForGestures = new TimeSpan(0, 0, 0, 1, 0);
 
         // Start is called before the first frame update
-        private void Start()
+        protected virtual void Start()
         {
             _nullVector = Vector3.zero;
         }
 
         // Update is called once per frame
-        private void Update()
+        protected virtual void Update()
         {
             var addHmdPosition = HmdPosition.Instance.GetHmdPosition();
             if (Equals(addHmdPosition, default(HmdTimedPosition))) return;

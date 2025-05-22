@@ -7,6 +7,7 @@ using UnityEngine.Serialization;
 
 namespace OmiLAXR.Endpoints
 {
+    [AddComponentMenu("OmiLAXR / 6) Endpoints / Local Endpoint")]
     [Description("Stores statements on local path.")]
     public class LocalEndpoint : Endpoint
     {

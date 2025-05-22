@@ -2,7 +2,7 @@ using UnityEngine;
 
 namespace OmiLAXR.TrackingBehaviours
 {
-    public class EventTrackingBehaviour : TrackingBehaviour<Object>
+    public class ObjectlessTrackingBehaviour : TrackingBehaviour<Object>
     {
         protected override void AfterFilteredObjects(Object[] objects)
         {

@@ -6,7 +6,7 @@ namespace OmiLAXR.TrackingBehaviours.System
 {
     [AddComponentMenu("OmiLAXR / 3) Tracking Behaviours / System Tracking Behaviour")]
     [Description("Tracks states of game (started, quit, paused, resumed, focused, unfocused) and detects state changes.")]
-    public class SystemTrackingBehaviour : EventTrackingBehaviour
+    public class SystemTrackingBehaviour : ObjectlessTrackingBehaviour
     {
         public readonly TrackingBehaviourEvent<DateTime> OnStartedGame = new TrackingBehaviourEvent<DateTime>();
         public readonly TrackingBehaviourEvent<DateTime> OnQuitGame = new TrackingBehaviourEvent<DateTime>();
@@ -27,12 +27,12 @@ namespace OmiLAXR.TrackingBehaviours.System
         private bool _isFirstRun = true;
         private bool _sendStartSignal = false;
         
-        private void Start()
+        protected virtual void Start()
         {
             SendStartSignal();
         }
 
-        private void SendStartSignal()
+        protected void SendStartSignal()
         {
             if (_sendStartSignal)
                 return;
@@ -43,18 +43,18 @@ namespace OmiLAXR.TrackingBehaviours.System
             _sendStartSignal = true;
         }
 
-        private void OnApplicationQuit()
+        protected virtual void OnApplicationQuit()
         {
            OnQuitGame?.Invoke(this, DateTime.Now);
         }
 
-        private void OnApplicationFocus(bool hasFocus)
+        protected virtual void OnApplicationFocus(bool hasFocus)
         {
             SendStartSignal();
             OnFocusedGame?.Invoke(this, DateTime.Now, hasFocus);
         }
 
-        private void OnApplicationPause(bool pauseStatus)
+        protected virtual void OnApplicationPause(bool pauseStatus)
         {
             if (_isFirstRun)
             {

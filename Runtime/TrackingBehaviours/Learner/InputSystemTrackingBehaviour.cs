@@ -7,7 +7,7 @@ namespace OmiLAXR.TrackingBehaviours.Learner
 {
     [AddComponentMenu("OmiLAXR / 3) Tracking Behaviours / Input System Tracking Behaviour"), 
      Description("Tracks XR device inputs by using <InputSystem> instance.")]
-    public class InputSystemTrackingBehaviour : EventTrackingBehaviour
+    public class InputSystemTrackingBehaviour : ObjectlessTrackingBehaviour
     {
         public struct InputTrackingBehaviourArgs
         {
@@ -19,7 +19,7 @@ namespace OmiLAXR.TrackingBehaviours.Learner
         [Gesture("XRController"), Action("Press")]
         public readonly TrackingBehaviourEvent<InputTrackingBehaviourArgs> OnPressedAnyButton = new TrackingBehaviourEvent<InputTrackingBehaviourArgs>();
         
-        private void Update()
+        protected virtual void Update()
         {
             // Check all devices
             foreach (var device in InputSystem.devices)

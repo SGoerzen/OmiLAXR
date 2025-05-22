@@ -11,8 +11,7 @@ namespace OmiLAXR.Filters
     {
         public override Object[] Pass(Object[] objects)
         {
-            var b = objects.Exclude<ExcludeFromTracking>();
-            return b;
+            return objects.Exclude<ExcludeFromTracking>();
         }
     }
 }
