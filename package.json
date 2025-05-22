@@ -1,9 +1,9 @@
 {
   "name": "com.rwth.unity.omilaxr",
-  "version": "2.0.14",
+  "version": "2.0.18",
   "displayName": "OmiLAXR",
   "description": "This is the base package for OmiLAXR ecosystem. This package has shareable code for all OmiLAXR packages.",
-  "unity": "2021.3",
+  "unity": "2020.3",
   "unityRelease": "15f1",
   "documentationUrl": "https://gitlab.com/learntech-rwth/omilaxr-framework/v2/omilaxr/-/wikis",
   "changelogUrl": "https://gitlab.com/learntech-rwth/omilaxr-ecosystem/v2/omilaxr/-/blob/main/CHANGELOG",

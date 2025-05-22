@@ -31,7 +31,7 @@ namespace OmiLAXR
         public readonly Dictionary<string, List<ITrackingBehaviourEvent>> Actions = new Dictionary<string, List<ITrackingBehaviourEvent>>();
         public readonly Dictionary<string, List<ITrackingBehaviourEvent>> Gestures = new Dictionary<string, List<ITrackingBehaviourEvent>>();
 
-        public List<PipelineExtension> Extensions = new List<PipelineExtension>();
+        public List<IPipelineExtension> Extensions = new List<IPipelineExtension>();
 
         public ActorDataProvider[] ActorDataProviders { get; protected set; }
 
@@ -62,7 +62,8 @@ namespace OmiLAXR
             => Listeners.OfType<T>().Select(listener => listener as T).FirstOrDefault();
 
         public event Action<Pipeline> AfterInit;
-        public event Action<Pipeline> AfterStarted;
+        public event Action<Pipeline> BeforeStartedPipeline;
+        public event Action<Pipeline> AfterStartedPipeline;
         public event Action<Pipeline> OnCollect; 
         public event Action<Object[]> AfterFoundObjects;
         public event Action<Object[]> AfterFilteredObjects;
@@ -78,18 +79,32 @@ namespace OmiLAXR
         {
             var type = comp.GetType();
             if (type.IsSubclassOf(typeof(Listener)))
-                Listeners.Add(comp as Listener);
-            else if (type.IsSubclassOf(typeof(Filter)))
-                Filters.Add(comp as Filter);
-            else if (type.IsSubclassOf(typeof(ITrackingBehaviour)))
-                TrackingBehaviours.Add(comp as ITrackingBehaviour);
-            else if (type.IsSubclassOf(typeof(PipelineExtension)))
             {
-                var ext = comp as PipelineExtension;
-                if (ext)
+                if (!Listeners.Contains(comp))
+                    Listeners.Add(comp as Listener);
+            }
+            else if (type.IsSubclassOf(typeof(Filter)))
+            {
+                if (!Filters.Contains(comp))
+                    Filters.Add(comp as Filter);
+            }
+            else if (type.IsSubclassOf(typeof(ITrackingBehaviour)))
+            {
+                var tb = comp as ITrackingBehaviour;
+                if (!TrackingBehaviours.Contains(tb))
+                    TrackingBehaviours.Add(tb);
+            }
+            else if (type.IsSubclassOf(typeof(IPipelineExtension)))
+            {
+                var pc = comp as IPipelineComponent;
+                if (pc != null)
                 {
-                    ext.Extend(this);
-                    Extensions.Add(ext);
+                    if (!Extensions.Contains(pc))
+                    {
+                        var ext = pc as IPipelineExtension;
+                        ext?.Extend(this);
+                        Extensions.Add(ext);
+                    }
                 }
             }
         }
@@ -207,8 +222,9 @@ namespace OmiLAXR
                 listener.StartListening();
             }
             
+            BeforeStartedPipeline?.Invoke(this);
             Log($"Started Pipeline with {trackingObjects.Count} tracking target objects...");
-            AfterStarted?.Invoke(this);
+            AfterStartedPipeline?.Invoke(this);
         }
 
         private void OnDisable()
@@ -220,6 +236,8 @@ namespace OmiLAXR
             // clear listenings
             foreach (var listener in Listeners.Where(l => l.enabled))
             {
+                if (listener == null)
+                    continue;
                 listener.OnFoundObjects -= FoundObjects;
             }
 
