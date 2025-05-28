@@ -27,7 +27,7 @@ namespace OmiLAXR
 
         private bool DetectChange(ref Vector3 curValue, Vector3 newValue, float threshold)
         {
-            var dis = Vector3.Distance(newValue, Vector3.one * threshold);
+            var dis = Vector3.Distance(newValue, curValue);
             if (dis <= threshold)
                 return false;
             curValue = newValue;
