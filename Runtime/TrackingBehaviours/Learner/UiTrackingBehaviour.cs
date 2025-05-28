@@ -114,8 +114,8 @@ namespace OmiLAXR.TrackingBehaviours.Learner
                     OnChangedScrollbar.Bind(scrollbar.onValueChanged,
                         value =>
                         {
-                            // todo: check if user really interacting
-                            OnChangedScrollbar.Invoke(this, scrollbar, value);
+                            if (!ieh || ieh.IsHovering)
+                                OnChangedScrollbar.Invoke(this, scrollbar, value);
                         });
                 }
             }
