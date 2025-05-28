@@ -1,6 +1,7 @@
 using System.Linq;
 using System.Reflection;
 using UnityEngine;
+using NotImplementedException = System.NotImplementedException;
 using Object = UnityEngine.Object;
 
 namespace OmiLAXR.TrackingBehaviours
@@ -8,7 +9,10 @@ namespace OmiLAXR.TrackingBehaviours
 
     public abstract class TrackingBehaviour : TrackingBehaviour<Object>
     {
-        
+        protected override void AfterFilteredObjects(Object[] objects)
+        {
+            
+        }
     }
     
     [DefaultExecutionOrder(-1)]

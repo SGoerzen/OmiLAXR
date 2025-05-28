@@ -6,7 +6,7 @@ namespace OmiLAXR.TrackingBehaviours.System
 {
     [AddComponentMenu("OmiLAXR / 3) Tracking Behaviours / System Tracking Behaviour")]
     [Description("Tracks states of game (started, quit, paused, resumed, focused, unfocused) and detects state changes.")]
-    public class SystemTrackingBehaviour : ObjectlessTrackingBehaviour
+    public class SystemTrackingBehaviour : TrackingBehaviour
     {
         public readonly TrackingBehaviourEvent<DateTime> OnStartedGame = new TrackingBehaviourEvent<DateTime>();
         public readonly TrackingBehaviourEvent<DateTime> OnQuitGame = new TrackingBehaviourEvent<DateTime>();

@@ -6,7 +6,7 @@ namespace OmiLAXR.TrackingBehaviours.Learner
 {
     [AddComponentMenu("OmiLAXR / 3) Tracking Behaviours / Session Tracking Behaviour")]
     [Description("Tracks the start and end of a session.")]
-    public class SessionTrackingBehaviour : ObjectlessTrackingBehaviour
+    public class SessionTrackingBehaviour : TrackingBehaviour
     {
         public readonly TrackingBehaviourEvent<DateTime> OnSessionStarted = new TrackingBehaviourEvent<DateTime>();
         public readonly TrackingBehaviourEvent<DateTime> OnSessionStopped = new TrackingBehaviourEvent<DateTime>();

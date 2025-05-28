@@ -7,7 +7,7 @@ namespace OmiLAXR.TrackingBehaviours.Learner
 {
     [AddComponentMenu("OmiLAXR / 3) Tracking Behaviours / Head Tracking Behaviour"), 
      Description("Detects nodding and shaking of the head by using <Camera>.")]
-    public class HeadTrackingBehaviour : ObjectlessTrackingBehaviour
+    public class HeadTrackingBehaviour : TrackingBehaviour
     {
         public struct HeadTrackingBehaviourArgs
         {

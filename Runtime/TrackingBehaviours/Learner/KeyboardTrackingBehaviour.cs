@@ -12,7 +12,7 @@ namespace OmiLAXR.TrackingBehaviours.Learner
 {
     [AddComponentMenu("OmiLAXR / 3) Tracking Behaviours / Keyboard Tracking Behaviour"),
      Description("Tracks keyboard presses and releases.")]
-    public class KeyboardTrackingBehaviour : ObjectlessTrackingBehaviour
+    public class KeyboardTrackingBehaviour : TrackingBehaviour
     {
         public struct KeyboardTrackingBehaviourArgs
         {
