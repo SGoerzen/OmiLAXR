@@ -35,7 +35,15 @@ namespace OmiLAXR.TrackingBehaviours
                 if (!enabled)
                     return;
                 // Skip Select<T> if not needed
-                AfterFilteredObjects(typeof(T) == typeof(Object) ? objects as T[] : Select<T>(objects));
+
+                if (typeof(T) == typeof(Object) || objects.Length == 0)
+                    AfterFilteredObjects(objects as T[]);
+                else
+                {
+                    var selectedObjects = Select<T>(objects);
+                    SelectedObjects = selectedObjects;
+                    AfterFilteredObjects(selectedObjects);
+                }
             };
             Pipeline.BeforeStoppedPipeline += (p) => Dispose(p.trackingObjects.ToArray());
         }
@@ -44,6 +52,8 @@ namespace OmiLAXR.TrackingBehaviours
         protected virtual void OnStoppedPipeline(Pipeline pipeline) {}
         protected virtual void AfterFoundObjects(T[] objects) {}
         protected abstract void AfterFilteredObjects(T[] objects);
+        
+        protected T[] SelectedObjects = new T[0];
 
         protected virtual void OnEnable()
         {

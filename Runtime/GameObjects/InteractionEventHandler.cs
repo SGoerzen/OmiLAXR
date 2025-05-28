@@ -97,8 +97,6 @@ namespace OmiLAXR
             _isHovering = true;
             _pressHoverSum = 0;
             
-            print("POINTER ENTER");
-
             OnHoverStarted?.Invoke(new InteractionEventArgs()
             {
                 TotalPresses = _pressTotalSum,
@@ -116,8 +114,6 @@ namespace OmiLAXR
         {
             if (!_isHovering) 
                 return;
-            print("POINTER EXIT");
-
             _isHovering = false;
 
             OnHoverEnded?.Invoke(new InteractionEventArgs()
@@ -135,8 +131,6 @@ namespace OmiLAXR
         /// </summary>
         public void OnPointerDown(PointerEventData eventData)
         {
-            print("POINTER DOWN");
-
             _pressStartTime = Time.time;
             _isPressing = true;
 
@@ -158,8 +152,6 @@ namespace OmiLAXR
         {
             if (!_isPressing) 
                 return;
-
-            print("POINTER UP");
             
             var pressDuration = Time.time - _pressStartTime;
             _isPressing = false;

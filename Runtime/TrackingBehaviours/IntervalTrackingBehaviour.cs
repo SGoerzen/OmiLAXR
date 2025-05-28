@@ -17,6 +17,7 @@ namespace OmiLAXR.TrackingBehaviours
     public abstract class IntervalTrackingBehaviour<T> : TrackingBehaviour<T>
         where T : Object
     {
+        public bool isIntervalActivated = true;
         /// <summary>
         /// Time interval in seconds between processing operations.
         /// </summary>
@@ -42,6 +43,9 @@ namespace OmiLAXR.TrackingBehaviours
         /// </summary>
         protected virtual void Update()
         {
+            if (!isIntervalActivated)
+                return;
+            
             // Check if it's time to process based on interval
             if (_isFirstProcess && processOnEnable)
             {
@@ -104,7 +108,7 @@ namespace OmiLAXR.TrackingBehaviours
         /// <summary>
         /// Called when the behavior is enabled.
         /// </summary>
-        protected virtual void OnEnable()
+        protected override void OnEnable()
         {
             _isFirstProcess = true;
             _lastProcessTime = 0f;
