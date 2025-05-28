@@ -7,9 +7,9 @@ using UnityEngine.Serialization;
 
 namespace OmiLAXR.Endpoints
 {
-    [AddComponentMenu("OmiLAXR / 6) Endpoints / Local Endpoint")]
+    [AddComponentMenu("OmiLAXR / 6) Endpoints / Local File Endpoint")]
     [Description("Stores statements on local path.")]
-    public class LocalEndpoint : Endpoint
+    public class LocalFileEndpoint : Endpoint
     {
         public enum DefaultFolderPaths
         {
@@ -22,18 +22,25 @@ namespace OmiLAXR.Endpoints
         
         [FormerlySerializedAs("storeLocation")] 
         [Header("Set a path where the files get stored. Will be applied if 'Location Target' is 'Custom'.")]
+        [HideInInspector]
         public string customLocation;
 
-        [ReadOnly] 
-        public string location;
+        [ReadOnly, SerializeField, TextArea] 
+        private string fileLocationPreview = "yyyymmddhhmmss.txt";
         
-        [Header("Set a filename where the statements are stored. If no filename is specified, the filename will be generated automatically.")]
+        [Header("Default: Generated automatically based on current time.")]
         public string fileName;
         
         private string _tempFilePath = "";
         
         private StreamWriter _streamWriter;
-        
+
+        private static string GenerateFileName(DateTime now)
+            => GenerateFileName(now.Year, now.Month, now.Day, now.Hour, now.Minute, now.Second);
+
+        private static string GenerateFileName(int year, int month, int day, int hour, int minute, int second)
+            => $"{year}{month:00}{day:00}{hour:00}{minute:00}{second:00}";
+
         protected override void Awake()
         {
             if (string.IsNullOrEmpty(customLocation))
@@ -43,11 +50,13 @@ namespace OmiLAXR.Endpoints
                 Directory.CreateDirectory(customLocation);
 
             var now = DateTime.Now;
-            var filename = $"{now.Year}{now.Month:00}{now.Day:00}{now.Hour:00}{now.Minute:00}{now.Second:00}";
+            var filename = GenerateFileName(now);
 
             fileName = string.IsNullOrEmpty(fileName) ? filename + ".txt" : fileName;
             
-            location = _tempFilePath = Path.Combine(customLocation, fileName);
+             _tempFilePath = Path.Combine(customLocation, fileName);
+             
+             fileLocationPreview = Path.GetFullPath(_tempFilePath);
 
             _streamWriter = new StreamWriter(_tempFilePath, true);
             _streamWriter.AutoFlush = true;
@@ -68,6 +77,18 @@ namespace OmiLAXR.Endpoints
                 default:
                     throw new ArgumentOutOfRangeException();
             }
+        }
+
+        private string GetFileLocationPreview()
+        {
+            var folder = GetDefaultFolder();
+            var n = string.IsNullOrEmpty(fileName) ? "yyyymmddhhmmss.txt" : fileName;
+            return Path.Combine(folder, n);
+        }
+        
+        public void UpdateFileLocationPreview()
+        {
+            fileLocationPreview = GetFileLocationPreview();
         }
 
         public string DefaultFolderPath => Path.Combine(GetDefaultFolder(), "OmiLAXR");
