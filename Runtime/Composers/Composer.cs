@@ -10,11 +10,16 @@ namespace OmiLAXR.Composers
 
         private void OnEnable()
         {
+            _name = GetType().Name.Replace("Composer", "");
         }
 
         public bool IsEnabled => enabled;
 
         public abstract Author GetAuthor();
+
+        private string _name;
+        public virtual string GetName() => _name;
+
         public virtual bool IsHigherComposer => false;
         public event ComposerAction<IStatement, bool> AfterComposed;
         
@@ -25,6 +30,7 @@ namespace OmiLAXR.Composers
         {
             if (!IsEnabled)
                 return;
+            statement.SetComposer(this);
             AfterComposed?.Invoke(this, statement, immediate);
         }
         protected void SendStatementImmediate(IStatement statement)
