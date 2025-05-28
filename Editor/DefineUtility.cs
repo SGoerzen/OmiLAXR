@@ -1,3 +1,4 @@
+#if UNITY_EDITOR
 using UnityEditor;
 
 namespace OmiLAXR.Editor
@@ -87,3 +88,4 @@ namespace OmiLAXR.Editor
         }
     }
 }
+#endif
