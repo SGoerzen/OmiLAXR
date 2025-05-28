@@ -3,7 +3,6 @@ using System.ComponentModel;
 using System.IO;
 using OmiLAXR.Composers;
 using UnityEngine;
-using UnityEngine.Serialization;
 
 namespace OmiLAXR.Endpoints
 {
@@ -19,80 +18,117 @@ namespace OmiLAXR.Endpoints
         }
 
         public DefaultFolderPaths defaultFolder = DefaultFolderPaths.PersistantDataPath;
-        
-        [FormerlySerializedAs("storeLocation")] 
-        [Header("Set a path where the files get stored. Will be applied if 'Location Target' is 'Custom'.")]
+
+        [Header("Relative to project root (only used when 'Custom' is selected)")]
         [HideInInspector]
         public string customLocation;
-
-        [ReadOnly, SerializeField, TextArea] 
-        private string fileLocationPreview = "yyyymmddhhmmss.txt";
         
+        public string fileExtension = "txt";
+        
+        [Header("If true, the statements will be split into multiple files organized by composers.")]
+        public bool splitByComposers = false;
+        
+        [ReadOnly, SerializeField, TextArea]
+        private string exampleFileLocationPreview = "yyyymmddhhmmss.txt";
+
         [Header("Default: Generated automatically based on current time.")]
         public string fileName;
-        
-        private string _tempFilePath = "";
-        
+
+        private string _resolvedFilePath;
         private StreamWriter _streamWriter;
 
-        private static string GenerateFileName(DateTime now)
-            => GenerateFileName(now.Year, now.Month, now.Day, now.Hour, now.Minute, now.Second);
+        private string GenerateFileName(DateTime now)
+        {
+            return string.Format("{0:0000}{1:00}{2:00}{3:00}{4:00}{5:00}.{6}",
+                now.Year, now.Month, now.Day, now.Hour, now.Minute, now.Second, fileExtension);
+        }
+        
+        private void OnValidate()
+        {
+#if UNITY_EDITOR
+            var absPath = GetResolvedFilePath();
+            var relPath = MakeRelativeToProject(absPath);
+            exampleFileLocationPreview = relPath;
+#endif
+        }
 
-        private static string GenerateFileName(int year, int month, int day, int hour, int minute, int second)
-            => $"{year}{month:00}{day:00}{hour:00}{minute:00}{second:00}";
+
+        private string MakeRelativeToProject(string absolutePath)
+        {
+            var projectRoot = Path.GetFullPath(Path.Combine(Application.dataPath, ".."));
+            Uri projectUri = new Uri(projectRoot + Path.DirectorySeparatorChar);
+            Uri fileUri = new Uri(absolutePath);
+            string relative = Uri.UnescapeDataString(projectUri.MakeRelativeUri(fileUri).ToString());
+            return relative.Replace('/', Path.DirectorySeparatorChar);
+        }
+
+
+        private static string ProjectRoot
+        {
+            get { return Path.GetFullPath(Path.Combine(Application.dataPath, "..")); }
+        }
+
+        public static string ResolveRelativeToProject(string relativePath)
+        {
+            return Path.GetFullPath(Path.Combine(ProjectRoot, relativePath ?? ""));
+        }
+
+        private string GetResolvedFolder()
+        {
+            if (defaultFolder == DefaultFolderPaths.PersistantDataPath)
+            {
+                return Application.persistentDataPath;
+            }
+            else if (defaultFolder == DefaultFolderPaths.TempFolder)
+            {
+                return Path.GetTempPath();
+            }
+            else if (defaultFolder == DefaultFolderPaths.Custom)
+            {
+                return ResolveRelativeToProject(customLocation);
+            }
+
+            throw new ArgumentOutOfRangeException();
+        }
+
+        public string DefaultFolderPath
+        {
+            get { return Path.Combine(GetResolvedFolder(), "OmiLAXR"); }
+        }
+
+        private string GetResolvedFilePath()
+        {
+            var folder = GetResolvedFolder();
+            var n = string.IsNullOrEmpty(fileName) ? GenerateFileName(DateTime.Now) : string.Format("{0}.{1}", fileName, fileExtension);
+            return Path.Combine(folder, n);
+        }
+
+        public void UpdateFileLocationPreview()
+        {
+#if UNITY_EDITOR
+            exampleFileLocationPreview = GetResolvedFilePath();
+#endif
+        }
 
         protected override void Awake()
         {
-            if (string.IsNullOrEmpty(customLocation))
-                customLocation = DefaultFolderPath;
+            var fullPath = GetResolvedFilePath();
 
-            if (!Directory.Exists(customLocation))
-                Directory.CreateDirectory(customLocation);
-
-            var now = DateTime.Now;
-            var filename = GenerateFileName(now);
-
-            fileName = string.IsNullOrEmpty(fileName) ? filename + ".txt" : fileName;
-            
-             _tempFilePath = Path.Combine(customLocation, fileName);
-             
-             fileLocationPreview = Path.GetFullPath(_tempFilePath);
-
-            _streamWriter = new StreamWriter(_tempFilePath, true);
-            _streamWriter.AutoFlush = true;
-            
-            DebugLog.OmiLAXR.Print($"Started writing to local endpoint in '{_tempFilePath}'.");
-        }
-
-        public string GetDefaultFolder()
-        {
-            switch (defaultFolder)
+            var dir = Path.GetDirectoryName(fullPath);
+            if (!Directory.Exists(dir))
             {
-                case DefaultFolderPaths.PersistantDataPath:
-                    return Application.persistentDataPath;
-                case DefaultFolderPaths.TempFolder:
-                    return Path.GetTempPath();
-                case DefaultFolderPaths.Custom:
-                    return customLocation;
-                default:
-                    throw new ArgumentOutOfRangeException();
+                Directory.CreateDirectory(dir);
             }
+
+            _resolvedFilePath = fullPath;
+            exampleFileLocationPreview = _resolvedFilePath;
+
+            _streamWriter = new StreamWriter(_resolvedFilePath, true);
+            _streamWriter.AutoFlush = true;
+
+            DebugLog.OmiLAXR.Print("Started writing to local endpoint in '" + _resolvedFilePath + "'.");
         }
 
-        private string GetFileLocationPreview()
-        {
-            var folder = GetDefaultFolder();
-            var n = string.IsNullOrEmpty(fileName) ? "yyyymmddhhmmss.txt" : fileName;
-            return Path.Combine(folder, n);
-        }
-        
-        public void UpdateFileLocationPreview()
-        {
-            fileLocationPreview = GetFileLocationPreview();
-        }
-
-        public string DefaultFolderPath => Path.Combine(GetDefaultFolder(), "OmiLAXR");
-        
         protected override TransferCode HandleSending(IStatement statement)
         {
             try
