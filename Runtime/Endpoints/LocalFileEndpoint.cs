@@ -128,12 +128,15 @@ namespace OmiLAXR.Endpoints
 
             DebugLog.OmiLAXR.Print("Started writing to local endpoint in '" + _resolvedFilePath + "'.");
         }
+        
+        protected virtual string FormatLine(IStatement statement) 
+            => statement.ToDataStandardString();
 
         protected override TransferCode HandleSending(IStatement statement)
         {
             try
             {
-                _streamWriter.WriteLine(statement.ToDataStandardString());
+                _streamWriter.WriteLine(FormatLine(statement));
             }
             catch (IOException ex)
             {
