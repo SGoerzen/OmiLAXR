@@ -2,7 +2,6 @@ using System.ComponentModel;
 using System.Linq;
 using TMPro;
 using UnityEngine;
-using UnityEngine.EventSystems;
 using UnityEngine.UI;
 
 namespace OmiLAXR.TrackingBehaviours.Learner
@@ -29,6 +28,11 @@ namespace OmiLAXR.TrackingBehaviours.Learner
 
         [Gesture("UI"), Action("Change")] public readonly TrackingBehaviourEvent<Scrollbar, float> OnChangedScrollbar =
             new TrackingBehaviourEvent<Scrollbar, float>();
+        
+        public readonly TrackingBehaviourEvent<Selectable, InteractionEventArgs> OnStartHover = new TrackingBehaviourEvent<Selectable, InteractionEventArgs>();
+        public readonly TrackingBehaviourEvent<Selectable, InteractionEventArgs> OnEndHover = new TrackingBehaviourEvent<Selectable, InteractionEventArgs>();
+        public readonly TrackingBehaviourEvent<Selectable, InteractionEventArgs> OnStartPress = new TrackingBehaviourEvent<Selectable, InteractionEventArgs>();
+        public readonly TrackingBehaviourEvent<Selectable, InteractionEventArgs> OnEndPress = new TrackingBehaviourEvent<Selectable, InteractionEventArgs>();
 
         protected override void AfterFilteredObjects(Selectable[] selectables)
         {
@@ -36,6 +40,26 @@ namespace OmiLAXR.TrackingBehaviours.Learner
             {
                 var type = selectable.GetType();
                 var ieh = selectable.GetComponent<InteractionEventHandler>();
+
+                if (ieh)
+                {
+                    ieh.OnHoverEnded += (args) =>
+                    {
+                        OnStartHover?.Invoke(this, selectable, args);
+                    };
+                    ieh.OnHoverStarted += (args) =>
+                    {
+                        OnEndHover?.Invoke(this, selectable, args);
+                    };
+                    ieh.OnPressEnded += (args) =>
+                    {
+                        OnStartPress?.Invoke(this, selectable, args);
+                    };
+                    ieh.OnPressStarted += (args) =>
+                    {
+                        OnEndPress?.Invoke(this, selectable, args);
+                    };
+                }
                 
                 if (type == typeof(Button))
                 {

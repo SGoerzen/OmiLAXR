@@ -11,32 +11,6 @@ namespace OmiLAXR
     public class InteractionEventHandler : MonoBehaviour, IPointerEnterHandler, IPointerExitHandler,
         IPointerDownHandler, IPointerUpHandler
     {
-        /// <summary>
-        /// Contains data about the pointer interaction events.
-        /// </summary>
-        public struct PointerEventArgs
-        {
-            /// <summary>
-            /// Total number of presses recorded since this component was initialized.
-            /// </summary>
-            public int TotalPresses { get; set; }
-            
-            /// <summary>
-            /// Number of presses recorded during the current hover.
-            /// </summary>
-            public int PressesInHover { get; set; }
-            
-            /// <summary>
-            /// Duration in seconds that the pointer has been hovering over this element.
-            /// </summary>
-            public float HoverDuration { get; set; }
-            
-            /// <summary>
-            /// Duration in seconds that the pointer has been pressing this element.
-            /// </summary>
-            public float PressDuration { get; set; }
-        }
-        
         // Timestamp when the pointer starts hovering over this element
         private float _hoverStartTime;
         
@@ -54,28 +28,28 @@ namespace OmiLAXR
         /// <summary>
         /// Event triggered when the pointer starts hovering over this element.
         /// </summary>
-        public event Action<PointerEventArgs> OnHoverStarted;
+        public event Action<InteractionEventArgs> OnHoverStarted;
 
         /// <summary>
         /// Event triggered when the pointer stops hovering over this element.
         /// </summary>
-        public event Action<PointerEventArgs> OnHoverEnded;
+        public event Action<InteractionEventArgs> OnHoverEnded;
         
         /// <summary>
         /// Event triggered when the pointer begins pressing this element.
         /// </summary>
-        public event Action<PointerEventArgs> OnPressStarted;
+        public event Action<InteractionEventArgs> OnPressStarted;
         
         /// <summary>
         /// Event triggered when the pointer releases this element after pressing.
         /// </summary>
-        public event Action<PointerEventArgs> OnPressEnded;
+        public event Action<InteractionEventArgs> OnPressEnded;
         
         /// <summary>
         /// Event triggered when a complete click action occurs (press and release while hovering).
         /// Only fires when the element is released while the pointer is still hovering over it.
         /// </summary>
-        public event Action<PointerEventArgs> OnClicked;
+        public event Action<InteractionEventArgs> OnClicked;
         
         /// <summary>
         /// Whether the pointer is currently hovering over this element.
@@ -99,7 +73,7 @@ namespace OmiLAXR
             
             print("POINTER ENTER");
 
-            OnHoverStarted?.Invoke(new PointerEventArgs()
+            OnHoverStarted?.Invoke(new InteractionEventArgs()
             {
                 TotalPresses = _pressTotalSum,
                 PressesInHover = _pressHoverSum,
@@ -120,7 +94,7 @@ namespace OmiLAXR
 
             _isHovering = false;
 
-            OnHoverEnded?.Invoke(new PointerEventArgs()
+            OnHoverEnded?.Invoke(new InteractionEventArgs()
             {
                 TotalPresses = _pressTotalSum,
                 PressesInHover = _pressHoverSum,
@@ -140,7 +114,7 @@ namespace OmiLAXR
             _pressStartTime = Time.time;
             _isPressing = true;
 
-            OnPressStarted?.Invoke(new PointerEventArgs()
+            OnPressStarted?.Invoke(new InteractionEventArgs()
             {
                 TotalPresses = _pressTotalSum,
                 PressesInHover = _pressHoverSum,
@@ -166,7 +140,7 @@ namespace OmiLAXR
             _pressHoverSum++;
             _pressTotalSum++;
 
-            var eventArgs = new PointerEventArgs()
+            var eventArgs = new InteractionEventArgs()
             {
                 TotalPresses = _pressTotalSum,
                 PressesInHover = _pressHoverSum,
