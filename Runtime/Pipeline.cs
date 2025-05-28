@@ -74,6 +74,8 @@ namespace OmiLAXR
         public event Action<Pipeline> AfterStoppedPipeline; 
 
         public readonly List<Object> trackingObjects = new List<Object>();
+        private bool _cleanupCalled = false;
+        private bool _startupCalled = false;
 
         public void Add(PipelineComponent comp)
         {
@@ -212,6 +214,15 @@ namespace OmiLAXR
 
         private void OnEnable()
         {
+            Startup();
+        }
+
+        private void Startup()
+        {
+            if (_startupCalled)
+                return;
+            _startupCalled = true;
+            
             CollectGesturesAndActions();
             trackingObjects.Clear();
 
@@ -222,13 +233,22 @@ namespace OmiLAXR
                 listener.StartListening();
             }
             
+            _cleanupCalled = false;
             BeforeStartedPipeline?.Invoke(this);
             Log($"Started Pipeline with {trackingObjects.Count} tracking target objects...");
             AfterStartedPipeline?.Invoke(this);
         }
-
+        
         private void OnDisable()
         {
+            Cleanup();
+        }
+
+        private void Cleanup()
+        {
+            if (_cleanupCalled)
+                return;
+            _cleanupCalled = true;
             BeforeStoppedPipeline?.Invoke(this);
             
             trackingObjects.Clear();
@@ -248,11 +268,31 @@ namespace OmiLAXR
 
         public void StartPipeline()
         {
+            if (IsRunning)
+                return;
+            
             gameObject.SetActive(true);
+            Startup();
+        }
+
+        private void OnApplicationQuit()
+        {
+            Cleanup();
+        }
+
+        private void OnDestroy()
+        {
+            Cleanup();
         }
 
         public void StopPipeline()
         {
+            if (!IsRunning)
+                return;
+            
+            Cleanup();
+            _startupCalled = false;
+            
             gameObject.SetActive(false);
         }
 
