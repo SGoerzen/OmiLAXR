@@ -6,6 +6,8 @@ namespace OmiLAXR.Composers.HigherComposers
     public abstract class HigherComposer<T> : PipelineComponent, IComposer
         where T : IStatement
     {
+        private string _name;
+        public virtual string GetName() => _name;
         protected abstract Dictionary<string, MatchCondition<T>> Conditions();
         protected static TP GetPipeline<TP>()
             where TP : Pipeline => FindObject<TP>(true);

@@ -2,10 +2,9 @@
     "name": "OmiLAXR.Editor",
     "rootNamespace": "OmiLAXR.Editor",
     "references": [
-        "GUID:92238810d69db43818b28b85251b4b3c",
-        "GUID:71ad480b66ce6a244838fbe2a6b004e0"
+        "GUID:92238810d69db43818b28b85251b4b3c"
     ],
-    "includePlatforms": [],
+    "includePlatforms": ["Editor"],
     "excludePlatforms": [],
     "allowUnsafeCode": false,
     "overrideReferences": false,

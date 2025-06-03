@@ -1,7 +1,8 @@
 namespace OmiLAXR
 {
-    public interface IPipelineExtension
+    public interface IPipelineExtension : IPipelineComponent
     {
         Pipeline GetPipeline();
+        void Extend(Pipeline pipeline);
     }
 }

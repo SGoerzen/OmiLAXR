@@ -1,6 +1,7 @@
 using System.Linq;
 using System.Reflection;
 using UnityEngine;
+using NotImplementedException = System.NotImplementedException;
 using Object = UnityEngine.Object;
 
 namespace OmiLAXR.TrackingBehaviours
@@ -8,7 +9,10 @@ namespace OmiLAXR.TrackingBehaviours
 
     public abstract class TrackingBehaviour : TrackingBehaviour<Object>
     {
-        
+        protected override void AfterFilteredObjects(Object[] objects)
+        {
+            
+        }
     }
     
     [DefaultExecutionOrder(-1)]
@@ -17,6 +21,8 @@ namespace OmiLAXR.TrackingBehaviours
     {
         protected virtual void Awake()
         {
+            Pipeline.AfterStartedPipeline += OnStartedPipeline;
+            Pipeline.BeforeStoppedPipeline += OnStoppedPipeline;
             Pipeline.AfterFoundObjects += (objects) =>
             {
                 if (!enabled)
@@ -29,13 +35,25 @@ namespace OmiLAXR.TrackingBehaviours
                 if (!enabled)
                     return;
                 // Skip Select<T> if not needed
-                AfterFilteredObjects(typeof(T) == typeof(Object) ? objects as T[] : Select<T>(objects));
+
+                if (typeof(T) == typeof(Object) || objects.Length == 0)
+                    AfterFilteredObjects(objects as T[]);
+                else
+                {
+                    var selectedObjects = Select<T>(objects);
+                    SelectedObjects = selectedObjects;
+                    AfterFilteredObjects(selectedObjects);
+                }
             };
             Pipeline.BeforeStoppedPipeline += (p) => Dispose(p.trackingObjects.ToArray());
         }
         
+        protected virtual void OnStartedPipeline(Pipeline pipeline) {}
+        protected virtual void OnStoppedPipeline(Pipeline pipeline) {}
         protected virtual void AfterFoundObjects(T[] objects) {}
         protected abstract void AfterFilteredObjects(T[] objects);
+        
+        protected T[] SelectedObjects = new T[0];
 
         protected virtual void OnEnable()
         {

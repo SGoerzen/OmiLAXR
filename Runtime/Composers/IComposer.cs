@@ -6,5 +6,6 @@ namespace OmiLAXR.Composers
         bool IsHigherComposer { get; }
         bool IsEnabled { get; }
         Author GetAuthor();
+        string GetName();
     }
 }
