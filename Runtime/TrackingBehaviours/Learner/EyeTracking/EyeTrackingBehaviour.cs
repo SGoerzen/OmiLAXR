@@ -1,7 +1,7 @@
 
 namespace OmiLAXR.TrackingBehaviours.Learner.EyeTracking
 {
-    public abstract class EyeTrackingBehaviour : EventTrackingBehaviour
+    public abstract class EyeTrackingBehaviour : TrackingBehaviour
     {
         /// <summary>
         /// Notable change in pupil size occurs. Track cognitive load or emotional response.
