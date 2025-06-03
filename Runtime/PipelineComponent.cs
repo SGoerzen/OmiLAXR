@@ -27,9 +27,28 @@ namespace OmiLAXR
         protected static T[] FindObjects<T>(bool includeInactive = false) where T : Object
         {
 #if UNITY_2023_1_OR_NEWER
-            return FindObjectsByType<T>(includeInactive ? FindObjectsInactive.Include : FindObjectsInactive.Exclude, FindObjectsSortMode.None);
+    return FindObjectsByType<T>(
+        includeInactive ? FindObjectsInactive.Include : FindObjectsInactive.Exclude,
+        FindObjectsSortMode.None
+    );
 #else
-            return FindObjectsOfType<T>().Where(o => o && ((o as GameObject).activeSelf || includeInactive)).ToArray();
+            return FindObjectsOfType<T>()
+                .Where(o =>
+                {
+                    if (!o) return false;
+
+                    if (includeInactive)
+                        return true;
+
+                    if (o is GameObject go)
+                        return go.activeSelf;
+
+                    if (o is Component c)
+                        return c.gameObject.activeSelf;
+
+                    return true; // fallback if neither GameObject nor Component
+                })
+                .ToArray();
 #endif
         }
 
