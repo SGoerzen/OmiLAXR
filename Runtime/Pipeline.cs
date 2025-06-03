@@ -35,7 +35,7 @@ namespace OmiLAXR
 
         public ActorDataProvider[] ActorDataProviders { get; protected set; }
 
-        #if UNITY_6000
+        #if UNITY_2023_1_OR_NEWER
         public static T GetPipeline<T>() where T : Pipeline
             => FindFirstObjectByType<T>();
         #else
@@ -43,7 +43,7 @@ namespace OmiLAXR
             => FindObjectOfType<T>();
         #endif
 
-        #if UNITY_6000 
+        #if UNITY_2023_1_OR_NEWER 
         public static Pipeline GetAll() => FindFirstObjectByType<Pipeline>();
         #else
         public static Pipeline GetAll() => FindObjectOfType<Pipeline>();
@@ -133,9 +133,7 @@ namespace OmiLAXR
             Filters.AddRange(GetComponentsInChildren<Filter>(false));
             
             // Find available data providers
-#if UNITY_2019
-            DataProviders.AddRange(FindObjectsOfType<DataProvider>().Where(d => !d.enabled));
-#elif UNITY_6000
+#if UNITY_2023_1_OR_NEWER
             DataProviders.AddRange(FindObjectsByType<DataProvider>(FindObjectsInactive.Exclude, FindObjectsSortMode.None));
 #else
             DataProviders.AddRange(FindObjectsOfType<DataProvider>(false));
