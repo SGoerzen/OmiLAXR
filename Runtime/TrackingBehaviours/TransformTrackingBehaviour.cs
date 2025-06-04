@@ -5,7 +5,7 @@ namespace OmiLAXR.TrackingBehaviours
 {
     [AddComponentMenu("OmiLAXR / 3) Tracking Behaviours / Transform Tracking Behaviour")]
     [Description("Tracks position, rotation and scale changes in a game object holding <TransformWatcher> component.")]
-    public class TransformTrackingBehaviour : IntervalTrackingBehaviour<TransformWatcher>
+    public class TransformTrackingBehaviour : TrackingBehaviour<TransformWatcher>
     {
         [Gesture("Movement"), Action("Translation")]
         public TrackingBehaviourEvent<TransformWatcher, TransformWatcher.TransformChange> OnChangedPosition =
@@ -36,7 +36,7 @@ namespace OmiLAXR.TrackingBehaviours
             }
         }
         
-        protected override void IntervalUpdate()
+        /*protected override void IntervalUpdate()
         {
             print("INTERVAL");
             foreach (var tw in SelectedObjects)
@@ -57,6 +57,6 @@ namespace OmiLAXR.TrackingBehaviours
                     OldValue = tw.PreviousScale
                 });
             }
-        }
+        }*/
     }
 }

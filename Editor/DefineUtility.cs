@@ -10,7 +10,7 @@ namespace OmiLAXR.Editor
 {
     public static class DefineUtility
     {
-        public static bool Exist(string define)
+        public static bool IsDefined(string define)
         {
             string[] defines;
 
