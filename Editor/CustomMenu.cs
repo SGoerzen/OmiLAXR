@@ -7,13 +7,6 @@ namespace OmiLAXR.Editor
 {
     internal static class CustomMenu
     {
-       /* [MenuItem("OmiLAXR / Create new module")]
-        internal static void CreateModule()
-        {
-            
-        }*/
-        
-#if UNITY_EDITOR
         [MenuItem("OmiLAXR / Create credentials.json file")]
         private static void CreateCredentialsFile()
         {
@@ -35,10 +28,6 @@ namespace OmiLAXR.Editor
             var credentialsPath = Path.GetFullPath("Packages/com.rwth.unity.omilaxr/Resources/StreamingAssets/example.credentials.json");
             File.Copy(credentialsPath, destFilePath, false);
         }        
-#endif
-        
-        // [MenuItem("OmiLAXR / Create new pipeline")]
-        // private static void CreateNewPipeline() {}
     }
 }
 #endif
