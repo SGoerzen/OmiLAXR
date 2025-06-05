@@ -2,7 +2,8 @@ namespace OmiLAXR.Composers
 {
     public interface IStatement
     {
-        void SetComposer(IComposer composer);
+        public void SetActor(Actor actor);
+        public void SetInstructor(Instructor instructor);
         IComposer GetComposer();
         bool IsDiscarded();
         void Discard();
