@@ -1,3 +1,4 @@
+using System;
 using UnityEngine;
 using UnityEngine.Events;
 
@@ -27,6 +28,16 @@ namespace OmiLAXR
             /// </summary>
             public Vector3 NewValue;
         }
+
+        [Serializable]
+        public struct TransformIgnore
+        {
+            public bool position;
+            public bool rotation;
+            public bool scale;
+        }
+
+        public TransformIgnore ignore;
         
         /// <summary>
         /// Minimum position change (in units) required to trigger the position change event.
@@ -161,7 +172,7 @@ namespace OmiLAXR
             var rotation = transform.eulerAngles;
 
             // Check for position changes and trigger events if needed
-            if (DetectChange(ref _lastPosition, pos, positionThreshold))
+            if (!ignore.position && DetectChange(ref _lastPosition, pos, positionThreshold))
             {
                 onChangedPosition?.Invoke(new TransformChange()
                 {
@@ -171,7 +182,7 @@ namespace OmiLAXR
             }
             
             // Check for rotation changes and trigger events if needed
-            if (DetectChange(ref _lastRotation, rotation, rotationThreshold))
+            if (!ignore.rotation && DetectChange(ref _lastRotation, rotation, rotationThreshold))
             {
                 onChangedRotation?.Invoke(new TransformChange()
                 {
@@ -181,7 +192,7 @@ namespace OmiLAXR
             }
             
             // Check for scale changes and trigger events if needed
-            if (DetectChange(ref _lastScale, scale, scaleThreshold))
+            if (!ignore.scale && DetectChange(ref _lastScale, scale, scaleThreshold))
             {
                 onChangedScale?.Invoke(new TransformChange()
                 {
