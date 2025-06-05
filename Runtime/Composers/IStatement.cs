@@ -1,3 +1,4 @@
+
 namespace OmiLAXR.Composers
 {
     public interface IStatement
@@ -7,7 +8,8 @@ namespace OmiLAXR.Composers
         bool IsDiscarded();
         void Discard();
 
-        string ToDataStandardString();
+        string ToDataStandardString(bool includeUri = true);
+        CsvFormat ToCsvFormat(bool includeUri = true);
         PipelineInfo GetSenderPipelineInfo();
     }
 }
