@@ -10,5 +10,7 @@ namespace OmiLAXR.Endpoints
         // todo
         [Tooltip("Will be ordered first.")]
         public List<string> priorityHeaders;
+        private void OnValidate() {
+		}
     }
 }

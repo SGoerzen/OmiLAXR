@@ -15,12 +15,12 @@ namespace OmiLAXR.Composers
         /// <summary>
         /// List of column headers.
         /// </summary>
-        public List<string> Headers { get; private set; } = new();
+        public List<string> Headers { get; private set; } = new List<string>();
 
         /// <summary>
         /// Rows stored as list of object lists.
         /// </summary>
-        public List<List<object>> Rows { get; } = new();
+        public List<List<object>> Rows { get; } = new List<List<object>>();
 
         /// <summary>
         /// The separator used for CSV formatting (default: comma).
@@ -41,7 +41,7 @@ namespace OmiLAXR.Composers
         /// </summary>
         public void RenameHeader(string oldName, string newName)
         {
-            int index = Headers.IndexOf(oldName);
+            var index = Headers.IndexOf(oldName);
             if (index == -1)
                 throw new ArgumentException($"Header '{oldName}' not found.");
 
@@ -65,7 +65,7 @@ namespace OmiLAXR.Composers
         /// <param name="headerName">The name of the header to remove.</param>
         public void DropHeader(string headerName)
         {
-            int index = Headers.IndexOf(headerName);
+            var index = Headers.IndexOf(headerName);
             if (index == -1)
                 throw new ArgumentException($"Header '{headerName}' not found.");
 
@@ -131,7 +131,7 @@ namespace OmiLAXR.Composers
             foreach (var row in Rows)
             {
                 var newRow = Enumerable.Repeat<object>(null, combinedHeaders.Count).ToList();
-                for (int i = 0; i < row.Count; i++)
+                for (var i = 0; i < row.Count; i++)
                     newRow[thisIndexMap[i]] = row[i];
                 newThisRows.Add(newRow);
             }
@@ -140,7 +140,7 @@ namespace OmiLAXR.Composers
             foreach (var row in other.Rows)
             {
                 var newRow = Enumerable.Repeat<object>(null, combinedHeaders.Count).ToList();
-                for (int i = 0; i < row.Count; i++)
+                for (var i = 0; i < row.Count; i++)
                     newRow[otherIndexMap[i]] = row[i];
                 newThisRows.Add(newRow);
             }
@@ -182,36 +182,40 @@ namespace OmiLAXR.Composers
         /// </summary>
         public static CsvFormat FromJson(JToken token)
         {
-            List<Dictionary<string, object>> flattenedRows = new();
+            var flattenedRows = new List<Dictionary<string, object>>();
             var allKeys = new HashSet<string>();
 
-            if (token is JArray array)
+            switch (token)
             {
-                foreach (var item in array)
+                case JArray array:
                 {
-                    if (item is JObject obj)
+                    foreach (var item in array)
                     {
-                        var flat = obj.Flatten();
-                        flattenedRows.Add(flat);
-                        foreach (var key in flat.Keys)
-                            allKeys.Add(key);
+                        if (item is JObject obj)
+                        {
+                            var flat = obj.Flatten();
+                            flattenedRows.Add(flat);
+                            foreach (var key in flat.Keys)
+                                allKeys.Add(key);
+                        }
+                        else
+                        {
+                            throw new ArgumentException("Array elements must be JSON objects.");
+                        }
                     }
-                    else
-                    {
-                        throw new ArgumentException("Array elements must be JSON objects.");
-                    }
+
+                    break;
                 }
-            }
-            else if (token is JObject singleObject)
-            {
-                var flat = singleObject.Flatten();
-                flattenedRows.Add(flat);
-                foreach (var key in flat.Keys)
-                    allKeys.Add(key);
-            }
-            else
-            {
-                throw new ArgumentException("Root must be a JSON object or array of objects.");
+                case JObject singleObject:
+                {
+                    var flat = singleObject.Flatten();
+                    flattenedRows.Add(flat);
+                    foreach (var key in flat.Keys)
+                        allKeys.Add(key);
+                    break;
+                }
+                default:
+                    throw new ArgumentException("Root must be a JSON object or array of objects.");
             }
 
             var headers = allKeys.OrderBy(k => k).ToList();
