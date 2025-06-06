@@ -6,7 +6,7 @@
   "unity": "2020.3",
   "unityRelease": "15f1",
   "documentationUrl": "https://gitlab.com/learntech-rwth/omilaxr-framework/v2/omilaxr/-/wikis",
-  "changelogUrl": "https://gitlab.com/learntech-rwth/omilaxr-ecosystem/v2/omilaxr/-/blob/main/CHANGELOG",
+  "changelogUrl": "https://gitlab.com/learntech-rwth/omilaxr-ecosystem/v2/omilaxr/-/blob/main/CHANGELOG.md",
   "licensesUrl": "https://gitlab.com/learntech-rwth/omilaxr-ecosystem/v2/omilaxr/-/blob/main/LICENSE",
   "homepage": "https://omilaxr.dev/",
   "dependencies": {
