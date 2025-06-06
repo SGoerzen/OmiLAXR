@@ -7,7 +7,9 @@ using UnityEngine;
 
 namespace OmiLAXR.Endpoints
 {
-    public abstract class Endpoint : DataProviderPipelineComponent
+    public abstract class Endpoint : Endpoint<IStatement> {}
+    public abstract class Endpoint<TStatement> : DataProviderPipelineComponent, IEndpoint
+    where TStatement : IStatement
     {
         public T GetDataProvider<T>() 
             where T : DataProvider
@@ -15,15 +17,15 @@ namespace OmiLAXR.Endpoints
         public event EndpointAction OnStartedSending;
         public event EndpointAction OnStoppedSending;
         public event EndpointAction OnPausedSending;
-        public event EndpointAction<IStatement> OnSendingStatement;
-        public event EndpointAction<IStatement> OnSentStatement;
-        public event EndpointAction<IStatement> OnFailedSendingStatement;
+        public event EndpointAction<TStatement> OnSendingStatement;
+        public event EndpointAction<TStatement> OnSentStatement;
+        public event EndpointAction<TStatement> OnFailedSendingStatement;
         
         public bool IsSending { get; private set; }
         public bool IsTransferring { get; private set; }
         
         private BackgroundWorker _sendWorker;
-        protected readonly ConcurrentQueue<IStatement> QueuedStatements = new ConcurrentQueue<IStatement>();
+        protected readonly ConcurrentQueue<TStatement> QueuedStatements = new ConcurrentQueue<TStatement>();
         
         private void SendWorkerOnDoWork(object sender, DoWorkEventArgs e)
         {
@@ -127,7 +129,7 @@ namespace OmiLAXR.Endpoints
         /// Enqueue statement to asynchronous sending queue
         /// </summary>
         /// <param name="statement"></param>
-        public virtual void SendStatement(IStatement statement)
+        public virtual void SendStatement(TStatement statement)
         {
             // Debug.Log("Enqueue " + statement, this);
             QueuedStatements.Enqueue(statement);
@@ -136,7 +138,7 @@ namespace OmiLAXR.Endpoints
         /// Send statement immediate without using queue system.
         /// </summary>
         /// <param name="statement"></param>
-        public virtual void SendStatementImmediate(IStatement statement)
+        public virtual void SendStatementImmediate(TStatement statement)
         {
             var code = TransferStatement(statement);
             if (code != TransferCode.Success && code != TransferCode.NoStatements)
@@ -145,9 +147,9 @@ namespace OmiLAXR.Endpoints
             }
         }
 
-        protected abstract TransferCode HandleSending(IStatement statement);
+        protected abstract TransferCode HandleSending(TStatement statement);
 
-        protected virtual TransferCode TransferStatement(IStatement statement)
+        protected virtual TransferCode TransferStatement(TStatement statement)
         {
             try
             {

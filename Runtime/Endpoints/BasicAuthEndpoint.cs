@@ -1,6 +1,10 @@
+using OmiLAXR.Composers;
+
 namespace OmiLAXR.Endpoints
 {
-    public abstract class BasicAuthEndpoint : Endpoint
+    public abstract class BasicAuthEndpoint : BasicAuthEndpoint<IStatement> {}
+    public abstract class BasicAuthEndpoint<TStatement> : Endpoint<TStatement>
+    where TStatement : IStatement
     {
         public BasicAuthCredentials credentials = new BasicAuthCredentials("https://lrs.elearn.rwth-aachen.de/data/xAPI", "", "");
         
