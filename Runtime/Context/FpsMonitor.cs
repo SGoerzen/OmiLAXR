@@ -3,7 +3,7 @@ using UnityEngine;
 
 namespace OmiLAXR.Context
 {
-    [AddComponentMenu("OmiLAXR / 0) Scenario Context / FPS Monitor")]
+    [AddComponentMenu("OmiLAXR / Scenario Context / FPS Monitor")]
     [DisallowMultipleComponent]
     [Description("Tracks Frames per Seconds.")]
     public class FpsMonitor : LearningContext

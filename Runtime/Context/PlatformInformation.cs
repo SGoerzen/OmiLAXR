@@ -4,7 +4,7 @@ using UnityEngine;
 
 namespace OmiLAXR.Context
 {
-    [AddComponentMenu("OmiLAXR / 0) Scenario Context / Platform Information")]
+    [AddComponentMenu("OmiLAXR / Scenario Context / Platform Information")]
     [DisallowMultipleComponent]
     [Description("Provides platform information in following format [prefixes:]OmiLAXR:v2.0.19:{OS}[:suffixes].")]
     public class PlatformInformation : LearningContext

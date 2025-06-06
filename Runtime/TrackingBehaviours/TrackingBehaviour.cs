@@ -73,6 +73,7 @@ namespace OmiLAXR.TrackingBehaviours
             // Subscribe to pipeline events
             Pipeline.AfterStartedPipeline += OnStartedPipeline;
             Pipeline.BeforeStoppedPipeline += OnStoppedPipeline;
+            Pipeline.BeforeStoppedPipeline += HandleStoppedPipeline;
             
             // Handle objects found by the pipeline
             Pipeline.AfterFoundObjects += (objects) =>
@@ -102,6 +103,11 @@ namespace OmiLAXR.TrackingBehaviours
             
             // Clean up when pipeline stops
             Pipeline.BeforeStoppedPipeline += (p) => Dispose(p.trackingObjects.ToArray());
+        }
+
+        private void HandleStoppedPipeline(Pipeline p)
+        {
+            ClearSchedules();
         }
 
         /// <summary>
@@ -154,6 +160,12 @@ namespace OmiLAXR.TrackingBehaviours
         {
             foreach (var scheduler in Schedulers)
                 scheduler.Stop();
+        }
+
+        protected void ClearSchedules()
+        {
+            StopSchedules();
+            Schedulers.Clear();
         }
 
         protected virtual void OnDisable()

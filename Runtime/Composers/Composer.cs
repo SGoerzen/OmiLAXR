@@ -1,12 +1,15 @@
+using System;
+using System.Linq;
 using OmiLAXR.TrackingBehaviours;
 using UnityEngine;
+using Object = UnityEngine.Object;
 
 namespace OmiLAXR.Composers
 {
     public abstract class Composer<T> : DataProviderPipelineComponent, IComposer
         where T : PipelineComponent, ITrackingBehaviour
     {
-        [HideInInspector] public T trackingBehaviour;
+        [HideInInspector] public T[] trackingBehaviours;
 
         private void OnEnable()
         {
@@ -23,16 +26,28 @@ namespace OmiLAXR.Composers
         public virtual bool IsHigherComposer => false;
         public event ComposerAction<IStatement, bool> AfterComposed;
         
-        protected static TB GetTrackingBehaviour<TB>(bool includeInactive = false)
-            where TB : Object, ITrackingBehaviour => FindObject<TB>(includeInactive);
-        
-        protected void SendStatement(IStatement statement, bool immediate = false)
+        protected static TB[] GetTrackingBehaviours<TB>(bool includeInactive = false)
+            where TB : Object, ITrackingBehaviour => FindObjects<TB>(includeInactive);
+
+        protected void SendStatement(ITrackingBehaviour statementOwner, IStatement statement, bool immediate = false)
         {
             if (!IsEnabled)
                 return;
+            
+            statement.SetOwner(statementOwner);
             statement.SetComposer(this);
+            
             AfterComposed?.Invoke(this, statement, immediate);
         }
+        protected void SendStatementImmediate(ITrackingBehaviour statementOwner, IStatement statement, bool immediate = false)
+            => SendStatement(statementOwner, statement, immediate: true);
+        
+        [Obsolete("Use SendStatement(ITrackingBehaviour, IStatement, bool) instead.")]
+        protected void SendStatement(IStatement statement, bool immediate = false)
+        {
+            SendStatement(trackingBehaviours.First(), statement, immediate);
+        }
+        [Obsolete("Use SendStatementImmediate(ITrackingBehaviour, IStatement) instead.")]
         protected void SendStatementImmediate(IStatement statement)
             => SendStatement(statement, immediate: true);
 
@@ -42,12 +57,13 @@ namespace OmiLAXR.Composers
             
             if (!IsEnabled)
                 return;
-            trackingBehaviour = GetTrackingBehaviour<T>(false);
+            
+            trackingBehaviours = GetTrackingBehaviours<T>(false);
         }
 
         protected virtual void Start()
         {
-            if (trackingBehaviour) 
+            foreach (var trackingBehaviour in trackingBehaviours)
                 Compose(trackingBehaviour);
         }
 

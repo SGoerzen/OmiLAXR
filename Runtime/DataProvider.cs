@@ -13,7 +13,7 @@ namespace OmiLAXR
     /// Serves as a central hub for composers, hooks, and endpoints.
     /// Executes early in Unity's order to ensure data is available for other components.
     /// </summary>
-    [AddComponentMenu("OmiLAXR / 0) Core / Data Provider")]
+    [AddComponentMenu("OmiLAXR / Core / Data Provider")]
     [DefaultExecutionOrder(-1)]
     public class DataProvider : PipelineComponent
     {

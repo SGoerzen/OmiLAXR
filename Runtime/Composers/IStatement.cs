@@ -1,10 +1,13 @@
 
+using OmiLAXR.TrackingBehaviours;
+
 namespace OmiLAXR.Composers
 {
     public interface IStatement
     {
         string GetOrigin();
         void SetComposer(IComposer composer);
+        void SetOwner(ITrackingBehaviour trackingBehaviour);
         IComposer GetComposer();
         bool IsDiscarded();
         void Discard();

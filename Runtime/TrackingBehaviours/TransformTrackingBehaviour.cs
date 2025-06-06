@@ -22,7 +22,7 @@ namespace OmiLAXR.TrackingBehaviours
         public readonly TrackingBehaviourEvent<TransformWatcher, TransformWatcher.TransformChange> OnChangedScale =
             new TrackingBehaviourEvent<TransformWatcher, TransformWatcher.TransformChange>();
 
-        private void Start()
+        protected override void OnStartedPipeline(Pipeline pipeline)
         {
             SetInterval(() =>
             {

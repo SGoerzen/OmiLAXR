@@ -15,7 +15,7 @@ namespace OmiLAXR
     /// <summary>
     /// Pipeline System containing many stages.
     /// </summary>
-    [AddComponentMenu("OmiLAXR / 0) Pipelines / Pipeline")]
+    [AddComponentMenu("OmiLAXR / Core / Pipeline")]
     [DefaultExecutionOrder(0)]
     public class Pipeline : MonoBehaviour
     {

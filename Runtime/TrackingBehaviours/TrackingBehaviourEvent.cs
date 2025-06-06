@@ -172,6 +172,8 @@ namespace OmiLAXR.TrackingBehaviours
         private Dictionary<UnityEvent<TValue>, UnityAction<TValue>> _unityBinds =
             new Dictionary<UnityEvent<TValue>, UnityAction<TValue>>();
         public bool IsDisabled { get; set; } = false;
+        
+        public int HandlerCount => Actions.Count;
 
         public void AddHandler(TrackingBehaviourAction<TSender, TValue> action)
         {

@@ -19,7 +19,7 @@ namespace OmiLAXR.TrackingBehaviours
             if (provider == null || !provider.enabled)
             {
                 enabled = false;
-                DebugLog.OmiLAXR.Error("Cannot find any <HeartRateProvider> in parent pipeline.");
+                DebugLog.OmiLAXR.Warning("Cannot find any <HeartRateProvider> in parent pipeline. The Heart Rate Tracking Behaviour was disabled.");
                 return;
             }
             SetInterval(() =>
