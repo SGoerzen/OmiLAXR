@@ -45,7 +45,7 @@ namespace OmiLAXR.Endpoints
             return TransferCode.Success;
         }
         
-        private void PrintStatement(string message)
+        private static void PrintStatement(string message)
             => DebugLog.OmiLAXR.Print("Sent statement: " + message);
     }
 }
