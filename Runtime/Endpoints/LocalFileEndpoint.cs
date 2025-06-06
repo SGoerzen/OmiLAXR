@@ -23,8 +23,9 @@ namespace OmiLAXR.Endpoints
         [Header("Relative to project root (only used when 'Custom' is selected)")]
         [HideInInspector]
         public string customLocation;
-        
-        public string fileExtension = "txt";
+
+        protected virtual string GetDefaultExtension() => "txt";
+        public string fileExtension = "";
 
         [Header("If true, the statements will be split into multiple files named by composers.")]
         public bool splitByComposers = false;
@@ -37,8 +38,9 @@ namespace OmiLAXR.Endpoints
 
         private string _resolvedFilePath;
         private StreamWriter _streamWriter;
+        private bool _isFirstLine;
 
-        private Dictionary<string, StreamWriter> _composerWriters = new Dictionary<string, StreamWriter>();
+        private readonly Dictionary<int, StreamWriter> _composerWriters = new Dictionary<int, StreamWriter>();
 
         private string GenerateFileName(DateTime now)
         {
@@ -52,7 +54,16 @@ namespace OmiLAXR.Endpoints
             var absPath = GetResolvedFilePath();
             var relPath = MakeRelativeToProject(absPath);
             exampleFileLocationPreview = relPath;
+            
+            if (string.IsNullOrEmpty(fileExtension))
+                fileExtension = GetDefaultExtension();
 #endif
+        }
+
+        protected virtual void Reset()
+        {
+            if (string.IsNullOrEmpty(fileExtension))
+                fileExtension = GetDefaultExtension();
         }
 
         private string MakeRelativeToProject(string absolutePath)
@@ -113,6 +124,16 @@ namespace OmiLAXR.Endpoints
 #endif
         }
 
+        private (StreamWriter writer, bool hasContent) CreateWriter(string filePath)
+        {
+            var info = new FileInfo(filePath);
+            var hasContent = info.Length > 0;
+            var writer = new StreamWriter(filePath, true)
+            {
+                AutoFlush = false
+            };
+            return (writer, hasContent);
+        }
 
         protected override void Awake()
         {
@@ -126,10 +147,9 @@ namespace OmiLAXR.Endpoints
 
             if (!splitByComposers)
             {
-                _streamWriter = new StreamWriter(_resolvedFilePath, true)
-                {
-                    AutoFlush = true
-                };
+                var (writer, hasContent) = CreateWriter(_resolvedFilePath);
+                _streamWriter = writer;
+                _isFirstLine = !hasContent;
 
                 DebugLog.OmiLAXR.Print("Started writing to local endpoint in '" + _resolvedFilePath + "'.");
             }
@@ -137,41 +157,61 @@ namespace OmiLAXR.Endpoints
 
         protected virtual string FormatLine(IStatement statement)
         {
-            return statement.ToDataStandardString();
+            return statement.ToJsonString();
+        }
+
+        protected virtual void BeforeWrite(StreamWriter writer, IStatement statement, bool isFirstLine)
+        {
+            // do nothing
+        }
+
+        protected virtual void AfterWrite(StreamWriter writer, IStatement statement, bool isFirstLine)
+        {
+            // do nothing
         }
 
         protected override TransferCode HandleSending(IStatement statement)
         {
             try
             {
+                var isFirstLine = false;
                 if (splitByComposers)
                 {
-                    var composerName = statement.GetComposer().GetName();
-                    if (string.IsNullOrWhiteSpace(composerName))
-                        composerName = "Unknown";
-
-                    var folder = Path.Combine(GetResolvedFolder(), fileName);
-                    var filePath = Path.Combine(folder, composerName + "." + fileExtension);
-
-                    if (!_composerWriters.TryGetValue(composerName, out var writer))
+                    var composer = statement.GetComposer();
+                    var composerHashId = composer.GetHashCode();
+                    
+                    if (!_composerWriters.TryGetValue(composerHashId, out var writer))
                     {
+                        var composerName = statement.GetComposer().GetName();
+                        if (string.IsNullOrWhiteSpace(composerName))
+                            composerName = "Unknown";
+
+                        var folder = Path.Combine(GetResolvedFolder(), fileName);
+                        var filePath = Path.Combine(folder, composerName + "." + fileExtension);
+                        
                         if (!Directory.Exists(folder))
                             Directory.CreateDirectory(folder);
 
-                        writer = new StreamWriter(filePath, true)
-                        {
-                            AutoFlush = true
-                        };
-                        _composerWriters[composerName] = writer;
+                        var (w, hasContent) = CreateWriter(filePath);
+                        writer = w;
+                        isFirstLine = !hasContent;
+                        _composerWriters[composerHashId] = writer;
 
                         DebugLog.OmiLAXR.Print("Created writer for '" + composerName + "' in '" + filePath + "'");
                     }
 
+                    BeforeWrite(writer, statement, isFirstLine);
                     writer.WriteLine(FormatLine(statement));
+                    writer.Flush();
+                    AfterWrite(writer, statement, isFirstLine);
                 }
                 else
                 {
+                    BeforeWrite(_streamWriter, statement, _isFirstLine);
                     _streamWriter.WriteLine(FormatLine(statement));
+                    _streamWriter.Flush();
+                    AfterWrite(_streamWriter, statement, _isFirstLine);
+                    _isFirstLine = false;
                 }
             }
             catch (IOException ex)
@@ -187,12 +227,14 @@ namespace OmiLAXR.Endpoints
         {
             if (_streamWriter != null)
             {
+                _streamWriter.Flush();
                 _streamWriter.Close();
                 _streamWriter.Dispose();
             }
 
             foreach (var writer in _composerWriters.Values)
             {
+                writer?.Flush();
                 writer?.Close();
                 writer?.Dispose();
             }

@@ -73,6 +73,8 @@ GameObject:
   m_Component:
   - component: {fileID: 698706409944608985}
   - component: {fileID: 2187313474582957741}
+  - component: {fileID: 7544826140815961707}
+  - component: {fileID: 4440402473614298922}
   m_Layer: 0
   m_Name: 6) Endpoints
   m_TagString: Untagged
@@ -107,6 +109,48 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 74f372b2d8814ee2950adac76efd5162, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  printAsCsv: 0
+--- !u!114 &7544826140815961707
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 3687486509951000795}
+  m_Enabled: 0
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: d14817de6a7d472ea918bcd5e92a616b, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  defaultFolder: 0
+  customLocation: 
+  fileExtension: csv
+  splitByComposers: 0
+  exampleFileLocationPreview: ../../../../Library/Application Support/DefaultCompany/OmiLAXR
+    Dev (Unity 6)/20250606164231.csv
+  fileName: 
+  includeUri: 0
+  excludedHeaders: []
+  priorityHeaders: []
+--- !u!114 &4440402473614298922
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 3687486509951000795}
+  m_Enabled: 0
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 601b6cb9c3664889aa7b3f4d6a8ec2d3, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  defaultFolder: 0
+  customLocation: 
+  fileExtension: txt
+  splitByComposers: 0
+  exampleFileLocationPreview: ../../../../Library/Application Support/DefaultCompany/OmiLAXR
+    Dev (Unity 6)/20250606164231.txt
+  fileName: 
 --- !u!1 &5165783425236376776
 GameObject:
   m_ObjectHideFlags: 0
@@ -147,7 +191,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 1507998828881280351}
-  - component: {fileID: 4067064354450214901}
+  - component: {fileID: 5216930199837453405}
   m_Layer: 0
   m_Name: OmiLAXR Data Provider
   m_TagString: Untagged
@@ -173,7 +217,7 @@ Transform:
   - {fileID: 698706409944608985}
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!114 &4067064354450214901
+--- !u!114 &5216930199837453405
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -185,3 +229,4 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 8dee3ca2e9d84084be4e889a91a6561f, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  statementUri: 

@@ -3,13 +3,16 @@ namespace OmiLAXR.Composers
 {
     public interface IStatement
     {
+        string GetOrigin();
         void SetComposer(IComposer composer);
         IComposer GetComposer();
         bool IsDiscarded();
         void Discard();
 
-        string ToDataStandardString(bool includeUri = true);
-        CsvFormat ToCsvFormat(bool includeUri = true);
+        [System.Obsolete("Use ToJsonString(bool pretty = false) instead.", true)]
+        string ToDataStandardString();
+        string ToJsonString(bool pretty = false);
+        CsvFormat ToCsvFormat(bool flat = false);
         PipelineInfo GetSenderPipelineInfo();
     }
 }

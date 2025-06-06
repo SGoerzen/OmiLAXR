@@ -3,7 +3,7 @@ using System.Collections.Generic;
 
 namespace OmiLAXR.Extensions
 {
-    public static class JsonFlattener
+    public static class Json_Ext
     {
         public static Dictionary<string, object> Flatten(this JToken token, string prefix = "")
         {
@@ -20,7 +20,7 @@ namespace OmiLAXR.Extensions
             }
             else if (token is JArray array)
             {
-                for (int i = 0; i < array.Count; i++)
+                for (var i = 0; i < array.Count; i++)
                 {
                     var nested = Flatten(array[i], $"{prefix}{i}_");
                     foreach (var kvp in nested)

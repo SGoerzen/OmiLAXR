@@ -9,6 +9,9 @@ namespace OmiLAXR.Endpoints
 {
     public abstract class Endpoint : DataProviderPipelineComponent
     {
+        public T GetDataProvider<T>() 
+            where T : DataProvider
+            => GetComponentInParent<T>();
         public event EndpointAction OnStartedSending;
         public event EndpointAction OnStoppedSending;
         public event EndpointAction OnPausedSending;

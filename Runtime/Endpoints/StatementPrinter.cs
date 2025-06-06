@@ -1,3 +1,4 @@
+using System;
 using System.ComponentModel;
 using OmiLAXR.Composers;
 using UnityEngine;
@@ -8,19 +9,43 @@ namespace OmiLAXR.Endpoints
     [Description("Prints all received statements to Unity Editor console. May be used for testing purposes.")]
     public class StatementPrinter : Endpoint
     {
-        public bool printAsCsv = false;
+        [Serializable]
+        public enum PrintType
+        {
+            Default,
+            Json,
+            Csv,
+            CsvFlat
+        }
+        public PrintType printType = PrintType.Default;
         protected override TransferCode HandleSending(IStatement statement)
         {
-            if (printAsCsv)
+            switch (printType)
             {
-                var csvFormat = statement.ToCsvFormat(false);
-                DebugLog.OmiLAXR.Print("Sent statement: " + csvFormat);
+                case PrintType.Json:
+                    PrintStatement(statement.ToJsonString());
+                    break;
+                case PrintType.Csv:
+                {
+                    var csvFormat = statement.ToCsvFormat() ;
+                    PrintStatement(csvFormat.ToString());
+                    break;
+                }
+                case PrintType.CsvFlat:
+                {
+                    var csvFormat = statement.ToCsvFormat(true);
+                    DebugLog.OmiLAXR.Print(csvFormat.ToString());
+                    break;
+                }
+                default:
+                    PrintStatement(statement.ToString());
+                    break;
             }
-            else
-            {
-                DebugLog.OmiLAXR.Print("Sent statement: " + statement);
-            }
+
             return TransferCode.Success;
         }
+        
+        private void PrintStatement(string message)
+            => DebugLog.OmiLAXR.Print("Sent statement: " + message);
     }
 }
