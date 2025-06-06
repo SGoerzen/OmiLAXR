@@ -202,25 +202,6 @@ namespace OmiLAXR.Composers
             var result = new CsvFormat();
             var headers = new HashSet<string>();
 
-            void AddObject(JObject obj, Dictionary<string, object> sharedContext = null)
-            {
-                var dict = flatten ? obj.Flatten() : obj.Properties().ToDictionary(
-                    p => p.Name,
-                    p => p.Value is JObject or JArray ? p.Value.ToString(Newtonsoft.Json.Formatting.None) : p.Value.ToObject<object>()
-                );
-
-                if (sharedContext != null)
-                {
-                    foreach (var kvp in sharedContext)
-                        dict[kvp.Key] = kvp.Value;
-                }
-
-                foreach (var key in dict.Keys)
-                    headers.Add(key);
-
-                result.AddRow(dict);
-            }
-
             switch (token)
             {
                 case JArray array:
@@ -256,6 +237,29 @@ namespace OmiLAXR.Composers
 
             result.SetHeaders(headers.OrderBy(k => k).ToArray());
             return result;
+
+            void AddObject(JObject obj, Dictionary<string, object> sharedContext = null)
+            {
+                var dict = flatten
+                    ? obj.Flatten()
+                    : obj.Properties().ToDictionary(
+                        p => p.Name,
+                        p => (p.Value is JObject || p.Value is JArray)
+                            ? p.Value.ToString(Newtonsoft.Json.Formatting.None)
+                            : p.Value.ToObject<object>()
+                    );
+
+                if (sharedContext != null)
+                {
+                    foreach (var kvp in sharedContext)
+                        dict[kvp.Key] = kvp.Value;
+                }
+
+                foreach (var key in dict.Keys)
+                    headers.Add(key);
+
+                result.AddRow(dict);
+            }
         }
     }
 }
