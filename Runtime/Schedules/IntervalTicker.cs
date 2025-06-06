@@ -14,16 +14,11 @@ namespace OmiLAXR.Schedules
         [Serializable]
         public new class Settings : Scheduler.Settings
         {
+            [Tooltip("Time in seconds in what interval the action is triggered."), Min(0.01f)]
             public float intervalSeconds = 1.0f;
         }
-        
-        /// <summary>
-        /// The time interval in seconds between callback executions.
-        /// This value determines how frequently the OnTick method will be called.
-        /// </summary>
-        private readonly float _intervalSeconds;
 
-        private Settings _settings;
+        private readonly Settings _settings;
 
         /// <summary>
         /// Initializes a new instance of the IntervalTimer class.
@@ -36,7 +31,6 @@ namespace OmiLAXR.Schedules
         public IntervalTicker(MonoBehaviour owner, Settings settings, Action onTick, Action onTickStart = null, Action onTickEnd = null)
         : base(owner, settings, onTick, onTickStart, onTickEnd)
         {
-            _intervalSeconds = settings.intervalSeconds;
             _settings = settings;
         }
 
@@ -51,10 +45,9 @@ namespace OmiLAXR.Schedules
             // Infinite loop that waits for the interval and then invokes the callback
             while (true)
             {
-                yield return new WaitForSeconds(_intervalSeconds);
-                if (!_settings.isActive)
-                    break;
-                OnTick?.Invoke();
+                yield return new WaitForSeconds(_settings.intervalSeconds);
+                if (_settings.isActive)
+                    OnTick?.Invoke();
             }
         }
     }
