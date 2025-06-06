@@ -43,6 +43,10 @@ namespace OmiLAXR.Composers
             if (!IsEnabled)
                 return;
             trackingBehaviour = GetTrackingBehaviour<T>(false);
+        }
+
+        protected virtual void Start()
+        {
             if (trackingBehaviour) 
                 Compose(trackingBehaviour);
         }

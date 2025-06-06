@@ -13,20 +13,20 @@ namespace OmiLAXR.TrackingBehaviours
         public TransformWatcher.TransformIgnore ignore;
         
         [Gesture("Movement"), Action("Translation")]
-        public TrackingBehaviourEvent<TransformWatcher, TransformWatcher.TransformChange> OnChangedPosition =
+        public readonly TrackingBehaviourEvent<TransformWatcher, TransformWatcher.TransformChange> OnChangedPosition =
             new TrackingBehaviourEvent<TransformWatcher, TransformWatcher.TransformChange>();
         [Gesture("Movement"), Action("Rotation")]
-        public TrackingBehaviourEvent<TransformWatcher, TransformWatcher.TransformChange> OnChangedRotation =
+        public readonly TrackingBehaviourEvent<TransformWatcher, TransformWatcher.TransformChange> OnChangedRotation =
             new TrackingBehaviourEvent<TransformWatcher, TransformWatcher.TransformChange>();
         [Gesture("Movement"), Action("Scale")]
-        public TrackingBehaviourEvent<TransformWatcher, TransformWatcher.TransformChange> OnChangedScale =
+        public readonly TrackingBehaviourEvent<TransformWatcher, TransformWatcher.TransformChange> OnChangedScale =
             new TrackingBehaviourEvent<TransformWatcher, TransformWatcher.TransformChange>();
 
         private void Start()
         {
             SetInterval(() =>
             {
-                foreach (var tw in SelectedObjects)
+                foreach (var tw in AllFilteredObjects)
                 {
                     if (!ignore.position)
                     {
@@ -36,7 +36,6 @@ namespace OmiLAXR.TrackingBehaviours
                             NewValue = tw.CurrentPosition,
                         };
                         OnChangedPosition.Invoke(this, tw, posState);
-                        print("Position " + posState.NewValue);
                     }
 
                     if (!ignore.rotation)

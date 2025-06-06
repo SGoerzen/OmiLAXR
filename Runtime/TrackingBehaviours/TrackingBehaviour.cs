@@ -95,7 +95,7 @@ namespace OmiLAXR.TrackingBehaviours
                 else
                 {
                     var selectedObjects = Select<T>(objects);
-                    SelectedObjects.AddRange(selectedObjects);
+                    AllFilteredObjects.AddRange(selectedObjects);
                     AfterFilteredObjects(selectedObjects);
                 }
             };
@@ -133,7 +133,7 @@ namespace OmiLAXR.TrackingBehaviours
         /// <summary>
         /// Stores the currently selected objects for tracking.
         /// </summary>
-        protected readonly List<T> SelectedObjects = new List<T>();
+        protected readonly List<T> AllFilteredObjects = new List<T>();
 
         /// <summary>
         /// Called when the behavior is enabled.

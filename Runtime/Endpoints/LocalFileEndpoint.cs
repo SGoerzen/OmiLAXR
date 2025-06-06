@@ -126,8 +126,12 @@ namespace OmiLAXR.Endpoints
 
         private (StreamWriter writer, bool hasContent) CreateWriter(string filePath)
         {
-            var info = new FileInfo(filePath);
-            var hasContent = info.Length > 0;
+            var hasContent = false;
+            if (File.Exists(filePath))
+            {
+                var info = new FileInfo(filePath);
+                hasContent = info.Length > 0;
+            }
             var writer = new StreamWriter(filePath, true)
             {
                 AutoFlush = false
