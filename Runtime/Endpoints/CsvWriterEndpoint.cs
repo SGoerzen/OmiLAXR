@@ -7,6 +7,7 @@ namespace OmiLAXR.Endpoints
     public class CsvWriterEndpoint : LocalFileEndpoint
     {
         public bool flatten = false;
+        public bool includeOrigin = false;
         public List<string> includeHeaders;
         public List<string> excludeHeaders;
 

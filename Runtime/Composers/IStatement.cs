@@ -6,6 +6,7 @@ namespace OmiLAXR.Composers
     public interface IStatement
     {
         string GetOrigin();
+        void SetOrigin(string origin);
         void SetComposer(IComposer composer);
         void SetOwner(ITrackingBehaviour trackingBehaviour);
         IComposer GetComposer();

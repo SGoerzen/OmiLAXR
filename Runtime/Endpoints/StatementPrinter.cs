@@ -9,6 +9,7 @@ namespace OmiLAXR.Endpoints
     [Description("Prints all received statements to Unity Editor console. May be used for testing purposes.")]
     public class StatementPrinter : Endpoint
     {
+        public bool includeOrigin = true;
         [Serializable]
         public enum PrintType
         {
@@ -20,6 +21,9 @@ namespace OmiLAXR.Endpoints
         public PrintType printType = PrintType.Default;
         protected override TransferCode HandleSending(IStatement statement)
         {
+            if (!includeOrigin)
+                statement.SetOrigin("/");
+            
             switch (printType)
             {
                 case PrintType.Json:

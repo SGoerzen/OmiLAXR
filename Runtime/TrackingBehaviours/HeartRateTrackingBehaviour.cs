@@ -1,6 +1,6 @@
 
+using NUnit.Framework;
 using OmiLAXR.Actors.HeartRate;
-using OmiLAXR.Schedules;
 using UnityEngine;
 
 namespace OmiLAXR.TrackingBehaviours
@@ -9,6 +9,8 @@ namespace OmiLAXR.TrackingBehaviours
     /// Tracking behavior specifically designed to monitor heart rate data at regular intervals.
     /// Implements IntervalHandler to support scheduled execution via the IntervalTimer.
     /// </summary>
+    [AddComponentMenu("OmiLAXR / 3) Tracking Behaviours / Heart Rate Tracking Behaviour")]
+    [Description("Tracks the heart rate of an actor.")]
     public class HeartRateTrackingBehaviour : TrackingBehaviour
     {
         public readonly TrackingBehaviourEvent<int> OnHeartBeat = new TrackingBehaviourEvent<int>();
@@ -19,7 +21,7 @@ namespace OmiLAXR.TrackingBehaviours
             if (provider == null || !provider.enabled)
             {
                 enabled = false;
-                DebugLog.OmiLAXR.Warning("Cannot find any <HeartRateProvider> in parent pipeline. The Heart Rate Tracking Behaviour was disabled.");
+                DebugLog.OmiLAXR.Warning($"Cannot find any <HeartRateProvider> in parent pipeline '{Pipeline.name}'. The Heart Rate Tracking Behaviour was disabled.");
                 return;
             }
             SetInterval(() =>

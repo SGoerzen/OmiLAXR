@@ -109,7 +109,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 74f372b2d8814ee2950adac76efd5162, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  printAsCsv: 0
+  includeOrigin: 1
+  printType: 0
 --- !u!114 &7544826140815961707
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -127,11 +128,12 @@ MonoBehaviour:
   fileExtension: csv
   splitByComposers: 0
   exampleFileLocationPreview: ../../../../Library/Application Support/DefaultCompany/OmiLAXR
-    Dev (Unity 6)/20250606164231.csv
+    Dev (Unity 6)/20250607152031.csv
   fileName: 
-  includeUri: 0
-  excludedHeaders: []
-  priorityHeaders: []
+  flatten: 0
+  includeOrigin: 0
+  includeHeaders: []
+  excludeHeaders: []
 --- !u!114 &4440402473614298922
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -149,7 +151,7 @@ MonoBehaviour:
   fileExtension: txt
   splitByComposers: 0
   exampleFileLocationPreview: ../../../../Library/Application Support/DefaultCompany/OmiLAXR
-    Dev (Unity 6)/20250606164231.txt
+    Dev (Unity 6)/20250607152031.txt
   fileName: 
 --- !u!1 &5165783425236376776
 GameObject:
@@ -229,4 +231,3 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 8dee3ca2e9d84084be4e889a91a6561f, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  statementUri: 
