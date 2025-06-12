@@ -5,9 +5,9 @@
   "description": "This is the base package for OmiLAXR ecosystem. This package has shareable code for all OmiLAXR packages.",
   "unity": "2020.3",
   "unityRelease": "15f1",
-  "documentationUrl": "https://gitlab.com/learntech-rwth/omilaxr-framework/v2/omilaxr/-/wikis",
-  "changelogUrl": "https://gitlab.com/learntech-rwth/omilaxr-ecosystem/v2/omilaxr/-/blob/main/CHANGELOG.md",
-  "licensesUrl": "https://gitlab.com/learntech-rwth/omilaxr-ecosystem/v2/omilaxr/-/blob/main/LICENSE",
+  "documentationUrl": "https://omilaxr.dev/",
+  "changelogUrl": "https://github.com/SGoerzen/OmiLAXR.xAPI/blob/main/CHANGELOG.md",
+  "licensesUrl": "https://github.com/SGoerzen/OmiLAXR.xAPI/blob/main/LICENSE",
   "homepage": "https://omilaxr.dev/",
   "dependencies": {
     "com.unity.textmeshpro": "3.0.9",
