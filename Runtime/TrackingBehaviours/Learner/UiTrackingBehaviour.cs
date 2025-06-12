@@ -11,22 +11,22 @@ namespace OmiLAXR.TrackingBehaviours.Learner
     public class UiTrackingBehaviour : TrackingBehaviour<Selectable>
     {
         [Gesture("UI"), Action("Click")]
-        public TrackingBehaviourEvent<Button> OnClickedButton = new TrackingBehaviourEvent<Button>();
+        public readonly TrackingBehaviourEvent<Button> OnClickedButton = new TrackingBehaviourEvent<Button>();
 
-        [Gesture("UI"), Action("Change")] public TrackingBehaviourEvent<Slider, float> OnChangedSlider =
+        [Gesture("UI"), Action("Change")] public readonly TrackingBehaviourEvent<Slider, float> OnChangedSlider =
             new TrackingBehaviourEvent<Slider, float>();
 
         [Gesture("UI"), Action("Change")]
-        public TrackingBehaviourEvent<Selectable, int, string[]> OnChangedDropdown =
+        public readonly TrackingBehaviourEvent<Selectable, int, string[]> OnChangedDropdown =
             new TrackingBehaviourEvent<Selectable, int, string[]>();
 
-        [Gesture("UI"), Action("Change")] public TrackingBehaviourEvent<Toggle, bool> OnChangedToggle =
+        [Gesture("UI"), Action("Change")] public readonly TrackingBehaviourEvent<Toggle, bool> OnChangedToggle =
             new TrackingBehaviourEvent<Toggle, bool>();
 
-        [Gesture("UI"), Action("Change")] public TrackingBehaviourEvent<Selectable, string> OnChangedInputField =
+        [Gesture("UI"), Action("Change")] public readonly TrackingBehaviourEvent<Selectable, string> OnChangedInputField =
             new TrackingBehaviourEvent<Selectable, string>();
 
-        [Gesture("UI"), Action("Change")] public TrackingBehaviourEvent<Scrollbar, float> OnChangedScrollbar =
+        [Gesture("UI"), Action("Change")] public readonly TrackingBehaviourEvent<Scrollbar, float> OnChangedScrollbar =
             new TrackingBehaviourEvent<Scrollbar, float>();
 
         protected override void AfterFilteredObjects(Selectable[] selectables)
@@ -34,55 +34,88 @@ namespace OmiLAXR.TrackingBehaviours.Learner
             foreach (var selectable in selectables)
             {
                 var type = selectable.GetType();
-
+                var ieh = selectable.GetComponent<InteractionEventHandler>();
+                
                 if (type == typeof(Button))
                 {
                     var button = (Button)selectable;
-                    OnClickedButton.Bind(button.onClick, this, button);
+                    OnClickedButton.Bind(button.onClick, () =>
+                    {
+                        if (!ieh || ieh.IsHovering)
+                            OnClickedButton.Invoke(this, button);
+                    });
                 }
                 else if (type == typeof(Slider))
                 {
                     var slider = (Slider)selectable;
                     OnChangedSlider.Bind(slider.onValueChanged,
-                        value => { OnChangedSlider.Invoke(this, slider, value); });
+                        value =>
+                        {
+                            if (!ieh || ieh.IsPressing)
+                                OnChangedSlider.Invoke(this, slider, value);
+                        });
                 }
                 else if (type == typeof(Dropdown))
                 {
                     var dropdown = (Dropdown)selectable;
                     var options = dropdown.options.Select(o => o.text).ToArray();
                     OnChangedDropdown.Bind(dropdown.onValueChanged,
-                        value => { OnChangedDropdown.Invoke(this, dropdown, value, options); });
+                        value =>
+                        {
+                            if (!ieh || ieh.IsHovering)
+                                OnChangedDropdown.Invoke(this, dropdown, value, options);
+                        });
                 }
                 else if (type == typeof(TMP_Dropdown))
                 {
                     var dropdown = (TMP_Dropdown)selectable;
                     var options = dropdown.options.Select(o => o.text).ToArray();
                     OnChangedDropdown.Bind(dropdown.onValueChanged,
-                        value => { OnChangedDropdown.Invoke(this, dropdown, value, options); });
+                        value =>
+                        {
+                            if (!ieh || ieh.IsHovering)
+                                OnChangedDropdown.Invoke(this, dropdown, value, options);
+                        });
                 }
                 else if (type == typeof(Toggle))
                 {
                     var toggle = (Toggle)selectable;
                     OnChangedToggle.Bind(toggle.onValueChanged,
-                        value => { OnChangedToggle.Invoke(this, toggle, value); });
+                        value =>
+                        {
+                            if (ieh || ieh.IsHovering)
+                                OnChangedToggle.Invoke(this, toggle, value);
+                        });
                 }
                 else if (type == typeof(InputField))
                 {
                     var inputField = (InputField)selectable;
                     OnChangedInputField.Bind(inputField.onValueChanged,
-                        value => { OnChangedInputField.Invoke(this, inputField, value); });
+                        value =>
+                        {
+                            if (inputField.isFocused)
+                                OnChangedInputField.Invoke(this, inputField, value);
+                        });
                 }
                 else if (type == typeof(TMP_InputField))
                 {
                     var inputField = (TMP_InputField)selectable;
                     OnChangedInputField.Bind(inputField.onValueChanged,
-                        value => { OnChangedInputField.Invoke(this, inputField, value); });
+                        value =>
+                        {
+                            if (inputField.isFocused)
+                                OnChangedInputField.Invoke(this, inputField, value);
+                        });
                 }
                 else if (type == typeof(Scrollbar))
                 {
                     var scrollbar = (Scrollbar)selectable;
                     OnChangedScrollbar.Bind(scrollbar.onValueChanged,
-                        value => { OnChangedScrollbar.Invoke(this, scrollbar, value); });
+                        value =>
+                        {
+                            if (!ieh || ieh.IsHovering)
+                                OnChangedScrollbar.Invoke(this, scrollbar, value);
+                        });
                 }
             }
         }

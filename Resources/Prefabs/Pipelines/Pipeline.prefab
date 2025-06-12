@@ -85,6 +85,7 @@ GameObject:
   m_Component:
   - component: {fileID: 1822057256119651754}
   - component: {fileID: 2546363671201581991}
+  - component: {fileID: 4017677163264171610}
   - component: {fileID: 4595212218988023255}
   m_Layer: 0
   m_Name: Pipeline
@@ -125,7 +126,20 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   actor: {fileID: 4595212218988023255}
   instructor: {fileID: 0}
-  Extensions: []
+--- !u!114 &4017677163264171610
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 6582749516187797561}
+  m_Enabled: 0
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 5450a72822304464292b82a77e0d85f3, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  teamName: Team
+  teamEmail: team@omilaxr.dev
 --- !u!114 &4595212218988023255
 MonoBehaviour:
   m_ObjectHideFlags: 0

@@ -10,9 +10,9 @@ namespace OmiLAXR
             {
                 if (!_pipeline)
                 {
-#if UNITY_2019
-                    _pipeline = GetComponent<Pipeline>() ?? GetComponentInParent<Pipeline>();
-#else
+#if UNITY_2020_1_OR_NEWER
+                    _pipeline = GetComponent<Pipeline>() ?? GetComponentInParent<Pipeline>(true);
+#else 
                     _pipeline = GetComponent<Pipeline>() ?? GetComponentInParent<Pipeline>(true);
 #endif
                 }

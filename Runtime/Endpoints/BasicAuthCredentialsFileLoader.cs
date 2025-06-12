@@ -1,12 +1,11 @@
 using System.IO;
-using UnityEditor;
 using UnityEngine;
 
 namespace OmiLAXR.Endpoints
 {
     [RequireComponent(typeof(Endpoint))]
     [AddComponentMenu("OmiLAXR / 6) Endpoints / Basic Auth Credentials File Loader")]
-    [DefaultExecutionOrder(-1000)]
+    [DefaultExecutionOrder(-1001)]
     public class BasicAuthCredentialsFileLoader : MonoBehaviour
     {
         [Header("Name of file that is located in StreamingAssets path.")]
@@ -40,14 +39,13 @@ namespace OmiLAXR.Endpoints
                 var jsonContent = File.ReadAllText(filePath);
                 var credentials = JsonUtility.FromJson<BasicAuthCredentials>(jsonContent);
 
-                targetEndpoint.credentials = credentials;
+                targetEndpoint.Credentials = credentials;
+                DebugLog.OmiLAXR.Print($"⚙️ Loaded credentials from '{filename}' successfully.", this);
                 targetEndpoint.StartSending();
-
-                Debug.Log($"Loaded '{filename}' successfully.", this);
             }
             else
             {
-                Debug.LogError($"Cannot find '{filename}' in path '{filePath}'.", this);
+                DebugLog.OmiLAXR.Error($"❌ Cannot find '{filename}' in path '{filePath}'.", this);
             }
         }
     }

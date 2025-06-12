@@ -1,10 +1,33 @@
+#if UNITY_EDITOR
 using UnityEditor;
+using System.Linq;
+
+#if UNITY_2021_2_OR_NEWER
+using UnityEditor.Build; 
+#endif
 
 namespace OmiLAXR.Editor
 {
     public static class DefineUtility
     {
-        public static void RemoveXapiRegistryExistsDefine(string define)
+        public static bool IsDefined(string define)
+        {
+            string[] defines;
+
+#if UNITY_2021_2_OR_NEWER
+            var namedBuildTarget = NamedBuildTarget.FromBuildTargetGroup(EditorUserBuildSettings.selectedBuildTargetGroup);
+            defines = PlayerSettings
+                .GetScriptingDefineSymbols(namedBuildTarget)
+                .Split(';');
+#else
+        defines = PlayerSettings
+            .GetScriptingDefineSymbolsForGroup(EditorUserBuildSettings.selectedBuildTargetGroup)
+            .Split(';');
+#endif
+
+            return defines.Contains(define);
+        }
+        public static void Unset(string define)
         {
 #if UNITY_2021_2_OR_NEWER
             var groups = new[]
@@ -43,7 +66,7 @@ namespace OmiLAXR.Editor
 #endif
         }
         
-        public static void AddXapiRegistryExistsDefine(string define)
+        public static void Set(string define)
         {
 #if UNITY_2021_2_OR_NEWER
             var groups = new[]
@@ -87,3 +110,4 @@ namespace OmiLAXR.Editor
         }
     }
 }
+#endif

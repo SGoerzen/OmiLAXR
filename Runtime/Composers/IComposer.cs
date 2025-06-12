@@ -1,10 +1,11 @@
+
 namespace OmiLAXR.Composers
 {
     public interface IComposer
     {
-        event ComposerAction<IStatement, bool> AfterComposed;
+        event ComposerAction<IStatement> AfterComposed;
         bool IsHigherComposer { get; }
-        bool IsEnabled { get; }
         Author GetAuthor();
+        string GetName();
     }
 }

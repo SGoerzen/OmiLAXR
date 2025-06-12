@@ -12,7 +12,7 @@ namespace OmiLAXR.TrackingBehaviours.Learner
 {
     [AddComponentMenu("OmiLAXR / 3) Tracking Behaviours / Keyboard Tracking Behaviour"),
      Description("Tracks keyboard presses and releases.")]
-    public class KeyboardTrackingBehaviour : ObjectlessTrackingBehaviour
+    public class KeyboardTrackingBehaviour : TrackingBehaviour
     {
         public struct KeyboardTrackingBehaviourArgs
         {
@@ -33,10 +33,10 @@ namespace OmiLAXR.TrackingBehaviours.Learner
         private readonly Dictionary<KeyCode, bool> _wasDown = new Dictionary<KeyCode, bool>();
         private List<KeyCode> _keys = new List<KeyCode>();
 
-        protected override void Awake()
+        protected override void OnEnable()
         {
-            base.Awake();
-
+            base.OnEnable();
+            
             foreach (KeyCode keyCode in Enum.GetValues(typeof(KeyCode)))
             {
                 if (keyCode >= KeyCode.A && keyCode <= KeyCode.Z ||
@@ -48,11 +48,11 @@ namespace OmiLAXR.TrackingBehaviours.Learner
                     keyCode == KeyCode.Backspace || keyCode == KeyCode.Tab ||
                     keyCode == KeyCode.Escape || keyCode == KeyCode.Delete)
                 {
-#if UNITY_2019 || UNITY_2020
+#if UNITY_2021_1_OR_NEWER
+                    _wasDown.TryAdd(keyCode, false);
+#else 
                     if (!_wasDown.ContainsKey(keyCode))
                         _wasDown.Add(keyCode, false);
-#else
-                    _wasDown.TryAdd(keyCode, false);
 #endif
                 }
             }

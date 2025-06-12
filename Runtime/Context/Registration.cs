@@ -7,7 +7,7 @@ namespace OmiLAXR
 {
     [DefaultExecutionOrder(-10000)]
     [DisallowMultipleComponent]
-    [AddComponentMenu("OmiLAXR / 0) Scenario Context / Registration")]
+    [AddComponentMenu("OmiLAXR / Scenario Context / Registration")]
     [Description("Component for holding a registration UUID.")]
     public class Registration : LearningContext
     {

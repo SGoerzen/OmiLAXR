@@ -1,3 +1,5 @@
+using UnityEngine;
+
 namespace OmiLAXR
 {
     public interface IDebugSender
@@ -14,7 +16,6 @@ namespace OmiLAXR
         }
         
         public static readonly DebugLog OmiLAXR = new DebugLog("OmiLAXR");
-        public static readonly DebugLog xAPI = new DebugLog("OmiLAXR.xAPI");
         
         private static string BuildMessage(string prefix, string message, params object[] ps)
             => $"[{prefix}]: {((ps != null && ps.Length > 0) ? string.Format(message, ps) : message)}";
@@ -24,5 +25,11 @@ namespace OmiLAXR
             => UnityEngine.Debug.LogError(BuildMessage(_prefix, message, ps));
         public void Warning(string message, params object[] ps)
             => UnityEngine.Debug.LogWarning(BuildMessage(_prefix, message, ps));
+        public void Print(string message, Object context)
+            => UnityEngine.Debug.Log(BuildMessage(_prefix, message), context);
+        public void Error(string message, Object context)
+            => UnityEngine.Debug.LogError(BuildMessage(_prefix, message), context);
+        public void Warning(string message, Object context)
+            => UnityEngine.Debug.LogWarning(BuildMessage(_prefix, message), context);
     }
 }

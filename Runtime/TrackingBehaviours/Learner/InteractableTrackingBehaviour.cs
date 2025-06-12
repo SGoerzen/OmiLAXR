@@ -5,10 +5,12 @@ namespace OmiLAXR.TrackingBehaviours.Learner
     public struct InteractableEventArgs
     {
         public GameObject Target;
+        public Hand Hand;
 
-        public InteractableEventArgs(GameObject target)
+        public InteractableEventArgs(GameObject target, Hand hand = Hand.Unknown)
         {
             Target = target;
+            Hand = hand;
         }
     }
     
