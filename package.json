@@ -25,5 +25,8 @@
     "name": "Sergej Görzen",
     "email": "goerzen@cs.rwth-aachen.de",
     "url": "https://elearn.rwth-aachen.de/goerzen"
+  },
+  "publishConfig": {
+    "access": "public"  
   }
 }
