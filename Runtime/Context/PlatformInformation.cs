@@ -4,9 +4,9 @@ using UnityEngine;
 
 namespace OmiLAXR.Context
 {
-    [AddComponentMenu("OmiLAXR / 0) Scenario Context / Platform Information")]
+    [AddComponentMenu("OmiLAXR / Scenario Context / Platform Information")]
     [DisallowMultipleComponent]
-    [Description("Provides platform information in following format [prefixes:]OmiLAXR:v2.0.15:{OS}[:suffixes].")]
+    [Description("Provides platform information in following format [prefixes:]OmiLAXR.{MODULE}:{COMPOSER}:{VERSION}:{OS}[:suffixes].")]
     public class PlatformInformation : LearningContext
     {
         [Serializable]
@@ -21,32 +21,22 @@ namespace OmiLAXR.Context
         private static PlatformInformation _instance;
         public static PlatformInformation Instance => GetInstance(ref _instance);
         
-        private const string OmiLAXR_Version = "v2.0.15";
-
         // This will store the value in the inspector
         [SerializeField] 
         public PlatformInformationAppendix appendix = new PlatformInformationAppendix();
 
-        public string GetPlatformString()
+        public string GetPlatformString(string module, string version, string composer)
         {
-            var platformStr = $"OmiLAXR:{OmiLAXR_Version}:{Application.platform}";
+            var platformStr = $"OmiLAXR.{module}:{composer}:v{version}:{Application.platform}";
 
             if (appendix.prefixes.Length > 0)
             {
-#if UNITY_2019 || UNITY_2020
                 platformStr = $"{string.Join(":", appendix.prefixes)}:{platformStr}";
-#else
-                platformStr = $"{string.Join(':', appendix.prefixes)}:{platformStr}";
-#endif
             }
             
             if (appendix.suffixes.Length > 0)
             {
-#if UNITY_2019 || UNITY_2020
                 platformStr = $"{platformStr}:{string.Join(":", appendix.suffixes)}";
-#else
-                platformStr = $"{platformStr}:{string.Join(':', appendix.suffixes)}";
-#endif
             }
 
             return platformStr;

@@ -1,0 +1,208 @@
+# Changelog
+
+## [2.1.0] - 2025-06-12
+
+### Added
+- **Utils**
+  - `CsvFormat` to manage CSV structures in memory.
+  - `CsvFile` for improved CSV writing.
+  - `Scheduler` system with `IntervalTicker` and `TimeoutTicker`.
+    - Includes `SetTimeout(Action, float)` and `SetInterval(Action, float)` for scheduling logic in tracking behaviours.
+  - `InteractionEventHandler` to detect `OnPress`, `OnRelease`, `OnHover`, and `OnUnhover`.
+
+- **Listeners**
+  - Global threshold settings from `TransformWatcher` added to the main camera's `Transform Listener`.
+
+- **Tracking Behaviours**
+  - `HeartRateTrackingBehaviour` added, based on interval logic.
+  - New options for `TransformTrackingBehaviour`:
+    - `interval`: for interval-based triggering.
+    - `detectOnChange`: flag for delta-based detection.
+    - `ignore`: selectively ignore transform axes.
+  - `TrackingBehaviourEvent.Bind()` now supports `Action<T>` delegates.
+  - Added `Hand` information to `TeleportationTrackingBehaviour` and `InteractableTrackingBehaviour`.
+
+- **Endpoints**
+  - **Buffered batch sending** introduced:
+    - `MaxBatchSize` can be overridden to control batch limits.
+  - `LocalFileEndpoint` renamed to **(JSON) File Endpoint**, now writes `.jsonl` instead of `.txt`.
+  - Output now supports:
+    - Browsable folder path for statement output (via Unity Editor).
+    - One file per composer via `oneFilePerComposer = true`.
+    - File/folder naming via configurable `identifier`.
+    - Custom `FormatLine(IStatement)` override for each log line.
+  - Statement preview UI added for all endpoints.
+  - `CsvLocalFileEndpoint` added for CSV exports:
+    - Shares all features of `LocalFileEndpoint`.
+    - Optionally flattens headers (`flatten = true`) for wide compatibility.
+    - Added `PrintStatement` types (Default, Short, CSV, CSVFlat, JSON).
+  - Make Endpoints work with Threads instead of BackgroundWorker.
+  - Added `FlushQueue()`.
+
+- **Inspector & Preview**
+  - Statement previews added to endpoints.
+  - Visual component tree previews added to pipelines and data providers.
+
+### Changed
+- `Composers<T>` now supports multiple `TrackingBehaviours`.
+  - Use `SendStatement(ITrackingBehaviour owner, IStatement statement, bool immediate = false)` instead of `SendStatement(IStatement, bool)` if needed.
+
+- `Mouse` and `Keyboard` composers are now disabled by default.
+- Prefab setup updated:
+  - Added `(JSON) File Endpoint` to default prefab.
+- Improved UI for `LocalFileEndpoint`, including folder selection and data previews.
+- Enhanced fallback behaviour if xAPI registry is missing or invalid.
+
+### Fixed
+- Threshold comparison logic in `TransformWatcher`.
+- Composers now process multiple `TrackingBehaviours` correctly.
+- Incorrect context version metadata has been corrected.
+- UI components no longer trigger change events unless directly interacted with (e.g., sliders).
+- `BeforeStoppedPipeline` errors resolved.
+- Optimized pipeline lifecycle performance.
+
+### Deprecated
+- `ObjectlessTrackingBehaviour` is now obsolete — use `TrackingBehaviour` instead.
+- `Composers<T>` usage pattern changed:
+  - **If supporting multiple matching behaviours**, use  
+    `SendStatement(ITrackingBehaviour statementOwner, IStatement statement)`  
+    instead of the legacy method.
+  - If not using multi-behaviour composers, your current implementation remains valid.
+
+---
+
+## [2.0.18] - 2025-06-06
+
+### Changed
+- Renamed `EventTrackingBehaviour` to `ObjectlessTrackingBehaviour` to avoid confusion with `TrackingBehaviourEvent`.
+  - **Need for action:** If your project extends `EventTrackingBehaviour`, update it to use `ObjectlessTrackingBehaviour`.
+- Made existing `TrackingBehaviour` classes more easily extendable by marking key methods as `protected` and `virtual`.
+- Ensured full compatibility with Unity ≥2020.3.15f — the package now appears in the Unity Package Manager for Unity 2020.
+
+---
+
+## [2.0.13 - 2.0.17] - 2025-05-21
+
+### Added
+- `InputSystemTrackingBehaviour` and `TeleportationTrackingBehaviour` components.
+- `SessionManager`, `SessionTrackingBehaviour`, and `SessionComposer` for managing actor-specific session lifecycle.
+- Generalized internal structures in preparation for `OmiLAXR.UnityXR`.
+
+### Changed
+- Removed the need to manually set InputSystem to "Both".
+- Reorganized the `Prefabs` folder for better structure.
+- Installation order no longer affects package behavior.
+
+### Fixed
+- `LrsCredentialsLoader` no longer starts if it is disabled.
+
+---
+
+## [2.0.13 - 2.0.17] - 2025-05-21
+
+### Added
+- `InputSystemTrackingBehaviour` and `TeleportationTrackingBehaviour` components.
+- `SessionManager`, `SessionTrackingBehaviour`, and `SessionComposer` to manage the lifecycle of tracking sessions per actor.
+- Generalized functionality in preparation for `OmiLAXR.UnityXR`.
+
+### Changed
+- Removed the need to manually set InputSystem to "Both".
+- Reorganized `Prefabs` folder structure.
+- Package installation order no longer causes errors.
+
+### Fixed
+- `LrsCredentialsLoader` no longer starts if it is disabled.
+
+### Deprecated
+- None.
+
+---
+
+## [2.0.11] - 2024-11-25
+
+### Added
+- `[Global Settings]` component added to the OmiLAXR prefab.
+- Support for path-based tracking names via `obj.GetTrackingName()` when enabled in `[Global Settings]`.
+
+### Changed
+- `LocalEndpoint` now allows selection of storage location: `persistentDataPath`, `temporaryCachePath`, or a custom path.
+
+### Fixed
+- Fixed incorrect path for `example.credentials.json`.
+
+### Deprecated
+- None.
+
+---
+
+## [2.0.10] - 2024-11-11
+
+### Fixed
+- Fixed compatibility errors for Unity 2021.
+
+### Changed
+- Updated README files.
+
+### Added
+- None.
+
+### Deprecated
+- None.
+
+---
+
+## [2.0.9] - 2024-11-11
+
+### Added
+- `ActorDataProvider` for storing global actor data (e.g. heart rate results).
+- `Detect<T>()` method in tracking behaviours uses `FindObjectsOfType<T>` and passes objects to `Found()`.
+- `AutoListener<T>` base class automatically uses `Detect<T>()` — calling `StartListening()` is no longer required.
+- Short `Bind()` notation for `TrackingBehaviorEvent` with default invoker: e.g. `OnClickedButton.Bind(button.onClick, this, button)`.
+- `HeartRateMonitor` component for adding heart rate to context via an `ActorDataProvider`. Extend `HeartRateProvider` and override `int GetHeartRate()` for your heart rate system.
+- Example `Simulator` classes for heart rate.
+- `ExcludeFromTracking` component and corresponding pipeline filter to skip marked GameObjects.
+- Menu item **OmiLAXR / Create credentials.json file** to auto-generate credentials in `StreamingAssets`.
+
+### Changed
+- `protected Pipeline` field renamed to `public Pipeline`.
+  - Need for action: Rename usages if affected by this visibility change.
+- Renamed internal field access patterns in tracking components for better support of `enabled` flag.
+- Ensured compatibility with Unity 2020, 2021, 2022, 2023, and Unity 6 (6000).
+
+### Fixed
+- Tracking components now respect the `enabled` property consistently.
+- `HigherComposer` now includes a `SendStatement` method.
+
+### Deprecated
+- None.
+
+### Notes
+- Need for action: Ensure you're using the latest xAPI Registry JSON files. See:  
+  https://gitlab.com/learntech-rwth/xapi/-/merge_requests/43/diffs
+
+---
+
+## [2.0.7] - 2024-10-14
+
+### Added
+- Custom timestamp support via `WithTimestamp(DateTime timestamp)` in `xApiStatement`.
+- `Dispatch(Action action)` method to `Endpoint` for main thread dispatching.
+- `SendImmediate` method to `Endpoint` for high-priority xAPI statements.
+- `StatementPrinter` endpoint added to `OmiLAXR Data Provider` prefab (disabled by default).
+- `UnityComponentFilter` added by default to `LearnerPipeline` prefab.
+- `enabled` checkbox added to: `BasicAuthFileLoader`, `TrackingBehaviour`, and `Listener`.
+
+### Changed
+- Inspector menu paths updated for several components.
+- `"System start"`, `"pause"`, `"resumed"`, and `"quit"` statements are now sent immediately.
+- `Found(Object[] objects)` in `Listener` now accepts a single object instead of requiring an array.
+- Need for action: `TransferStatement()` in `Endpoint` renamed to `HandleQueue()`. A method named `TransferStatement()` still exists for other purposes.
+- Need for action: Capitalization of some event names — update event handler method names accordingly.
+- Need for action: `GetAuthor()` must now be `public` instead of `protected`.
+
+### Fixed
+- Incorrect `"System started Game"` statement has been fixed.
+
+### Deprecated
+- Need for action: `BindedComposer` removed and replaced by `IComposer` interface.
+- Need for action: `AfterComposed` now includes an additional property: `bool immediate`.

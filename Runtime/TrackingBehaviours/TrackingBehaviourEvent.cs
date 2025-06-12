@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using UnityEngine.Events;
 
@@ -171,7 +172,12 @@ namespace OmiLAXR.TrackingBehaviours
 
         private Dictionary<UnityEvent<TValue>, UnityAction<TValue>> _unityBinds =
             new Dictionary<UnityEvent<TValue>, UnityAction<TValue>>();
+        
+        private Dictionary<Action<TValue>, Action<TValue>> _actionBinds =
+            new Dictionary<Action<TValue>, Action<TValue>>();
         public bool IsDisabled { get; set; } = false;
+        
+        public int HandlerCount => Actions.Count;
 
         public void AddHandler(TrackingBehaviourAction<TSender, TValue> action)
         {
@@ -212,7 +218,7 @@ namespace OmiLAXR.TrackingBehaviours
         
         public void Bind(UnityEvent<TValue> unityEvent, UnityAction<TValue> invoker)
         {
-#if UNITY_2020 || UNITY_2019
+#if !UNITY_2021_1_OR_NEWER
             if (!_unityBinds.ContainsKey(unityEvent))
                 _unityBinds.Add(unityEvent, invoker);
 #else
@@ -222,12 +228,31 @@ namespace OmiLAXR.TrackingBehaviours
             unityEvent.AddListener(invoker);
         }
 
+        
+        
         public void Unbind(UnityEvent<TValue> unityEvent)
         {
            unityEvent.RemoveListener(_unityBinds[unityEvent]);
            _unityBinds.Remove(unityEvent);
         }
 
+        public void Bind(Action<TValue> action, Action<TValue> invoker)
+        {
+#if !UNITY_2021_1_OR_NEWER
+            if (!_actionBinds.ContainsKey(action))
+                _actionBinds.Add(action, invoker);
+#else
+            if (!_actionBinds.TryAdd(action, invoker))
+                return;
+#endif
+            action += invoker;
+        }
+        public void Unbind(Action<TValue> action)
+        {
+            action -= _actionBinds[action];
+            _actionBinds.Remove(action);
+        }
+        
         public void UnbindAll()
         {
             foreach (var ev in _unityBinds.Keys)
@@ -235,6 +260,16 @@ namespace OmiLAXR.TrackingBehaviours
                 ev.RemoveListener(_unityBinds[ev]);
             }
             _unityBinds.Clear();
+            
+            void unbind(Action<TValue> action)
+            {
+                action -= _actionBinds[action];
+            }
+            foreach (var ev in _actionBinds.Keys)
+            {
+                unbind(ev);
+            }
+            _actionBinds.Clear();
         }
     }
     public class TrackingBehaviourEvent<TSender, TValue, TArgs> : ITrackingBehaviourEvent
@@ -244,6 +279,8 @@ namespace OmiLAXR.TrackingBehaviours
 
         private Dictionary<UnityEvent<TValue>, UnityAction<TValue>> _unityBinds =
             new Dictionary<UnityEvent<TValue>, UnityAction<TValue>>();
+        private Dictionary<Action<TValue>, Action<TValue>> _actionBinds =
+            new Dictionary<Action<TValue>, Action<TValue>>();
         public bool IsDisabled { get; set; } = false;
 
         public void AddHandler(TrackingBehaviourAction<TSender, TValue, TArgs> action)
@@ -251,7 +288,7 @@ namespace OmiLAXR.TrackingBehaviours
             Action += action;
             Actions.Add(action);
         }
-
+        
         public void Invoke(ITrackingBehaviour owner, TSender sender, TValue value, TArgs args)
         {
             if (IsDisabled)
@@ -283,9 +320,25 @@ namespace OmiLAXR.TrackingBehaviours
             ClearActions();
         }
 
+        public void Bind(Action<TValue> action, Action<TValue> invoker)
+        {
+#if !UNITY_2021_1_OR_NEWER
+            if (!_actionBinds.ContainsKey(action))
+                _actionBinds.Add(action, invoker);
+#else
+            if (!_actionBinds.TryAdd(action, invoker))
+                return;
+#endif
+            action += invoker;
+        }
+        public void Unbind(Action<TValue> action)
+        {
+            action -= _actionBinds[action];
+            _actionBinds.Remove(action);
+        }
         public void Bind(UnityEvent<TValue> unityEvent, UnityAction<TValue> invoker)
         {
-            #if UNITY_2020 || UNITY_2019
+            #if !UNITY_2021_1_OR_NEWER
             if (!_unityBinds.ContainsKey(unityEvent))
                 _unityBinds.Add(unityEvent, invoker);
             #else
@@ -301,6 +354,8 @@ namespace OmiLAXR.TrackingBehaviours
             _unityBinds.Remove(unityEvent);
         }
 
+      
+
         public void UnbindAll()
         {
             foreach (var ev in _unityBinds.Keys)
@@ -308,6 +363,16 @@ namespace OmiLAXR.TrackingBehaviours
                 ev.RemoveListener(_unityBinds[ev]);
             }
             _unityBinds.Clear();
+
+            void unbind(Action<TValue> action)
+            {
+                action -= _actionBinds[action];
+            }
+            foreach (var ev in _actionBinds.Keys)
+            {
+                unbind(ev);
+            }
+            _actionBinds.Clear();
         }
     }
 }

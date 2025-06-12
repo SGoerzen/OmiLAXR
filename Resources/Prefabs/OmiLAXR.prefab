@@ -114,6 +114,14 @@ PrefabInstance:
     serializedVersion: 3
     m_TransformParent: {fileID: 3220772463875552635}
     m_Modifications:
+    - target: {fileID: 121891111681147942, guid: 4f668f0f622a648e6be1f89fd531ad8a, type: 3}
+      propertyPath: intervalSettings
+      value: 
+      objectReference: {fileID: 11400000, guid: 340b3044919984bcba2bd593de12a3b5, type: 2}
+    - target: {fileID: 121891111681147942, guid: 4f668f0f622a648e6be1f89fd531ad8a, type: 3}
+      propertyPath: intervalSettings.runOnStart
+      value: 1
+      objectReference: {fileID: 0}
     - target: {fileID: 2376266485913577314, guid: 4f668f0f622a648e6be1f89fd531ad8a, type: 3}
       propertyPath: m_Name
       value: Learner Pipeline

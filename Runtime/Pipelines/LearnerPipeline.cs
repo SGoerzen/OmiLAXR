@@ -2,7 +2,7 @@ using UnityEngine;
 
 namespace OmiLAXR.Pipelines
 {
-    [AddComponentMenu("OmiLAXR / 0) Pipelines / Learner Pipeline")]
+    [AddComponentMenu("OmiLAXR / Core / Learner Pipeline")]
     public class LearnerPipeline : Pipeline
     {
         

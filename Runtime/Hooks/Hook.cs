@@ -11,8 +11,8 @@ namespace OmiLAXR.Hooks
         }
         public abstract IStatement AfterCompose(IStatement statement);
         
-        protected TS GetProvider<TS>(IStatement statement) where TS : ActorDataProvider
-            => statement.GetSenderPipelineInfo().ActorDataProviders
-                .FirstOrDefault(o => o.GetType() == typeof(TS) || o.GetType().IsSubclassOf(typeof(TS))) as TS;
+        protected TS GetProvider<TS>(IStatement statement, bool includeInactive = false) where TS : ActorDataProvider
+            => statement.GetSenderPipelineInfo().ActorDataProviders?
+                .FirstOrDefault(o => (includeInactive && !o.enabled) && (o.GetType() == typeof(TS) || o.GetType().IsSubclassOf(typeof(TS)))) as TS;
     }
 }

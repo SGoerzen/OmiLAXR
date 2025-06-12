@@ -6,7 +6,7 @@ using Random = System.Random;
 
 namespace OmiLAXR.Actors.HeartRate
 {
-    [AddComponentMenu("OmiLAXR / 0) Learner / Heart Rate Monitor")]
+    [AddComponentMenu("OmiLAXR / Actor Data / Heart Rate Monitor")]
     [DisallowMultipleComponent]
     [Description("Simulates heart rate beats.")]
     public class HeartRateSimulator : HeartRateProvider

@@ -15,7 +15,7 @@ namespace OmiLAXR
     /// <summary>
     /// Pipeline System containing many stages.
     /// </summary>
-    [AddComponentMenu("OmiLAXR / 0) Pipelines / Pipeline")]
+    [AddComponentMenu("OmiLAXR / Core / Pipeline")]
     [DefaultExecutionOrder(0)]
     public class Pipeline : MonoBehaviour
     {
@@ -35,7 +35,7 @@ namespace OmiLAXR
 
         public ActorDataProvider[] ActorDataProviders { get; protected set; }
 
-        #if UNITY_6000
+        #if UNITY_2023_1_OR_NEWER
         public static T GetPipeline<T>() where T : Pipeline
             => FindFirstObjectByType<T>();
         #else
@@ -43,7 +43,7 @@ namespace OmiLAXR
             => FindObjectOfType<T>();
         #endif
 
-        #if UNITY_6000 
+        #if UNITY_2023_1_OR_NEWER 
         public static Pipeline GetAll() => FindFirstObjectByType<Pipeline>();
         #else
         public static Pipeline GetAll() => FindObjectOfType<Pipeline>();
@@ -67,13 +67,15 @@ namespace OmiLAXR
         public event Action<Pipeline> OnCollect; 
         public event Action<Object[]> AfterFoundObjects;
         public event Action<Object[]> AfterFilteredObjects;
-        public event ComposerAction<IStatement, bool> AfterComposedStatement; 
+        public event ComposerAction<IStatement> AfterComposedStatement; 
         public event EndpointAction<IStatement> BeforeSendStatement; 
         public event EndpointAction<IStatement> AfterSendStatement;
         public event Action<Pipeline> BeforeStoppedPipeline; 
         public event Action<Pipeline> AfterStoppedPipeline; 
 
         public readonly List<Object> trackingObjects = new List<Object>();
+        private bool _cleanupCalled = false;
+        private bool _startupCalled = false;
 
         public void Add(PipelineComponent comp)
         {
@@ -115,7 +117,7 @@ namespace OmiLAXR
             return actorGroup ?? GetComponent<Actor>();
         }
         
-        protected void Awake()
+        private void Init()
         {
             if (actor == null)
                 actor = FindActor();
@@ -131,9 +133,7 @@ namespace OmiLAXR
             Filters.AddRange(GetComponentsInChildren<Filter>(false));
             
             // Find available data providers
-#if UNITY_2019
-            DataProviders.AddRange(FindObjectsOfType<DataProvider>().Where(d => !d.enabled));
-#elif UNITY_6000
+#if UNITY_2023_1_OR_NEWER
             DataProviders.AddRange(FindObjectsByType<DataProvider>(FindObjectsInactive.Exclude, FindObjectsSortMode.None));
 #else
             DataProviders.AddRange(FindObjectsOfType<DataProvider>(false));
@@ -142,23 +142,14 @@ namespace OmiLAXR
             // Bind after and before send events
             foreach (var dp in DataProviders)
             {
-                foreach (var c in dp.Composers.Where(c => c.IsEnabled))
+                foreach (var c in dp.Composers)
                 {
-                    c.AfterComposed += (composer, statement, immediate) =>
-                    {
-                        AfterComposedStatement?.Invoke(composer, statement, immediate);
-                    };
+                    c.AfterComposed += AfterComposed;
                 }
-                foreach (var ep in dp.Endpoints.Where(e => e.enabled))
+                foreach (var ep in dp.Endpoints)
                 {
-                    ep.OnSendingStatement += (endpoint, statement) =>
-                    {
-                        BeforeSendStatement?.Invoke(endpoint, statement);
-                    };
-                    ep.OnSentStatement += (endpoint, statement) =>
-                    {
-                        AfterSendStatement?.Invoke(endpoint, statement);
-                    };
+                    ep.OnSendingStatement += OnSendingStatement;
+                    ep.OnSentStatement += OnSentStatement;
                 }
             }
 
@@ -167,12 +158,19 @@ namespace OmiLAXR
             
             OnCollect?.Invoke(this);
             
-            Log($"Initialized with {Listeners.Count} listeners, {Filters.Count} filters, {composersCount} composers, {hooksCount} hooks and {DataProviders.Count} data providers" );
+            Log($"Initialized with {Listeners.Count} listeners, {Filters.Count} filters, {TrackingBehaviours.Count} tracking behaviours, {composersCount} composers, {hooksCount} hooks and {DataProviders.Count} data providers" );
             
             AfterInit?.Invoke(this);
         }
+
+        private void AfterComposed(IComposer composer, IStatement statement)
+            => AfterComposedStatement?.Invoke(composer, statement);
+        private void OnSendingStatement(Endpoint endpoint, IStatement statement)
+            => BeforeSendStatement?.Invoke(endpoint, statement);
+        private void OnSentStatement(Endpoint endpoint, IStatement statement)
+            => AfterSendStatement?.Invoke(endpoint, statement);
         
-        protected void CollectGesturesAndActions()
+        private void CollectGesturesAndActions()
         {
             var tbs = TrackingBehaviours.ToArray();
             Actions.Clear();
@@ -212,23 +210,46 @@ namespace OmiLAXR
 
         private void OnEnable()
         {
+            Startup();
+        }
+
+        private void Startup()
+        {
+            if (_startupCalled)
+                return;
+         
+            Init();
+            
+            _startupCalled = true;
+            
             CollectGesturesAndActions();
             trackingObjects.Clear();
 
             // 1) Start listening for events
-            foreach (var listener in Listeners.Where(l => l.enabled))
+            foreach (var listener in Listeners)
             {
                 listener.OnFoundObjects += FoundObjects;
-                listener.StartListening();
+                if (listener.enabled)
+                    listener.StartListening();
             }
             
             BeforeStartedPipeline?.Invoke(this);
             Log($"Started Pipeline with {trackingObjects.Count} tracking target objects...");
             AfterStartedPipeline?.Invoke(this);
+            _cleanupCalled = false;
         }
-
+        
         private void OnDisable()
         {
+            Cleanup();
+        }
+
+        private void Cleanup()
+        {
+            if (_cleanupCalled)
+                return;
+            
+            _cleanupCalled = true;
             BeforeStoppedPipeline?.Invoke(this);
             
             trackingObjects.Clear();
@@ -241,18 +262,60 @@ namespace OmiLAXR
                 listener.OnFoundObjects -= FoundObjects;
             }
 
+            foreach (var endpoint in DataProviders.SelectMany(dp => dp.Endpoints))
+            {
+                if (endpoint == null || !endpoint.enabled)
+                    continue;
+                endpoint.StopSending();
+            }
+
             Log("Stopped Pipeline!");
             
             AfterStoppedPipeline?.Invoke(this);
+            
+            foreach (var dp in DataProviders)
+            {
+                foreach (var c in dp.Composers)
+                {
+                    c.AfterComposed -= AfterComposed;
+                }
+                foreach (var ep in dp.Endpoints)
+                {
+                    ep.OnSendingStatement -= OnSendingStatement;
+                    ep.OnSentStatement -= OnSentStatement;
+                }
+            }
+            
+            _startupCalled = false;
         }
 
         public void StartPipeline()
         {
+            if (IsRunning)
+                return;
+            
             gameObject.SetActive(true);
+            Startup();
+        }
+
+        private void OnApplicationQuit()
+        {
+            Cleanup();
+        }
+
+        private void OnDestroy()
+        {
+            Cleanup();
         }
 
         public void StopPipeline()
         {
+            if (!IsRunning)
+                return;
+            
+            Cleanup();
+            _startupCalled = false;
+            
             gameObject.SetActive(false);
         }
 

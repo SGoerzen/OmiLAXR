@@ -9,10 +9,20 @@ namespace OmiLAXR.Listeners
     public class SelectableObjectsListener : Listener
     {
         public bool includeInactive = true;
+        public bool addInteractionEventHandler = true;
 
         public override void StartListening()
         {
-            Found(FindObjects<Selectable>(includeInactive));
+            var selectables = FindObjects<Selectable>(includeInactive);
+            if (addInteractionEventHandler)
+            {
+                foreach (var selectable in selectables)
+                {
+                    if (!selectable.GetComponent<InteractionEventHandler>())
+                        selectable.gameObject.AddComponent<InteractionEventHandler>();
+                }
+            }
+            Found(selectables);
         }
     }
 }

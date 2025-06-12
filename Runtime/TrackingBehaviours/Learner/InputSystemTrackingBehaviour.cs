@@ -7,7 +7,7 @@ namespace OmiLAXR.TrackingBehaviours.Learner
 {
     [AddComponentMenu("OmiLAXR / 3) Tracking Behaviours / Input System Tracking Behaviour"), 
      Description("Tracks XR device inputs by using <InputSystem> instance.")]
-    public class InputSystemTrackingBehaviour : ObjectlessTrackingBehaviour
+    public class InputSystemTrackingBehaviour : TrackingBehaviour
     {
         public struct InputTrackingBehaviourArgs
         {

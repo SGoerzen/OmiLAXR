@@ -18,10 +18,5 @@ namespace OmiLAXR
             ObjectName,
             HierarchyTreePath
         }
-
-        private void Awake()
-        {
-            DontDestroyOnLoad(this);
-        }
     }
 }

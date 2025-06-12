@@ -1,46 +1,99 @@
+using System;
+using System.Collections.Generic;
+using System.Linq;
 using OmiLAXR.TrackingBehaviours;
 using UnityEngine;
+using Object = UnityEngine.Object;
 
 namespace OmiLAXR.Composers
 {
+    [DefaultExecutionOrder(-100)]
     public abstract class Composer<T> : DataProviderPipelineComponent, IComposer
         where T : PipelineComponent, ITrackingBehaviour
     {
-        [HideInInspector] public T trackingBehaviour;
+        [HideInInspector] public T[] trackingBehaviours;
 
-        private void OnEnable()
+        protected override void OnEnable()
         {
-        }
+            base.OnEnable();
 
-        public bool IsEnabled => enabled;
+            _name = GetType().Name.Replace("Composer", "");
+
+            trackingBehaviours = GetTrackingBehaviours<T>();
+
+            foreach (var trackingBehaviour in trackingBehaviours)
+                Compose(trackingBehaviour);
+
+            HandleWaitList();
+        }
 
         public abstract Author GetAuthor();
+
+        private string _name;
+        public virtual string GetName() => _name;
         public virtual bool IsHigherComposer => false;
-        public event ComposerAction<IStatement, bool> AfterComposed;
-        
-        protected static TB GetTrackingBehaviour<TB>(bool includeInactive = false)
-            where TB : Object, ITrackingBehaviour => FindObject<TB>(includeInactive);
-        
+        public event ComposerAction<IStatement> AfterComposed;
+
+        private List<IStatement> _waitList = new List<IStatement>();
+
+        protected static TB[] GetTrackingBehaviours<TB>(bool includeInactive = false)
+            where TB : Object, ITrackingBehaviour => FindObjects<TB>(includeInactive);
+
+        [Obsolete(
+            "Use SendStatement(ITrackingBehaviour, IStatement) instead. Immediate is not needed anymore due efficient thread queue handling.",
+            true)]
+        protected void SendStatement(ITrackingBehaviour statementOwner, IStatement statement, bool immediate)
+            => SendStatement(statementOwner, statement);
+
+        protected void SendStatement(ITrackingBehaviour statementOwner, IStatement statement)
+        {
+            statement.SetOwner(statementOwner);
+            statement.SetComposer(this);
+
+            if (AfterComposed?.GetInvocationList().Length < 1)
+            {
+                print("Enqueued statement: " + statement.ToShortString() + " in waitlist.");
+                _waitList.Add(statement);
+                return;
+            }
+            
+            AfterComposed?.Invoke(this, statement);
+        }
+
+        [Obsolete(
+            "Use SendStatement(ITrackingBehaviour, IStatement) instead. Immediate is not needed anymore due efficient thread queue handling.",
+            true)]
+        protected void SendStatementImmediate(ITrackingBehaviour statementOwner, IStatement statement)
+            => SendStatement(statementOwner, statement, immediate: true);
+
+        [Obsolete("Use SendStatement(ITrackingBehaviour, IStatement, bool) instead.")]
         protected void SendStatement(IStatement statement, bool immediate = false)
         {
-            if (!IsEnabled)
-                return;
-            AfterComposed?.Invoke(this, statement, immediate);
+            SendStatement(trackingBehaviours.First(), statement, immediate);
         }
+
+        [Obsolete("Use SendStatementImmediate(ITrackingBehaviour, IStatement) instead.")]
         protected void SendStatementImmediate(IStatement statement)
             => SendStatement(statement, immediate: true);
 
-        protected override void Awake()
+        protected abstract void Compose(T tb);
+
+        private void HandleWaitList()
         {
-            base.Awake();
-            
-            if (!IsEnabled)
-                return;
-            trackingBehaviour = GetTrackingBehaviour<T>(false);
-            if (trackingBehaviour) 
-                Compose(trackingBehaviour);
+            if (_waitList.Count > 0 && AfterComposed?.GetInvocationList().Length > 0)
+            {
+                foreach (var statement in _waitList)
+                {
+                    AfterComposed?.Invoke(this, statement);
+                }
+
+                _waitList.Clear();
+            }
         }
 
-        protected abstract void Compose(T tb);
+        private void Update()
+        {
+            HandleWaitList();
+        }
     }
 }
