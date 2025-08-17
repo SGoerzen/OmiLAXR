@@ -1,3 +1,8 @@
+/*
+* SPDX-License-Identifier: AGPL-3.0-or-later
+* Copyright (C) 2025 Sergej Görzen <sergej.goerzen@gmail.com>
+* This file is part of OmiLAXR.
+*/
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -7,49 +12,138 @@ using Object = UnityEngine.Object;
 
 namespace OmiLAXR.Composers
 {
+    /// <summary>
+    /// Abstract base class for statement composers that process tracking behaviors.
+    /// Manages statement caching, composition, and delivery to endpoints.
+    /// </summary>
+    /// <typeparam name="T">Type of tracking behavior this composer handles</typeparam>
     [DefaultExecutionOrder(-100)]
     public abstract class Composer<T> : DataProviderPipelineComponent, IComposer
         where T : PipelineComponent, ITrackingBehaviour
     {
+        /// <summary>
+        /// Array of tracking behaviors this composer is processing
+        /// </summary>
         [HideInInspector] public T[] trackingBehaviours;
-
+        
+        /// <summary>
+        /// Cache for storing statements with string keys
+        /// </summary>
+        private readonly Dictionary<string, IStatement> _statementCache = new Dictionary<string, IStatement>();
+        
+        /// <summary>
+        /// Cache for storing statements with integer keys
+        /// </summary>
+        private readonly Dictionary<int, IStatement> _statementCacheInt = new Dictionary<int, IStatement>();
+        
+        /// <summary>
+        /// Stores a statement in cache with string key
+        /// </summary>
+        public void StoreStatement(string key, IStatement statement)
+            => _statementCache[key] = statement;
+            
+        /// <summary>
+        /// Stores a statement in cache with integer key
+        /// </summary>
+        public void StoreStatement(int key, IStatement statement)
+            => _statementCacheInt[key] = statement;
+        
+        /// <summary>
+        /// Retrieves cached statement by string key, returns null if not found
+        /// </summary>
+        public IStatement RestoreStatement(string key)
+            => _statementCache.TryGetValue(key, out var statement) ? statement : null;
+            
+        /// <summary>
+        /// Retrieves cached statement by integer key, returns null if not found
+        /// </summary>
+        public IStatement RestoreStatement(int key)
+            => _statementCacheInt.TryGetValue(key, out var statement) ? statement : null;
+        
+        /// <summary>
+        /// Initializes the composer, finds tracking behaviors, and starts composition
+        /// </summary>
         protected override void OnEnable()
         {
             base.OnEnable();
 
+            // Generate composer name from class name
             _name = GetType().Name.Replace("Composer", "");
 
+            // Find all tracking behaviors of the specified type
             trackingBehaviours = GetTrackingBehaviours<T>();
 
+            // Start composing statements for each tracking behavior
             foreach (var trackingBehaviour in trackingBehaviours)
                 Compose(trackingBehaviour);
 
+            // Process any queued statements
             HandleWaitList();
         }
 
+        /// <summary>
+        /// Gets author information for statements created by this composer
+        /// </summary>
         public abstract Author GetAuthor();
 
+        /// <summary>
+        /// Cached composer name derived from class name
+        /// </summary>
         private string _name;
+        
+        /// <summary>
+        /// Returns the display name of this composer
+        /// </summary>
         public virtual string GetName() => _name;
+        
+        /// <summary>
+        /// Returns the logical grouping for this composer
+        /// </summary>
+        public virtual ComposerGroup GetGroup() => ComposerGroup.Other;
+
+        /// <summary>
+        /// Indicates if this is a higher-level composer that processes other composers' output
+        /// </summary>
         public virtual bool IsHigherComposer => false;
+        
+        /// <summary>
+        /// Event fired after a statement has been composed and is ready for delivery
+        /// </summary>
         public event ComposerAction<IStatement> AfterComposed;
 
-        private List<IStatement> _waitList = new List<IStatement>();
+        /// <summary>
+        /// Queue for statements waiting for event handlers to be registered
+        /// </summary>
+        private readonly List<IStatement> _waitList = new List<IStatement>();
 
+        /// <summary>
+        /// Finds all tracking behaviors of specified type in the scene
+        /// </summary>
+        /// <param name="includeInactive">Whether to include inactive GameObjects</param>
         protected static TB[] GetTrackingBehaviours<TB>(bool includeInactive = false)
             where TB : Object, ITrackingBehaviour => FindObjects<TB>(includeInactive);
 
+        /// <summary>
+        /// Obsolete: Use SendStatement(ITrackingBehaviour, IStatement) instead
+        /// </summary>
         [Obsolete(
             "Use SendStatement(ITrackingBehaviour, IStatement) instead. Immediate is not needed anymore due efficient thread queue handling.",
             true)]
         protected void SendStatement(ITrackingBehaviour statementOwner, IStatement statement, bool immediate)
             => SendStatement(statementOwner, statement);
 
+        /// <summary>
+        /// Sends a composed statement for delivery to endpoints
+        /// </summary>
+        /// <param name="statementOwner">The tracking behavior that generated this statement</param>
+        /// <param name="statement">The composed statement to send</param>
         protected void SendStatement(ITrackingBehaviour statementOwner, IStatement statement)
         {
+            // Set ownership and composer information
             statement.SetOwner(statementOwner);
             statement.SetComposer(this);
 
+            // If no handlers registered, queue statement for later
             if (AfterComposed?.GetInvocationList().Length < 1)
             {
                 print("Enqueued statement: " + statement.ToShortString() + " in waitlist.");
@@ -57,29 +151,48 @@ namespace OmiLAXR.Composers
                 return;
             }
             
+            // Send statement to registered handlers
             AfterComposed?.Invoke(this, statement);
         }
 
+        /// <summary>
+        /// Obsolete: Use SendStatement(ITrackingBehaviour, IStatement) instead
+        /// </summary>
         [Obsolete(
             "Use SendStatement(ITrackingBehaviour, IStatement) instead. Immediate is not needed anymore due efficient thread queue handling.",
             true)]
         protected void SendStatementImmediate(ITrackingBehaviour statementOwner, IStatement statement)
             => SendStatement(statementOwner, statement, immediate: true);
 
+        /// <summary>
+        /// Obsolete: Use SendStatement(ITrackingBehaviour, IStatement, bool) instead
+        /// </summary>
         [Obsolete("Use SendStatement(ITrackingBehaviour, IStatement, bool) instead.")]
         protected void SendStatement(IStatement statement, bool immediate = false)
         {
             SendStatement(trackingBehaviours.First(), statement, immediate);
         }
 
+        /// <summary>
+        /// Obsolete: Use SendStatementImmediate(ITrackingBehaviour, IStatement) instead
+        /// </summary>
         [Obsolete("Use SendStatementImmediate(ITrackingBehaviour, IStatement) instead.")]
         protected void SendStatementImmediate(IStatement statement)
             => SendStatement(statement, immediate: true);
 
+        /// <summary>
+        /// Implements composition logic for the specific tracking behavior type.
+        /// Override this method to define how statements are created from tracking events.
+        /// </summary>
+        /// <param name="tb">The tracking behavior to compose statements for</param>
         protected abstract void Compose(T tb);
 
+        /// <summary>
+        /// Processes queued statements when event handlers become available
+        /// </summary>
         private void HandleWaitList()
         {
+            // Send all queued statements if handlers are now available
             if (_waitList.Count > 0 && AfterComposed?.GetInvocationList().Length > 0)
             {
                 foreach (var statement in _waitList)
@@ -91,6 +204,9 @@ namespace OmiLAXR.Composers
             }
         }
 
+        /// <summary>
+        /// Checks for queued statements each frame and processes them when handlers become available
+        /// </summary>
         private void Update()
         {
             HandleWaitList();

@@ -1,5 +1,40 @@
 # Changelog
 
+## [2.1.1] - 2025-08-17
+
+### Added
+- `StressLevelTrackingBehaviour` and `StressLevelProvider` for aggregating multiple `IStressInputProvider` sources (e.g. `HeartRateProvider`, future `FacialExpression`, or custom).
+- Example implementation: `StressLevelEstimator`.
+- Support for storing and restoring statements with `Composer.StoreStatement(string key, IStatement statement)` and `RestoreStatement(string key)`.
+- `AsyncEndpoint` base class for using `async/await` in endpoints, with `HandleSendingAsync` and `HandleSendingBatchAsync` overrides.
+- `BearerEndpoint` (based on `AsyncEndpoint`) using bearer tokens for authentication.
+- Unified authentication workflow via `AuthLoader<TEndpoint, TConfig>`:
+    - **WebGL:** checks remote JSON config via query (`?{filename}=https://...`), URL query parameters (`endpoint` and `token`), and `Application.streamingAssetsPath`.
+    - **Non-Web:** checks command-line args, local `{filename}.json`, `Application.persistentDataPath`, and `Application.streamingAssetsPath`.
+    - Includes `BearerAuthLoader` and `BasicAuthCredentialsLoader`.
+- Web compatibility utilities:
+    - Threads can be disabled via `useThreads = false` or `OMILAXR_THREADS_DISABLED` (default disabled on WebGL).
+    - `WebEndpoint` utilities for browser integration.
+    - `AsyncEndpoint` supports `UnityWebRequests`.
+- `virtual ComposerGroup GetGroup() => ComposerGroup.Other` for grouping composers by enum (`Other`, `System`, `Attention`, `Movement`, `Environment`, `Ppm`).
+- XML `<summary>` comments for documentation.
+- Menu item `OmiLAXR / Create 'bearer.json' file` to create configuration in `StreamingAssets`.
+- `Pipeline.OnQuit` event and `TrackingBehaviour.OnQuitPipeline` method.
+- `OnAppQuit` hook for pipeline components; shutdown order managed by `ApplicationShutdownManager` via `ShutdownOrder` attribute.
+- Endpoints configurable via `Consume(MapData config)` and retrievable via `Provide()`.
+
+### Changed
+- Asset view now refreshes automatically after using `Create '...' file` menu.
+- `Description` sections in the UI are collapsible.
+- License headers added to all files.
+
+### Fixed
+- `StatementPrinter` now works on WebGL.
+- Added `OnReleasedAnyButton` event to `InputSystemTrackingBehaviour`.
+- Corrected `Pipeline.GetAll()` return type to `Pipeline[]`.
+
+---
+
 ## [2.1.0] - 2025-06-12
 
 ### Added

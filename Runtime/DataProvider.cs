@@ -1,3 +1,8 @@
+/*
+* SPDX-License-Identifier: AGPL-3.0-or-later
+* Copyright (C) 2025 Sergej Görzen <sergej.goerzen@gmail.com>
+* This file is part of OmiLAXR.
+*/
 using System.Collections.Generic;
 using System.Linq;
 using OmiLAXR.Composers;
@@ -43,7 +48,7 @@ namespace OmiLAXR
         /// <summary>
         /// Extensions that can add functionality to the DataProvider without modifying its core implementation.
         /// </summary>
-        public List<IDataProviderExtension> Extensions = new List<IDataProviderExtension>();
+        public readonly List<IDataProviderExtension> Extensions = new List<IDataProviderExtension>();
         
         /// <summary>
         /// Retrieves the first composer of the specified type.
@@ -53,14 +58,14 @@ namespace OmiLAXR
         public T GetComposer<T>() where T : IComposer
             => Composers.OfType<T>().FirstOrDefault();
         
-        private bool _isInit = false;
+        private bool _isInit;
         
         /// <summary>
         /// Initializes the DataProvider by discovering and registering all available
         /// composers, higher composers, hooks, and endpoints in its children.
         /// Sets up event subscriptions for processing statements.
         /// </summary>
-        private void OnEnable()
+        protected override void OnEnable()
         {
             if (_isInit)
                 return;
@@ -118,7 +123,6 @@ namespace OmiLAXR
         /// </summary>
         /// <param name="sender">The composer that generated the statement</param>
         /// <param name="statement">The data/statement to be processed</param>
-        /// <param name="sendImmediate">Whether to send the statement immediately or queue it</param>
         private void HandleStatement(IComposer sender, IStatement statement)
         {
             // First, allow higher composers to examine and potentially aggregate the statement

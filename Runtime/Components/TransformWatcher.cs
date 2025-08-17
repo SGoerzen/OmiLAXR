@@ -1,8 +1,13 @@
+/*
+* SPDX-License-Identifier: AGPL-3.0-or-later
+* Copyright (C) 2025 Sergej Görzen <sergej.goerzen@gmail.com>
+* This file is part of OmiLAXR.
+*/
 using System;
 using UnityEngine;
 using UnityEngine.Events;
 
-namespace OmiLAXR
+namespace OmiLAXR.Components
 {
     /// <summary>
     /// Monitors a GameObject's transform for significant changes in position, rotation, and scale.

@@ -1,3 +1,8 @@
+/*
+* SPDX-License-Identifier: AGPL-3.0-or-later
+* Copyright (C) 2025 Sergej Görzen <sergej.goerzen@gmail.com>
+* This file is part of OmiLAXR.
+*/
 using System;
 using System.Collections;
 using UnityEngine;
@@ -25,13 +30,13 @@ namespace OmiLAXR.Schedules
         /// Reference to the MonoBehaviour that will own and execute the coroutine.
         /// This is necessary because only MonoBehaviours can start coroutines in Unity.
         /// </summary>
-        protected readonly MonoBehaviour Owner;
+        private readonly MonoBehaviour _owner;
         
         /// <summary>
         /// Reference to the running coroutine. Null when the scheduler is not active.
         /// Used to keep track of and stop the currently running coroutine when needed.
         /// </summary>
-        protected Coroutine Coroutine;
+        private Coroutine _coroutine;
 
         /// <summary>
         /// The handler that receives scheduling events (start, tick, end).
@@ -41,9 +46,9 @@ namespace OmiLAXR.Schedules
         public event Action OnTickStart;
         public event Action OnTickEnd;
 
-        private Settings _settings;
+        private readonly Settings _settings;
 
-        private bool _isRunning = false;
+        private bool _isRunning;
 
         /// <summary>
         /// Initializes a new instance of the Scheduler class.
@@ -51,10 +56,11 @@ namespace OmiLAXR.Schedules
         /// <param name="owner">The MonoBehaviour that will own and execute the coroutine.</param>
         /// <param name="onTickStart"></param>
         /// <param name="onTickEnd"></param>
+        /// <param name="settings"></param>
         /// <param name="onTick"></param>
         protected Scheduler(MonoBehaviour owner, Settings settings, Action onTick, Action onTickStart = null, Action onTickEnd = null)
         {
-            Owner = owner;
+            _owner = owner;
             OnTick += onTick;
             OnTickStart += onTickStart;
             OnTickEnd += onTickEnd;
@@ -69,14 +75,13 @@ namespace OmiLAXR.Schedules
         /// Starts the scheduler. If already running, stops the current scheduler first.
         /// Calls the handler's OnTickStart method and initiates the coroutine.
         /// </summary>
-        /// <param name="immediate">If true, executes the callback immediately before the first scheduled event. Default is true.</param>
         public void Start()
         {
             if (_isRunning)
                 return;
             _settings.isActive = true;
             OnTickStart?.Invoke();
-            Coroutine = Owner.StartCoroutine(Run(_settings.tickImmediate));
+            _coroutine = _owner.StartCoroutine(Run(_settings.tickImmediate));
             _isRunning = true;
         }
         
@@ -90,10 +95,10 @@ namespace OmiLAXR.Schedules
                 return;
             OnTickEnd?.Invoke();
             _settings.isActive = false;
-            if (Coroutine != null)
+            if (_coroutine != null)
             {
-                Owner.StopCoroutine(Coroutine);
-                Coroutine = null;
+                _owner.StopCoroutine(_coroutine);
+                _coroutine = null;
             }
             _isRunning = false;
         }
