@@ -1,3 +1,8 @@
+/*
+* SPDX-License-Identifier: AGPL-3.0-or-later
+* Copyright (C) 2025 Sergej Görzen <sergej.goerzen@gmail.com>
+* This file is part of OmiLAXR.
+*/
 using System.ComponentModel;
 using UnityEngine;
 
@@ -7,59 +12,110 @@ using UnityEngine.InputSystem;
 
 namespace OmiLAXR.TrackingBehaviours.Learner
 {
+    /// <summary>
+    /// Tracks mouse input events including clicks, wheel scrolling, and movement.
+    /// Supports both legacy Input Manager and new Input System.
+    /// </summary>
     [AddComponentMenu("OmiLAXR / 3) Tracking Behaviours / Mouse Tracking Behaviour")]
     [Description("Tracks mouse clicks and wheel.")]
     public class MouseTrackingBehaviour : TrackingBehaviour
     {
+        /// <summary>
+        /// Contains information about a mouse event including button name and position.
+        /// </summary>
         public struct MouseTrackingBehaviourArgs
         {
-            public string mouseButton;
-            public Vector3 mousePosition;
+            /// <summary>
+            /// Name of the mouse button that triggered the event.
+            /// </summary>
+            public readonly string MouseButton;
+            
+            /// <summary>
+            /// Screen position where the mouse event occurred.
+            /// </summary>
+            public Vector3 MousePosition;
 
+            /// <summary>
+            /// Initializes mouse tracking event arguments.
+            /// </summary>
+            /// <param name="name">Button name (left, right, middle, wheel)</param>
+            /// <param name="position">Mouse position in screen coordinates</param>
             public MouseTrackingBehaviourArgs(string name, Vector3 position)
             {
-                mouseButton = name;
-                mousePosition = position;
+                MouseButton = name;
+                MousePosition = position;
             }
         }
 
+        /// <summary>
+        /// Event triggered when a mouse button is clicked (pressed and released).
+        /// </summary>
         [Gesture("Mouse"), Action("Click")]
-        public TrackingBehaviourEvent<MouseTrackingBehaviourArgs> OnClicked =
+        public readonly TrackingBehaviourEvent<MouseTrackingBehaviourArgs> OnClicked =
             new TrackingBehaviourEvent<MouseTrackingBehaviourArgs>();
 
+        /// <summary>
+        /// Event triggered when a mouse button is pressed down.
+        /// </summary>
         [Gesture("Mouse"), Action("Press")]
-        public TrackingBehaviourEvent<MouseTrackingBehaviourArgs> OnPressedDown =
+        public readonly TrackingBehaviourEvent<MouseTrackingBehaviourArgs> OnPressedDown =
             new TrackingBehaviourEvent<MouseTrackingBehaviourArgs>();
 
+        /// <summary>
+        /// Event triggered when the mouse wheel is scrolled.
+        /// </summary>
         [Gesture("Mouse"), Action("Scroll")]
-        public TrackingBehaviourEvent<MouseTrackingBehaviourArgs, float> OnScrolledWheel =
+        public readonly TrackingBehaviourEvent<MouseTrackingBehaviourArgs, float> OnScrolledWheel =
             new TrackingBehaviourEvent<MouseTrackingBehaviourArgs, float>();
 
+        /// <summary>
+        /// Event triggered when the mouse position changes significantly.
+        /// </summary>
         [Gesture("Mouse"), Action("Move")]
         public TrackingBehaviourEvent<Vector3, Vector3> OnMousePositionChanged =
             new TrackingBehaviourEvent<Vector3, Vector3>();
 
+        // Button state tracking for detecting press/release transitions
         private bool _isLeftDown;
         private bool _isRightDown;
         private bool _isWheelDown;
 
-        public float movementThreshold = 3.0f; // Threshold in pixels
+        /// <summary>
+        /// Minimum movement distance in pixels to trigger position change events.
+        /// </summary>
+        public float movementThreshold = 3.0f;
         private Vector3 _lastMousePosition;
 
-        private float _mouseWheel = 0;
+        private float _mouseWheel;
+        /// <summary>
+        /// Minimum wheel scroll delta to trigger scroll events.
+        /// </summary>
         public float mouseWheelThreshold = 0.5f;
 
+        /// <summary>
+        /// Button names corresponding to mouse button indices.
+        /// </summary>
         private static readonly string[] ButtonNames = { "left", "right", "middle" };
 
+        /// <summary>
+        /// Initialize mouse position tracking.
+        /// </summary>
         protected virtual void Start()
         {
             _lastMousePosition = GetMousePosition();
         }
 
+        /// <summary>
+        /// Handles mouse button state changes and triggers appropriate events.
+        /// </summary>
+        /// <param name="index">Button index (0=left, 1=right, 2=middle)</param>
+        /// <param name="wasDown">Previous button state</param>
+        /// <param name="position">Current mouse position</param>
         private void HandleMouseClick(int index, ref bool wasDown, Vector3 position)
         {
             bool isDown = false;
 #if ENABLE_INPUT_SYSTEM
+            // Use Input System if available
             if (Mouse.current != null)
             {
                 switch (index)
@@ -70,32 +126,40 @@ namespace OmiLAXR.TrackingBehaviours.Learner
                 }
             }
 #else
+            // Fall back to legacy Input Manager
             isDown = Input.GetMouseButton(index);
 #endif
 
-            var name = ButtonNames[index];
+            var n = ButtonNames[index];
 
             switch (wasDown)
             {
+                // Button was just pressed
                 case false when isDown:
-                    OnPressedDown?.Invoke(this, new MouseTrackingBehaviourArgs(name, position));
+                    OnPressedDown?.Invoke(this, new MouseTrackingBehaviourArgs(n, position));
                     break;
+                // Button was just released (clicked)
                 case true when !isDown:
-                    OnClicked?.Invoke(this, new MouseTrackingBehaviourArgs(name, position));
+                    OnClicked?.Invoke(this, new MouseTrackingBehaviourArgs(n, position));
                     break;
             }
 
             wasDown = isDown;
         }
 
+        /// <summary>
+        /// Updates mouse input tracking each frame.
+        /// </summary>
         private void Update()
         {
             var mousePos = GetMousePosition();
+            
+            // Check all mouse buttons for state changes
             HandleMouseClick(0, ref _isLeftDown, mousePos);
             HandleMouseClick(1, ref _isRightDown, mousePos);
             HandleMouseClick(2, ref _isWheelDown, mousePos);
 
-            // Detect mouse wheel
+            // Detect mouse wheel scrolling
             float curMouseWheel = GetMouseScroll();
             float mouseWheelDis = Mathf.Abs(_mouseWheel - curMouseWheel);
             if (mouseWheelDis > mouseWheelThreshold)
@@ -104,7 +168,7 @@ namespace OmiLAXR.TrackingBehaviours.Learner
                 OnScrolledWheel?.Invoke(this, new MouseTrackingBehaviourArgs("wheel", mousePos), curMouseWheel);
             }
 
-            // Detect mouse move
+            // Detect significant mouse movement
             float distance = Vector3.Distance(mousePos, _lastMousePosition);
             if (distance > movementThreshold)
             {
@@ -113,6 +177,10 @@ namespace OmiLAXR.TrackingBehaviours.Learner
             }
         }
 
+        /// <summary>
+        /// Gets current mouse position using appropriate input system.
+        /// </summary>
+        /// <returns>Mouse position in screen coordinates</returns>
         private Vector3 GetMousePosition()
         {
 #if ENABLE_INPUT_SYSTEM
@@ -127,6 +195,10 @@ namespace OmiLAXR.TrackingBehaviours.Learner
 #endif
         }
 
+        /// <summary>
+        /// Gets current mouse scroll wheel delta.
+        /// </summary>
+        /// <returns>Scroll wheel delta value</returns>
         private float GetMouseScroll()
         {
 #if ENABLE_INPUT_SYSTEM

@@ -1,8 +1,13 @@
+/*
+* SPDX-License-Identifier: AGPL-3.0-or-later
+* Copyright (C) 2025 Sergej Görzen <sergej.goerzen@gmail.com>
+* This file is part of OmiLAXR.
+*/
 using System;
 using UnityEngine;
 using UnityEngine.EventSystems;
 
-namespace OmiLAXR
+namespace OmiLAXR.Components
 {
     /// <summary>
     /// Handles pointer interaction events for UI elements, supporting both mouse and XR interaction.
@@ -44,12 +49,12 @@ namespace OmiLAXR
         private float _pressStartTime;
 
         // Flags to track the current interaction state
-        private bool _isHovering = false;
-        private bool _isPressing = false;
+        private bool _isHovering;
+        private bool _isPressing;
         
         // Sum of how often the button was pressed inside a hover
-        private int _pressHoverSum = 0;
-        private int _pressTotalSum = 0;
+        private int _pressHoverSum;
+        private int _pressTotalSum;
 
         /// <summary>
         /// Event triggered when the pointer starts hovering over this element.

@@ -1,3 +1,9 @@
+/*
+* SPDX-License-Identifier: AGPL-3.0-or-later
+* Copyright (C) 2025 Sergej Görzen <sergej.goerzen@gmail.com>
+* This file is part of OmiLAXR.
+*/
+
 using System.Linq;
 using UnityEngine;
 using Object = UnityEngine.Object;
@@ -10,6 +16,10 @@ namespace OmiLAXR
     /// </summary>
     public abstract class PipelineComponent : MonoBehaviour, IPipelineComponent
     {
+        protected virtual void OnEnable()
+        {
+            ApplicationShutdownManager.Register(this);
+        }
         /// <summary>
         /// Finds the first object of the specified type in the scene.
         /// Handles different Unity versions by using the appropriate API calls.
@@ -76,6 +86,11 @@ namespace OmiLAXR
                 instance = FindObjectOfType<T>();
             return instance;
 #endif
+        }
+
+        protected virtual void OnAppQuit()
+        {
+            // do nothing
         }
     }
 }
