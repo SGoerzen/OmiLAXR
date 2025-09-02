@@ -1,5 +1,12 @@
 # Changelog
 
+## [2.1.2] - 2025-08-25
+
+### Fixed
+- Made `GetHeartRate()` virtual to restore backwards compatibility for custom Heart Rate modules.
+
+---
+
 ## [2.1.1] - 2025-08-17
 
 ### Added
