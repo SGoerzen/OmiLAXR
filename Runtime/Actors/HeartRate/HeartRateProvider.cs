@@ -27,7 +27,7 @@ namespace OmiLAXR.Actors.HeartRate
         /// This value is updated by derived classes through the SetHeartRate method.
         /// </summary>
         /// <returns>Current heart rate in BPM, or 0 if no reading is available</returns>
-        public int GetHeartRate() => heartRate;
+        public virtual int GetHeartRate() => heartRate;
 
         /// <summary>
         /// Identifier name for this data provider within the stress level system.
