@@ -6,7 +6,7 @@
 #if UNITY_EDITOR
 using System.ComponentModel;
 using System.Reflection;
-using OmiLAXR.Enums;
+using OmiLAXR.Types;
 using UnityEditor;
 using UnityEngine;
 

@@ -17,7 +17,7 @@ namespace OmiLAXR.Listeners
     /// </summary>
     [AddComponentMenu("OmiLAXR / 1) Listeners / <TransformWatcher> Objects Listener")]
     [Description("Provides all <TransformWatcher> components to pipeline.")]
-    public class TransformWatcherListener : Listener
+    public sealed class TransformWatcherListener : Listener
     {
         /// <summary>
         /// Initiates detection of all TransformWatcher components in the scene.

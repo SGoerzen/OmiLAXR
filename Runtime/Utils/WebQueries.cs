@@ -11,7 +11,7 @@ namespace OmiLAXR.Utils
     /// Utility class for parsing and managing URL query parameters.
     /// Provides easy access to query string key-value pairs from a given URL.
     /// </summary>
-    public class WebQueries
+    public sealed class WebQueries
     {
         /// <summary>
         /// Dictionary storing parsed query parameters.

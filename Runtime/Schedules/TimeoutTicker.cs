@@ -13,48 +13,62 @@ namespace OmiLAXR.Schedules
     /// A scheduler that executes a single delayed action after a specified timeout.
     /// Useful for deferring execution rather than repeating it periodically.
     /// </summary>
-    public class TimeoutTicker : Scheduler
+    [CreateAssetMenu(
+        fileName = "TimeoutTicker",
+        menuName = "OmiLAXR/Scheduler/TimeoutTicker",
+        order = 2)]
+    public sealed class TimeoutTicker : Scheduler
     {
-        [Serializable]
-        public new class Settings : Scheduler.Settings
-        {
-            [Tooltip("Time in seconds before the action is triggered."), Min(0.01f)]
-            public float timeoutSeconds = 1.0f;
-        }
-        
-        private readonly Settings _settings;
+        [Tooltip("Time in seconds before the action is triggered."), Min(0.01f)]
+        public float timeoutSeconds = 1.0f;
 
         /// <summary>
-        /// Creates a TimeoutTicker that triggers a one-time action after a delay.
+        /// Runtime initialization for the TimeoutTicker.
         /// </summary>
-        /// <param name="owner">The MonoBehaviour responsible for running the coroutine.</param>
-        /// <param name="settings">Configuration for the timeout, including delay and activation flag.</param>
-        /// <param name="onTick">The callback to invoke after the timeout.</param>
-        /// <param name="onTickStart">Optional callback before waiting starts.</param>
-        /// <param name="onTickEnd">Optional callback after execution completes.</param>
-        public TimeoutTicker(MonoBehaviour owner, Settings settings, Action onTick, Action onTickStart = null, Action onTickEnd = null)
-            : base(owner, settings, onTick, onTickStart, onTickEnd)
+        public void Init(
+            MonoBehaviour owner,
+            float timeoutSeconds,
+            Action onTick,
+            Action onTickStart = null,
+            Action onTickEnd = null,
+            bool runImmediate = false)
         {
-            _settings = settings;
+            this.timeoutSeconds = timeoutSeconds;
+            base.Init(owner, onTick, onTickStart, onTickEnd, runImmediate);
         }
 
         /// <summary>
         /// Executes the scheduled action once after the configured timeout.
         /// </summary>
-        /// <returns>An IEnumerator for Unity's coroutine system.</returns>
         protected override IEnumerator Run()
         {
-            if (!_settings.isActive)
+            if (!isActive)
                 yield break;
 
             TriggerOnTickStart();
 
-            yield return new WaitForSeconds(_settings.timeoutSeconds);
+            yield return new WaitForSeconds(timeoutSeconds);
 
-            if (_settings.isActive)
+            if (isActive)
                 TriggerOnTick();
 
             TriggerOnTickEnd();
+        }
+
+        /// <summary>
+        /// Factory for programmatic creation.
+        /// </summary>
+        public static TimeoutTicker Create(
+            MonoBehaviour owner,
+            float timeoutSeconds,
+            Action onTick,
+            Action onTickStart = null,
+            Action onTickEnd = null,
+            bool runImmediate = false)
+        {
+            var ticker = CreateInstance<TimeoutTicker>();
+            ticker.Init(owner, timeoutSeconds, onTick, onTickStart, onTickEnd, runImmediate);
+            return ticker;
         }
     }
 }

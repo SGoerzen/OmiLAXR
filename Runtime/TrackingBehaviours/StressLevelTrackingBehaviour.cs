@@ -24,17 +24,17 @@ namespace OmiLAXR.TrackingBehaviours
         /// <summary>
         /// Event triggered whenever the stress level value changes.
         /// </summary>
-        public readonly TrackingBehaviourEvent<float> OnStressLevelUpdated = new TrackingBehaviourEvent<float>();
+        public readonly TrackingBehaviourEvent<float, float> OnStressLevelUpdated = new TrackingBehaviourEvent<float, float>();
         
         /// <summary>
         /// Event triggered when stress level increases beyond the change threshold.
         /// </summary>
-        public readonly TrackingBehaviourEvent<float> OnStressLevelIncreased = new TrackingBehaviourEvent<float>();
+        public readonly TrackingBehaviourEvent<float, float> OnStressLevelIncreased = new TrackingBehaviourEvent<float, float>();
         
         /// <summary>
         /// Event triggered when stress level decreases beyond the change threshold.
         /// </summary>
-        public readonly TrackingBehaviourEvent<float> OnStressLevelDecreased = new TrackingBehaviourEvent<float>();
+        public readonly TrackingBehaviourEvent<float, float> OnStressLevelDecreased = new TrackingBehaviourEvent<float, float>();
         
         /// <summary>
         /// Event triggered when stress level crosses into high stress range (>0.75).
@@ -79,16 +79,17 @@ namespace OmiLAXR.TrackingBehaviours
             // Skip processing if no significant change
             if (Math.Abs(current - _lastLevel) < 0.001f)
                 return;
-            
-            // Always notify of any stress level update
-            OnStressLevelUpdated?.Invoke(this, current);
-
             // Check for significant increases or decreases
             var delta = current - _lastLevel;
+            
+            // Always notify of any stress level update
+            OnStressLevelUpdated?.Invoke(this, current, delta);
+
+    
             if (delta > changeThreshold)
-                OnStressLevelIncreased?.Invoke(this, current);
+                OnStressLevelIncreased?.Invoke(this, current, delta);
             else if (delta < -changeThreshold)
-                OnStressLevelDecreased?.Invoke(this, current);
+                OnStressLevelDecreased?.Invoke(this, current, delta);
 
             // Check for stress state transitions
             if (current > 0.75f && !_isStressed)

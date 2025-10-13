@@ -3,6 +3,9 @@
 * Copyright (C) 2025 Sergej Görzen <sergej.goerzen@gmail.com>
 * This file is part of OmiLAXR.
 */
+
+using System;
+using OmiLAXR.Schedules;
 using UnityEngine;
 
 namespace OmiLAXR
@@ -15,7 +18,7 @@ namespace OmiLAXR
     [DefaultExecutionOrder(-99999999)] // Execute as early as possible
     [DisallowMultipleComponent] // Enforce singleton pattern at component level
     [AddComponentMenu("OmiLAXR / Global Settings")]
-    public class GlobalSettings : PipelineComponent
+    public sealed class GlobalSettings : PipelineComponent
     {
         /// <summary>
         /// Cached singleton instance for fast access across the system.
@@ -27,7 +30,28 @@ namespace OmiLAXR
         /// Automatically locates the instance in the scene if not already cached.
         /// </summary>
         public static GlobalSettings Instance => GetInstance(ref _instance);
+
+        [SerializeField]
+        private Scheduler globalScheduler;
+
+        public Scheduler GetScheduler()
+        {
+            if (!globalScheduler)
+            {
+                DebugLog.OmiLAXR.Warning("Cannot find Global Scheduler. Please assign one to <GlobalSettings>. As fallback RealtimeScheduler is chosen.");
+                globalScheduler = RealtimeTicker.Create(this);
+            }
+            if (!globalScheduler.owner)
+                globalScheduler.owner = this;
+            return globalScheduler;
+        }
         
+        private void Reset()
+        {
+            if (!globalScheduler)
+                globalScheduler = RealtimeTicker.Create(this);
+        }
+
         /// <summary>
         /// Controls how object names are resolved for tracking identification.
         /// Affects all tracking behaviors unless overridden by CustomTrackingName components.

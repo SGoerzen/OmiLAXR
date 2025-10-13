@@ -1,5 +1,57 @@
 # Changelog
 
+## [2.2.0] - 2025-10-13
+
+### Added
+- **Area Detection**:
+  - Neue Komponenten `Area` und `Room` zur Detektion von Bereichen mittels `Collider`, inklusive `OnEnter` und `OnLeave` Events.
+  - `AreaTrackingBehaviour` implementiert zur Verwaltung von Area-bezogenen Events.
+
+- **Schedulers**:
+  - Einführung von `ScheduledTrackingBehaviour`, dessen Lebenszyklus durch auswählbare Scheduler-Komponenten (`Realtime`, `Interval`, `Timeout`) bestimmt wird.
+  - Standardmäßig wird der `RealtimeScheduler` (Unity Update Cycle) verwendet.
+
+- **Gaze Tracking (GT)**:
+  - `GazeDetector`-Komponente zur effizienten Strahlverfolgung und `GazeHit`-Erkennung.
+  - Abstrakte `GazeTrackingBehaviour` mit Unterstützung für Ereignisse wie `OnFixated`, `OnGazeEntered`, `OnGazeLeft`.
+  - Austauschbare `FixationLogic` als `ScriptableObject`.
+  - Implementierung eines `<Camera> Gaze Tracking Behaviour` für Blickerkennung über die Hauptkamera.
+
+- **Eye Tracking (ET)**:
+  - Erweiterung der Gaze Tracking-Funktionalität.
+  - Abstrakte Klasse `EyeCalibrator` zur Implementierung eigener Kalibrierungen.
+  - SDK-unabhängige Datenstrukturen für Augen- und Blickdaten.
+  - `EyeGazeTrackingBehaviour` mit austauschbarer `Saccade`- und `Pursuit`-Logik.
+  - Zusätzliche Events: `OnSaccaded`, `OnPursuit` (für links, rechts oder beide Augen).
+  - Verwendet zwei `GazeDetector`-Komponenten zur Repräsentation beider Augen.
+  - *Hinweis: Diese Funktion befindet sich in der Beta-Phase und wird in einem bevorstehenden Forschungsprojekt evaluiert (getestet mit Meta Quest Pro und MetaXR).*
+
+- **Facial Tracking**:
+  - Abstrakte `FacialTrackingBehaviour` zur Verarbeitung von Gesichtsdaten.
+  - Detektion von Emotionen durch austauschbare `ScriptableObjects` (z. B. `Anger`, `Disgust`, `Fear`, `Happiness`, `Sadness`, `Smile`, `Surprise`).
+  - *Hinweis: Proof of Concept (Alpha), bisher keine Evaluation erfolgt.*
+
+- **Heart Rate**:
+  - Erste Implementierung der Herzfrequenz-Varianz.
+
+- **InteractableTrackingBehaviour**:
+  - Neues Event: `OnPointed`.
+
+- **UiTrackingBehaviour**:
+  - Neue Events: `PressStart`, `PressEnd`, `HoverStart`, `HoverEnd`.
+
+- Hinzugefügter `SdkProvider` zur Bereitstellung von SDK-Informationen für Datenexport.
+- Neue generische Typen wie `Frustum`, `Duration`, etc.
+
+### Changed
+- Kleinere Optimierungen an mehreren Komponenten und Verhaltensweisen.
+
+### Fixed
+- [Windows] Behebung von URI-Problemen beim Einsatz von Flatten CSV.
+- Behebung eines `IOException` (Sharing violation on path) bei paralleler Nutzung mehrerer OmiLAXR-Instanzen.
+
+---
+
 ## [2.1.2] - 2025-08-25
 
 ### Fixed

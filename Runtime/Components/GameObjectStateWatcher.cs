@@ -13,7 +13,7 @@ namespace OmiLAXR.Components
     /// Component that monitors and broadcasts GameObject state changes.
     /// Provides UnityEvents that can be subscribed to for handling destruction, enabling, and disabling events.
     /// </summary>
-    public class GameObjectStateWatcher : MonoBehaviour
+    public sealed class GameObjectStateWatcher : MonoBehaviour
     {
         /// <summary>
         /// UnityEvent invoked when the GameObject is destroyed.

@@ -21,7 +21,7 @@ namespace OmiLAXR.Filters
     /// </summary>
     [AddComponentMenu("OmiLAXR / 2) Filters / Unity Components Filter")]
     [Description("Filters out system relevant components that do need to be tracked.")]
-    public class UnityComponentsFilter : Filter
+    public sealed class UnityComponentsFilter : Filter
     {
         /// <summary>
         /// Array of component types that should be excluded from tracking.

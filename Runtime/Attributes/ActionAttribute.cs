@@ -10,7 +10,7 @@ namespace OmiLAXR
     /// Can be applied multiple times to the same field.
     /// </summary>
     [System.AttributeUsage(System.AttributeTargets.Field, AllowMultiple = true)]
-    public class ActionAttribute : System.Attribute
+    public sealed class ActionAttribute : System.Attribute
     {
         /// <summary>
         /// The name of the action associated with this attribute.

@@ -64,5 +64,11 @@ namespace OmiLAXR.TrackingBehaviours.Learner
         /// </summary>
         [Gesture("XRController"), Action("Grabbed")]
         public TrackingBehaviourEvent<InteractableEventArgs> OnGrabbed = new TrackingBehaviourEvent<InteractableEventArgs>();
+        
+        /// <summary>
+        /// Event triggered when an object is pointed at by the controller.
+        /// </summary>
+        [Gesture("XRController"), Action("Pointed")]
+        public TrackingBehaviourEvent<InteractableEventArgs> OnPointed = new TrackingBehaviourEvent<InteractableEventArgs>();
     }
 }

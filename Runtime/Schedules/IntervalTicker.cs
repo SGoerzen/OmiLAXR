@@ -10,68 +10,78 @@ using UnityEngine;
 namespace OmiLAXR.Schedules
 {
     /// <summary>
-    /// Utility class for executing actions at fixed time intervals using Unity coroutines.
-    /// Provides functionality to start, stop, and control timing of periodic callback execution.
-    /// Implements the Scheduler abstract class to provide interval-based scheduling.
+    /// Executes actions at fixed time intervals using Unity coroutines.
+    /// Interval and tick count can be set as asset fields.
     /// </summary>
-    public class IntervalTicker : Scheduler
+    [CreateAssetMenu(
+        fileName = "IntervalTicker",
+        menuName = "OmiLAXR/Scheduler/IntervalTicker",
+        order = 0)]
+    public sealed class IntervalTicker : Scheduler
     {
-        [Serializable]
-        public new class Settings : Scheduler.Settings
-        {
-            [Header("Time in seconds in what interval the action is triggered."), Min(0.01f)]
-            public float intervalSeconds = 1.0f;
-            [Header("How many ticks the action is triggered for. -1 = infinite.")]
-            public int tTLTicks = -1;
-        }
+        [Header("Time in seconds in what interval the action is triggered."), Min(0.01f)]
+        public float intervalSeconds = 1.0f;
 
-        private readonly Settings _settings;
-        
+        [Header("How many ticks the action is triggered for. -1 = infinite.")]
+        public int tTLTicks = -1;
+
         private int _tickCount;
 
         /// <summary>
-        /// Initializes a new instance of the IntervalTimer class.
+        /// Additional initialization (besides SchedulerTicker.Init).
         /// </summary>
-        /// <param name="owner">The MonoBehaviour that will own and execute the coroutine.</param>
-        /// <param name="settings">Settings that define the interval parameters.</param>
-        /// <param name="onTick"></param>
-        /// <param name="onTickStart"></param>
-        /// <param name="onTickEnd"></param>
-        public IntervalTicker(MonoBehaviour owner, Settings settings, Action onTick, Action onTickStart = null, Action onTickEnd = null)
-        : base(owner, settings, onTick, onTickStart, onTickEnd)
+        public override void Init(MonoBehaviour owner, Action onTick, 
+            Action onTickStart = null, Action onTickEnd = null,
+            bool runImmediate = false)
         {
-            _settings = settings;
+            base.Init(owner, onTick, onTickStart, onTickEnd, runImmediate);
+            // Reset counter each time a new session starts
             OnTickStart += () => _tickCount = 0;
         }
-        
+
         protected override void TriggerOnTick()
         {
             base.TriggerOnTick();
-            // Increment the counter (safely)
             _tickCount++;
         }
 
         /// <summary>
         /// Implements the abstract Run method from the Scheduler base class.
-        /// Creates an infinite coroutine that waits for the specified interval
-        /// before triggering the handler's OnTick method repeatedly.
+        /// Repeatedly waits for the interval and then invokes the tick action.
         /// </summary>
-        /// <returns>An IEnumerator for Unity's coroutine system.</returns>
         protected override IEnumerator Run()
         {
-            // Infinite loop that waits for the interval and then invokes the callback
-            while (_settings.isActive)
+            while (isActive)
             {
-                if (_settings.tTLTicks > -1 && _tickCount >= _settings.tTLTicks)
+                if (tTLTicks > -1 && _tickCount >= tTLTicks)
                 {
                     DebugLog.OmiLAXR.Warning("IntervalTicker: Ticks reached limit. Stopping.");
                     Stop();
                     yield break;
                 }
-    
-                yield return new WaitForSeconds(_settings.intervalSeconds);
+
+                yield return new WaitForSeconds(intervalSeconds);
                 TriggerOnTick();
             }
+        }
+
+        /// <summary>
+        /// Static factory for programmatic creation.
+        /// </summary>
+        public static IntervalTicker Create(
+            MonoBehaviour owner,
+            float interval,
+            Action onTick,
+            int tTLTicks = -1,
+            Action onTickStart = null,
+            Action onTickEnd = null,
+            bool runImmediate = false)
+        {
+            var ticker = CreateInstance<IntervalTicker>();
+            ticker.intervalSeconds = interval;
+            ticker.tTLTicks = tTLTicks;
+            ticker.Init(owner, onTick, onTickStart, onTickEnd, runImmediate);
+            return ticker;
         }
     }
 }

@@ -19,7 +19,7 @@ namespace OmiLAXR.Actors.HeartRate
     /// stress level detection system, using heart rate variability as a key stress marker.
     /// </summary>
     [Description("Monitors heart rate value provided by a Heart Rate Provider.")]
-    public abstract class HeartRateProvider : StressLevelDataProvider
+    public abstract class HeartRateProvider : ActorDataProvider, IStressLevelDataProvider
     {
         /// <summary>
         /// Gets the current heart rate value in beats per minute (BPM).
@@ -27,14 +27,16 @@ namespace OmiLAXR.Actors.HeartRate
         /// This value is updated by derived classes through the SetHeartRate method.
         /// </summary>
         /// <returns>Current heart rate in BPM, or 0 if no reading is available</returns>
-        public virtual int GetHeartRate() => heartRate;
+        public virtual int GetHeartRate() => HeartRate;
 
         /// <summary>
         /// Identifier name for this data provider within the stress level system.
         /// Used for logging, debugging, and distinguishing this provider from others.
         /// </summary>
         /// <returns>The string "HeartRate" as the provider identifier</returns>
-        public override string Name => "HeartRate";
+        public string Name => "HeartRate";
+
+        public bool IsActive => enabled;
 
         /// <summary>
         /// Weighting factor for heart rate's contribution to overall stress calculation.
@@ -42,7 +44,7 @@ namespace OmiLAXR.Actors.HeartRate
         /// Can be adjusted in derived classes if specific heart rate sources have different reliability.
         /// </summary>
         /// <returns>Weight factor of 1.0f for heart rate contribution</returns>
-        public override float Weight => 1.0f;
+        public float Weight => 1.0f;
         
         /// <summary>
         /// Current heart rate value in beats per minute (BPM).
@@ -55,8 +57,8 @@ namespace OmiLAXR.Actors.HeartRate
         /// - Moderate activity: 120-160 BPM
         /// - High stress/activity: 160+ BPM
         /// </summary>
-        [ReadOnly, SerializeField]
-        private int heartRate;
+        [field: SerializeField, ReadOnly]
+        public int HeartRate { get; protected set; }
 
         /// <summary>
         /// Protected method for derived classes to update the current heart rate value.
@@ -67,8 +69,7 @@ namespace OmiLAXR.Actors.HeartRate
         /// when and how heart rate updates occur based on their specific data sources.
         /// </summary>
         /// <param name="hr">New heart rate value in beats per minute (BPM)</param>
-        protected void SetHeartRate(int hr)
-            => heartRate = hr;
+        protected void SetHeartRate(int hr) => HeartRate = hr;
 
         /// <summary>
         /// Calculates and returns the current stress level based on heart rate analysis.
@@ -85,8 +86,7 @@ namespace OmiLAXR.Actors.HeartRate
         /// - 1.0f: Significantly elevated heart rate, high stress indication
         /// - Values between 0.0f and 1.0f indicate proportional stress levels
         /// </returns>
-        public override float? GetStressLevel()
-            => NormalizeHeartRate(heartRate);
+        public float? GetStressLevel() => NormalizeHeartRate(HeartRate);
 
         /// <summary>
         /// Static utility method that converts raw heart rate values into normalized stress indicators.

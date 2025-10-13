@@ -15,10 +15,10 @@ namespace OmiLAXR.Actors.StressLevel
     /// Simulates cyclical stress patterns through heart rate changes.
     /// Alternates between high-stress (120-150 BPM) and recovery phases (60-75 BPM).
     /// </summary>
-    [AddComponentMenu("OmiLAXR / Actor Data / Heart Stress Simulator")]
     [DisallowMultipleComponent]
-    [Description("Simulates heart rate to trigger and reduce stress levels.")]
-    public class HeartStressSimulator : HeartRateProvider
+    [AddComponentMenu("OmiLAXR / Actor Data / Heart Stress Simulator"),
+     Description("Simulates heart rate to trigger and reduce stress levels.")]
+    public sealed class HeartStressSimulator : HeartRateProvider
     {
         /// <summary>
         /// Random generator for heart rate values within defined ranges

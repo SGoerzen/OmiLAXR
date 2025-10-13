@@ -17,10 +17,13 @@ namespace OmiLAXR.Composers
     /// Manages statement caching, composition, and delivery to endpoints.
     /// </summary>
     /// <typeparam name="T">Type of tracking behavior this composer handles</typeparam>
+    /// <typeparam name="TStatement">Type of statements.</typeparam>
     [DefaultExecutionOrder(-100)]
-    public abstract class Composer<T> : DataProviderPipelineComponent, IComposer
+    public abstract class Composer<T, TStatement> : DataProviderPipelineComponent, IComposer
         where T : PipelineComponent, ITrackingBehaviour
+        where TStatement : class, IStatement
     {
+        
         /// <summary>
         /// Array of tracking behaviors this composer is processing
         /// </summary>
@@ -29,36 +32,79 @@ namespace OmiLAXR.Composers
         /// <summary>
         /// Cache for storing statements with string keys
         /// </summary>
-        private readonly Dictionary<string, IStatement> _statementCache = new Dictionary<string, IStatement>();
+        private readonly Dictionary<string, TStatement> _statementCache = new Dictionary<string, TStatement>();
         
         /// <summary>
         /// Cache for storing statements with integer keys
         /// </summary>
-        private readonly Dictionary<int, IStatement> _statementCacheInt = new Dictionary<int, IStatement>();
+        private readonly Dictionary<int, TStatement> _statementCacheInt = new Dictionary<int, TStatement>();
         
         /// <summary>
         /// Stores a statement in cache with string key
         /// </summary>
-        public void StoreStatement(string key, IStatement statement)
+        public void StoreStatement(string key, TStatement statement)
             => _statementCache[key] = statement;
             
         /// <summary>
         /// Stores a statement in cache with integer key
         /// </summary>
-        public void StoreStatement(int key, IStatement statement)
+        public void StoreStatement(int key, TStatement statement)
             => _statementCacheInt[key] = statement;
         
+        public void StoreStatement(ITrackingBehaviour tb, GameObject target, TStatement statement)
+            => StoreStatement(CombineHash(tb.GetHashCode(), target.GetHashCode()), statement);
+        
         /// <summary>
-        /// Retrieves cached statement by string key, returns null if not found
+        /// Retrieves a cached statement by string key. Optionally removes it from the cache.
         /// </summary>
-        public IStatement RestoreStatement(string key)
-            => _statementCache.TryGetValue(key, out var statement) ? statement : null;
-            
+        public TStatement RestoreStatement(string key, bool erase = false)
+        {
+            if (_statementCache.TryGetValue(key, out var statement))
+            {
+                if (erase)
+                    _statementCache.Remove(key);
+
+                return statement;
+            }
+
+            return null;
+        }
+        
+        [System.Runtime.CompilerServices.MethodImpl(System.Runtime.CompilerServices.MethodImplOptions.AggressiveInlining)]
+        private static int CombineHash(int h1, int h2)
+        {
+#if UNITY_2021_2_OR_NEWER
+    return System.HashCode.Combine(h1, h2);
+#else
+            unchecked { return ((h1 << 5) + h1) ^ h2; }
+#endif
+        }
+
+
         /// <summary>
-        /// Retrieves cached statement by integer key, returns null if not found
+        /// Retrieves a cached statement by integer key. Optionally removes it from the cache.
         /// </summary>
-        public IStatement RestoreStatement(int key)
-            => _statementCacheInt.TryGetValue(key, out var statement) ? statement : null;
+        public TStatement RestoreStatement(int key, bool erase = false)
+        {
+            if (_statementCacheInt.TryGetValue(key, out var statement))
+            {
+                if (erase)
+                    _statementCacheInt.Remove(key);
+
+                return statement;
+            }
+
+            return null;
+        }
+
+        /// <summary>
+        /// Retrieves a cached statement by composite key. Optionally removes it from the cache.
+        /// </summary>
+        public TStatement RestoreStatement(ITrackingBehaviour tb, GameObject target, bool erase = false)
+        {
+            var key = CombineHash(tb.GetHashCode(), target.GetHashCode());
+            return RestoreStatement(key, erase);
+        }
         
         /// <summary>
         /// Initializes the composer, finds tracking behaviors, and starts composition
@@ -85,6 +131,8 @@ namespace OmiLAXR.Composers
         /// Gets author information for statements created by this composer
         /// </summary>
         public abstract Author GetAuthor();
+
+        public virtual string GetDataStandardVersion() => "1.0.0";
 
         /// <summary>
         /// Cached composer name derived from class name
@@ -114,7 +162,7 @@ namespace OmiLAXR.Composers
         /// <summary>
         /// Queue for statements waiting for event handlers to be registered
         /// </summary>
-        private readonly List<IStatement> _waitList = new List<IStatement>();
+        private readonly List<TStatement> _waitList = new List<TStatement>();
 
         /// <summary>
         /// Finds all tracking behaviors of specified type in the scene
@@ -129,7 +177,7 @@ namespace OmiLAXR.Composers
         [Obsolete(
             "Use SendStatement(ITrackingBehaviour, IStatement) instead. Immediate is not needed anymore due efficient thread queue handling.",
             true)]
-        protected void SendStatement(ITrackingBehaviour statementOwner, IStatement statement, bool immediate)
+        protected void SendStatement(ITrackingBehaviour statementOwner, TStatement statement, bool immediate)
             => SendStatement(statementOwner, statement);
 
         /// <summary>
@@ -137,11 +185,12 @@ namespace OmiLAXR.Composers
         /// </summary>
         /// <param name="statementOwner">The tracking behavior that generated this statement</param>
         /// <param name="statement">The composed statement to send</param>
-        protected void SendStatement(ITrackingBehaviour statementOwner, IStatement statement)
+        protected void SendStatement(ITrackingBehaviour statementOwner, TStatement statement)
         {
+            if (!enabled)
+                return;
             // Set ownership and composer information
             statement.SetOwner(statementOwner);
-            statement.SetComposer(this);
 
             // If no handlers registered, queue statement for later
             if (AfterComposed?.GetInvocationList().Length < 1)
@@ -161,14 +210,14 @@ namespace OmiLAXR.Composers
         [Obsolete(
             "Use SendStatement(ITrackingBehaviour, IStatement) instead. Immediate is not needed anymore due efficient thread queue handling.",
             true)]
-        protected void SendStatementImmediate(ITrackingBehaviour statementOwner, IStatement statement)
+        protected void SendStatementImmediate(ITrackingBehaviour statementOwner, TStatement statement)
             => SendStatement(statementOwner, statement, immediate: true);
 
         /// <summary>
         /// Obsolete: Use SendStatement(ITrackingBehaviour, IStatement, bool) instead
         /// </summary>
         [Obsolete("Use SendStatement(ITrackingBehaviour, IStatement, bool) instead.")]
-        protected void SendStatement(IStatement statement, bool immediate = false)
+        protected void SendStatement(TStatement statement, bool immediate = false)
         {
             SendStatement(trackingBehaviours.First(), statement, immediate);
         }
@@ -177,7 +226,7 @@ namespace OmiLAXR.Composers
         /// Obsolete: Use SendStatementImmediate(ITrackingBehaviour, IStatement) instead
         /// </summary>
         [Obsolete("Use SendStatementImmediate(ITrackingBehaviour, IStatement) instead.")]
-        protected void SendStatementImmediate(IStatement statement)
+        protected void SendStatementImmediate(TStatement statement)
             => SendStatement(statement, immediate: true);
 
         /// <summary>

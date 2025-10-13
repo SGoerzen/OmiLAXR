@@ -90,6 +90,8 @@ namespace OmiLAXR.Utils
             }
         }
         
+        private readonly Dictionary<string, BufferedUtf8Writer> WritersByPath = new Dictionary<string, BufferedUtf8Writer>(StringComparer.OrdinalIgnoreCase);
+
         /// <summary>
         /// Ensures a file buffer exists for the given ID, creating it if necessary.
         /// Thread-safe creation and retrieval of buffers with optional default data initialization.
@@ -102,23 +104,39 @@ namespace OmiLAXR.Utils
         {
             lock (FileBuffers)
             {
-                // Return existing buffer if it already exists
-                if (FileBuffers.TryGetValue(bufferId, out var buffer))
+                // Falls bereits ein Buffer mit dieser ID existiert, zurückgeben
+                if (FileBuffers.TryGetValue(bufferId, out var existingBuffer))
+                    return existingBuffer;
+
+                // Gibt es bereits einen Writer für diesen Pfad?
+                if (!WritersByPath.TryGetValue(filePath, out var writer))
                 {
-                    return buffer;
+                    writer = new BufferedUtf8Writer(filePath);
+                    WritersByPath[filePath] = writer;
                 }
-            
-                // Create new buffer with file writer and optional default data
-                var stream = new BufferedUtf8Writer(filePath);
-                buffer = new FileBuffer() 
-                { 
-                    Data = fallbackValue?.Invoke(), // Initialize data using provided handler if available
-                    Writer = stream 
+
+                var buffer = new FileBuffer
+                {
+                    Data = fallbackValue?.Invoke(),
+                    Writer = writer
                 };
-                
-                // Add to managed dictionary
+
                 FileBuffers.Add(bufferId, buffer);
                 return buffer;
+            }
+        }
+
+        public void DisposeAll()
+        {
+            lock (FileBuffers)
+            {
+                foreach (var writer in WritersByPath.Values)
+                {
+                    writer?.Dispose();
+                }
+
+                WritersByPath.Clear();
+                FileBuffers.Clear();
             }
         }
 
@@ -129,6 +147,7 @@ namespace OmiLAXR.Utils
         /// </summary>
         public void Dispose()
         {
+            DisposeAll();
             lock (FileBuffers)
             {
                 // Clean up each buffer individually

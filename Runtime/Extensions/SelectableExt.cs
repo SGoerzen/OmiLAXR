@@ -3,6 +3,10 @@
 * Copyright (C) 2025 Sergej Görzen <sergej.goerzen@gmail.com>
 * This file is part of OmiLAXR.
 */
+
+using OmiLAXR.Types;
+using TMPro;
+using UnityEngine;
 using UnityEngine.UI;
 
 namespace OmiLAXR.Extensions
@@ -23,6 +27,44 @@ namespace OmiLAXR.Extensions
         {
             selectable.OnDeselect(null);
             selectable.interactable = !flag;
+        }
+        
+        /// <summary>
+        /// Retrieves the text content from a button's TextMeshProUGUI component.
+        /// Searches for a TextMeshProUGUI component in the button's children and returns its text.
+        /// </summary>
+        /// <param name="selectable">The Selectable to get text from</param>
+        /// <param name="defaultText">Text to return if no TextMeshProUGUI component is found</param>
+        /// <returns>The button's text content, or the default text if no text component exists</returns>
+        public static string GetTextOrDefault(this Selectable selectable, string defaultText = "")
+        {
+            var textMesh = selectable.GetComponentInChildren<TextMeshProUGUI>();
+            return !textMesh ? defaultText : textMesh.text;
+        }
+        
+        public static UiElementTypes GetUiElementType(this Selectable selectable)
+        {
+            switch (selectable)
+            {
+                case Button _:
+                    return UiElementTypes.Button;
+                case Toggle _:
+                    return UiElementTypes.ToggleButton;
+                case Slider _:
+                    return UiElementTypes.Slider;
+                case Dropdown _:
+                    return UiElementTypes.Dropdown;
+                case Scrollbar _:
+                    return UiElementTypes.Scrollbar;
+                case InputField inputField:
+                    // Heuristik: PasswordField oder TextField?
+                    if (inputField.contentType == InputField.ContentType.Password)
+                        return UiElementTypes.PasswordField;
+                    return UiElementTypes.TextField;
+                default:
+                    Debug.Log($"Unknown Selectable type: {selectable.GetType().Name}");
+                    return UiElementTypes.Custom;
+            }
         }
     }
 

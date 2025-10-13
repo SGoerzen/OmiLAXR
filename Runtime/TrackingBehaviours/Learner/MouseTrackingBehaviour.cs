@@ -160,7 +160,7 @@ namespace OmiLAXR.TrackingBehaviours.Learner
             HandleMouseClick(2, ref _isWheelDown, mousePos);
 
             // Detect mouse wheel scrolling
-            float curMouseWheel = GetMouseScroll();
+            var curMouseWheel = GetMouseScroll();
             float mouseWheelDis = Mathf.Abs(_mouseWheel - curMouseWheel);
             if (mouseWheelDis > mouseWheelThreshold)
             {
@@ -169,7 +169,7 @@ namespace OmiLAXR.TrackingBehaviours.Learner
             }
 
             // Detect significant mouse movement
-            float distance = Vector3.Distance(mousePos, _lastMousePosition);
+            var distance = Vector3.Distance(mousePos, _lastMousePosition);
             if (distance > movementThreshold)
             {
                 OnMousePositionChanged?.Invoke(this, mousePos, _lastMousePosition);

@@ -6,6 +6,7 @@
 using System;
 using System.IO;
 using System.Text;
+using System.Threading; // Für Thread.Sleep im Retry-Block
 
 namespace OmiLAXR.Utils
 {
@@ -54,18 +55,40 @@ namespace OmiLAXR.Utils
         /// <param name="bufferSize">Size of the internal buffer in bytes (default: 8192)</param>
         public BufferedUtf8Writer(string path, int bufferSize = 8192)
         {
-            // Open file with optimized settings for sequential writing
-            _fileStream = new FileStream(path, FileMode.OpenOrCreate, FileAccess.Write, FileShare.Read, 8192);
+            _fileStream = OpenWithRetry(path, bufferSize);
             _bufferedStream = new BufferedStream(_fileStream, bufferSize);
-            _writeBuffer = new byte[bufferSize]; // Reusable encoding buffer
+            _writeBuffer = new byte[bufferSize];
             FilePath = path;
         }
 
         /// <summary>
-        /// Writes a single line of text followed by a newline character.
-        /// Thread-safe operation with automatic UTF-8 encoding and buffering.
+        /// Opens a FileStream with retry handling for sharing violations.
         /// </summary>
-        /// <param name="line">Text line to write (newline will be appended automatically)</param>
+        private static FileStream OpenWithRetry(string path, int bufferSize)
+        {
+            const int maxAttempts = 5;
+            for (int attempt = 1; attempt <= maxAttempts; attempt++)
+            {
+                try
+                {
+                    return new FileStream(path, FileMode.OpenOrCreate, FileAccess.Write, FileShare.ReadWrite, 8192);
+                }
+                catch (IOException ex) when (IsSharingViolation(ex) && attempt < maxAttempts)
+                {
+                    Thread.Sleep(30 * attempt); // exponential backoff
+                }
+            }
+
+            // Let the final attempt throw if still failing
+            return new FileStream(path, FileMode.OpenOrCreate, FileAccess.Write, FileShare.ReadWrite, 8192);
+        }
+
+        private static bool IsSharingViolation(IOException ex)
+        {
+            const int ERROR_SHARING_VIOLATION = 32;
+            return (ex.HResult & 0xFFFF) == ERROR_SHARING_VIOLATION;
+        }
+
         public void WriteLine(string line)
         {
             lock (_lock)

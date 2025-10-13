@@ -4,6 +4,7 @@
 * This file is part of OmiLAXR.
 */
 using System;
+using System.Globalization;
 using System.Text;
 
 namespace OmiLAXR.Extensions
@@ -63,7 +64,7 @@ namespace OmiLAXR.Extensions
 
             // Add days component if present
             if (timeSpan.Days > 0)
-                sb.Append($"{timeSpan.Days}D");
+                sb.Append($"{timeSpan.Days.ToString(CultureInfo.InvariantCulture)}D");
 
             // Add time components if any are present
             if (timeSpan.Hours > 0 || timeSpan.Minutes > 0 || timeSpan.Seconds > 0 || timeSpan.Milliseconds > 0)
@@ -72,17 +73,17 @@ namespace OmiLAXR.Extensions
 
                 // Add hours component
                 if (timeSpan.Hours > 0)
-                    sb.Append($"{timeSpan.Hours}H");
+                    sb.Append($"{timeSpan.Hours.ToString(CultureInfo.InvariantCulture)}H");
 
                 // Add minutes component
                 if (timeSpan.Minutes > 0)
-                    sb.Append($"{timeSpan.Minutes}M");
+                    sb.Append($"{timeSpan.Minutes.ToString(CultureInfo.InvariantCulture)}M");
 
                 // Add seconds component (including fractional seconds from milliseconds)
                 if (timeSpan.Seconds > 0 || timeSpan.Milliseconds > 0)
                 {
                     var seconds = timeSpan.Seconds + timeSpan.Milliseconds / 1000.0;
-                    sb.Append($"{seconds:0.###}S"); // Format with up to 3 decimal places
+                    sb.Append($"{seconds.ToString("0.###", CultureInfo.InvariantCulture)}S"); // Format with up to 3 decimal places
                 }
             }
 

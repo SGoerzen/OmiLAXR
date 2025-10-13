@@ -4,6 +4,7 @@
 * This file is part of OmiLAXR.
 */
 using System.Linq;
+using UnityEngine;
 using Object = UnityEngine.Object;
 
 namespace OmiLAXR.Listeners

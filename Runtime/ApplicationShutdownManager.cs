@@ -22,7 +22,7 @@ namespace OmiLAXR
     /// for cleaning up resources, saving state, or performing other cleanup operations
     /// in a controlled manner when the application terminates.
     /// </remarks>
-    public class ApplicationShutdownManager : MonoBehaviour
+    public sealed class ApplicationShutdownManager : MonoBehaviour
     {
         /// <summary>
         /// Static list containing all MonoBehaviour components that have registered

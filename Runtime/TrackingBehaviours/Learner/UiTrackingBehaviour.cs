@@ -9,6 +9,7 @@ using OmiLAXR.Components;
 using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
+using NotImplementedException = System.NotImplementedException;
 
 namespace OmiLAXR.TrackingBehaviours.Learner
 {
@@ -20,6 +21,36 @@ namespace OmiLAXR.TrackingBehaviours.Learner
     [Description("Tracks interaction with <Button>, <Slider>, <Dropdown>, <TMP_Dropdown>, <Toggle>, <InputField>, <TMP_InputField> and <Scrollbar> components.")]
     public class UiTrackingBehaviour : TrackingBehaviour<Selectable>
     {
+        /// <summary>
+        /// Event for UI click interactions.
+        /// </summary>
+        [Gesture("UI"), Action("Click")]
+        public readonly TrackingBehaviourEvent<Selectable, InteractionEventHandler.InteractionEventArgs> OnClicked = new TrackingBehaviourEvent<Selectable, InteractionEventHandler.InteractionEventArgs>();
+        
+        /// <summary>
+        /// Event for press starts.
+        /// </summary>
+        [Gesture("UI"), Action("Press")]
+        public readonly TrackingBehaviourEvent<Selectable, InteractionEventHandler.InteractionEventArgs> OnPressStarted = new TrackingBehaviourEvent<Selectable, InteractionEventHandler.InteractionEventArgs>();
+        
+        /// <summary>
+        /// Event for press ends.
+        /// </summary>
+        [Gesture("UI"), Action("Press")]
+        public readonly TrackingBehaviourEvent<Selectable, InteractionEventHandler.InteractionEventArgs> OnPressEnded = new TrackingBehaviourEvent<Selectable, InteractionEventHandler.InteractionEventArgs>();
+        
+        /// <summary>
+        /// Event for hover starts.
+        /// </summary>
+        [Gesture("UI"), Action("Hover")]
+        public readonly TrackingBehaviourEvent<Selectable, InteractionEventHandler.InteractionEventArgs> OnHoverStarted = new TrackingBehaviourEvent<Selectable, InteractionEventHandler.InteractionEventArgs>();
+        
+        /// <summary>
+        /// Event for hover ends.
+        /// </summary>
+        [Gesture("UI"), Action("Hover")]
+        public readonly TrackingBehaviourEvent<Selectable, InteractionEventHandler.InteractionEventArgs> OnHoverEnded = new TrackingBehaviourEvent<Selectable, InteractionEventHandler.InteractionEventArgs>();
+        
         /// <summary>
         /// Event for button click interactions.
         /// </summary>
@@ -65,15 +96,27 @@ namespace OmiLAXR.TrackingBehaviours.Learner
             {
                 var type = selectable.GetType();
                 var ieh = selectable.GetComponent<InteractionEventHandler>();
+
+                if (ieh)
+                {
+                    ieh.OnClicked += HandleClicked;
+                    ieh.OnHoverStarted += HandleHoverStarted;
+                    ieh.OnHoverEnded += HandleHoverEnded;
+                    ieh.OnPressStarted += HandlePressStarted;
+                    ieh.OnPressEnded += HandlePressEnded;
+                }
                 
                 if (type == typeof(Button))
                 {
-                    var button = (Button)selectable;
-                    OnClickedButton.Bind(button.onClick, () =>
+                    if (!ieh)
                     {
-                        if (!ieh || ieh.IsHovering)
-                            OnClickedButton.Invoke(this, button);
-                    });
+                        var button = (Button)selectable;
+                        OnClickedButton.Bind(button.onClick, () =>
+                        {
+                            if (ieh.IsHovering)
+                                OnClickedButton.Invoke(this, button);
+                        });
+                    }
                 }
                 else if (type == typeof(Slider))
                 {
@@ -140,6 +183,57 @@ namespace OmiLAXR.TrackingBehaviours.Learner
                             OnChangedScrollbar.Invoke(this, scrollbar, value);
                     });
                 }
+            }
+        }
+
+        private void HandleClicked(InteractionEventHandler sender, InteractionEventHandler.InteractionEventArgs args)
+        {
+            var selectable = sender.GetComponent<Selectable>();
+            OnClicked.Invoke(this, selectable, args);
+        }
+
+        private void HandlePressEnded(InteractionEventHandler sender, InteractionEventHandler.InteractionEventArgs args)
+        {
+            var selectable = sender.GetComponent<Selectable>();
+            OnPressEnded.Invoke(this, selectable, args);
+        }
+
+        private void HandlePressStarted(InteractionEventHandler sender, InteractionEventHandler.InteractionEventArgs args)
+        {
+            var selectable = sender.GetComponent<Selectable>();
+            OnPressStarted.Invoke(this, selectable, args);
+        }
+
+        private void HandleHoverEnded(InteractionEventHandler sender, InteractionEventHandler.InteractionEventArgs args)
+        {
+            var selectable = sender.GetComponent<Selectable>();
+            OnHoverEnded.Invoke(this, selectable, args);
+        }
+
+        private void HandleHoverStarted(InteractionEventHandler sender, InteractionEventHandler.InteractionEventArgs args)
+        {
+            var selectable = sender.GetComponent<Selectable>();   
+            OnHoverStarted.Invoke(this, selectable, args);
+        }
+
+        protected override void Dispose(Object[] objects)
+        {
+            base.Dispose(objects);
+
+            var selectables = Select<Selectable>(objects);
+            foreach (var s in selectables)
+            {
+                var ieh = s.GetComponent<InteractionEventHandler>();
+
+                if (ieh)
+                {
+                    ieh.OnHoverStarted -= HandleHoverStarted;
+                    ieh.OnHoverEnded -= HandleHoverEnded;
+                    ieh.OnPressStarted -= HandlePressStarted;
+                    ieh.OnPressEnded -= HandlePressEnded;
+                    ieh.OnClicked -= HandleClicked;
+                }
+
             }
         }
     }

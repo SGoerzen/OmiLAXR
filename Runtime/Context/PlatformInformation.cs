@@ -19,7 +19,7 @@ namespace OmiLAXR.Context
     [AddComponentMenu("OmiLAXR / Scenario Context / Platform Information")]
     [DisallowMultipleComponent]
     [Description("Provides platform information in following format [prefixes:]OmiLAXR.{MODULE}:{COMPOSER}:{VERSION}:{OS}[:suffixes].")]
-    public class PlatformInformation : LearningContext
+    public sealed class PlatformInformation : LearningContext
     {
         /// <summary>
         /// Serializable data structure for storing custom prefixes and suffixes
@@ -87,8 +87,17 @@ namespace OmiLAXR.Context
         {
             var composerName = composer.GetType().Name;
             var composerGroup = composer.GetGroup();
+
+            var sdkStr = "";
+            if (SdkProvider.Instance)
+            {
+                var sdk = SdkProvider.Instance.GetName();
+                var sdkVersion = SdkProvider.Instance.GetVersion();
+                sdkStr = $"::{sdk}v{sdkVersion}";
+            }
+            
             // Build the core platform string with module, composer, version, and Unity platform
-            var platformStr = $"OmiLAXR.{module}:{composerGroup}.{composerName}:v{version}:{Application.platform}";
+            var platformStr = $"Unity{Application.platform}v{Application.unityVersion}::OmiLAXR.{module}v{version}::{composerGroup}.{composerName}{sdkStr}";
 
             // Prepend custom prefixes if any are configured
             if (appendix.prefixes.Length > 0)

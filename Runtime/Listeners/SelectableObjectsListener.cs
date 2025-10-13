@@ -5,6 +5,7 @@
 */
 using System.ComponentModel;
 using OmiLAXR.Components;
+using OmiLAXR.Extensions;
 using UnityEngine;
 using UnityEngine.UI;
 
@@ -18,7 +19,7 @@ namespace OmiLAXR.Listeners
     /// </summary>
     [AddComponentMenu("OmiLAXR / 1) Listeners / <Selectable> Objects Listener")]
     [Description("Provides all <Selectable> components to pipeline.")]
-    public class SelectableObjectsListener : Listener
+    public sealed class SelectableObjectsListener : Listener
     {
         /// <summary>
         /// Whether to include inactive/disabled selectable objects in the detection.
@@ -50,8 +51,7 @@ namespace OmiLAXR.Listeners
                 foreach (var selectable in selectables)
                 {
                     // Only add the handler if it doesn't already exist
-                    if (!selectable.GetComponent<InteractionEventHandler>())
-                        selectable.gameObject.AddComponent<InteractionEventHandler>();
+                    selectable.gameObject.EnsureComponent<InteractionEventHandler>();
                 }
             }
             

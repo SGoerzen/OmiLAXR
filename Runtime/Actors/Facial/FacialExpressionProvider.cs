@@ -15,14 +15,14 @@ namespace OmiLAXR.Facial
     /// Implements the StressLevelDataProvider interface to contribute to overall stress assessment.
     /// Currently contains placeholder implementation awaiting facial recognition integration.
     /// </summary>
-    internal class FacialExpressionProvider : StressLevelDataProvider
+    internal class FacialExpressionProvider : ActorDataProvider, IStressLevelDataProvider
     {
         /// <summary>
         /// Identifier name for this data provider within the stress level system.
         /// Used for logging, debugging, and system identification purposes.
         /// </summary>
         /// <returns>The string "FacialExpression" as the provider identifier</returns>
-        public override string Name => "FacialExpression";
+        public string Name => "FacialExpression";
 
         /// <summary>
         /// Indicates whether this provider is currently active and providing data.
@@ -30,7 +30,7 @@ namespace OmiLAXR.Facial
         /// In a complete implementation, this would check for camera availability and face detection.
         /// </summary>
         /// <returns>True if the provider is active and can provide stress level data</returns>
-        public override bool IsActive => true;
+        public bool IsActive => true;
 
         /// <summary>
         /// Weighting factor for this provider's contribution to overall stress calculation.
@@ -39,7 +39,7 @@ namespace OmiLAXR.Facial
         /// This reflects the psychological significance of facial micro-expressions in stress detection.
         /// </summary>
         /// <returns>Weight factor of 1.2f for facial expression contribution</returns>
-        public override float Weight => 1.2f;
+        public float Weight => 1.2f;
 
         /// <summary>
         /// Calculates and returns the current stress level based on facial expression analysis.
@@ -62,7 +62,7 @@ namespace OmiLAXR.Facial
         /// - 1.0f: Maximum stress detected, high tension in facial muscles
         /// Currently always returns 0.0f due to placeholder implementation
         /// </returns>
-        public override float? GetStressLevel()
+        public float? GetStressLevel()
         {
             // TODO: Implement actual facial expression analysis
             // This is a placeholder implementation awaiting:

@@ -31,6 +31,8 @@ namespace OmiLAXR.Composers
         /// </summary>
         /// <returns>Author details including name and contact information</returns>
         Author GetAuthor();
+
+        string GetDataStandardVersion();
         
         /// <summary>
         /// Returns the display name of this composer, typically derived from the class name.
