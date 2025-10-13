@@ -11,6 +11,7 @@ namespace OmiLAXR.Modules
     /// Interface for eye tracking modules that provide calibration functionality
     /// for VR/AR applications within the OmiLAXR framework.
     /// </summary>
+    [Obsolete("Not needed any more. Use ICalibrateable instead.", true)]
     public interface IEyeTrackingModule
     {
         /// <summary>
@@ -34,7 +35,9 @@ namespace OmiLAXR.Modules
         /// True if the eye tracking system is calibrated and ready for use;
         /// false if calibration is required or has failed.
         /// </returns>
-        bool IsCalibrated();
+        bool IsCalibrated { get; }
+
+        bool NeedsCalibration { get; }
 
         /// <summary>
         /// Event triggered when the calibration process begins.

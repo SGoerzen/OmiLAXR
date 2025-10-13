@@ -3,6 +3,9 @@
 * Copyright (C) 2025 Sergej Görzen <sergej.goerzen@gmail.com>
 * This file is part of OmiLAXR.
 */
+
+using System;
+
 namespace OmiLAXR.Modules
 {
     /// <summary>
@@ -15,6 +18,7 @@ namespace OmiLAXR.Modules
     /// such as eye tracking, hand tracking, or other XR features. All concrete modules
     /// must inherit from this class and implement the required pipeline behavior.
     /// </remarks>
+    [Obsolete("A specific class is not neede anymore. Just use PipelineComponent directly if needed.", true)]
     public abstract class Module : PipelineComponent
     {
        // TODO: Add module-specific properties and methods

@@ -20,7 +20,7 @@ namespace OmiLAXR.Filters
     /// </remarks>
     [AddComponentMenu("OmiLAXR / 2) Filters / <Exclude From Tracking> Filter")]
     [Description("Filters found objects that have the component <Exclude From Tracking>.")]
-    public class ExcludeFromTrackingFilter : Filter
+    public sealed class ExcludeFromTrackingFilter : Filter
     {
         /// <summary>
         /// Filters out objects that have the ExcludeFromTracking component.

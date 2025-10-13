@@ -32,7 +32,7 @@ namespace OmiLAXR
     /// Provides categorized logging methods (Print, Error, Warning) with automatic prefix handling.
     /// Ensures consistent log formatting across the entire OmiLAXR system.
     /// </summary>
-    public class DebugLog
+    public sealed class DebugLog
     {
         /// <summary>
         /// Prefix string used to identify log messages from this logger instance.

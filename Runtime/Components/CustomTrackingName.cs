@@ -14,7 +14,7 @@ namespace OmiLAXR.Components
     /// </summary>
     [AddComponentMenu("OmiLAXR / Game Objects / Custom Tracking Name")]
     [DisallowMultipleComponent]
-    public class CustomTrackingName : MonoBehaviour
+    public sealed class CustomTrackingName : MonoBehaviour
     {
         /// <summary>
         /// The custom tracking name to use for this GameObject.

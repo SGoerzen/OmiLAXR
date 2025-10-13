@@ -1,8 +1,9 @@
 /*
-* SPDX-License-Identifier: AGPL-3.0-or-later
-* Copyright (C) 2025 Sergej Görzen <sergej.goerzen@gmail.com>
-* This file is part of OmiLAXR.
-*/
+ * SPDX-License-Identifier: AGPL-3.0-or-later
+ * Copyright (C) 2025 Sergej Görzen <sergej.goerzen@gmail.com>
+ * This file is part of OmiLAXR.
+ */
+
 using System;
 using System.Collections;
 using UnityEngine;
@@ -10,118 +11,137 @@ using UnityEngine;
 namespace OmiLAXR.Schedules
 {
     /// <summary>
-    /// Abstract base class for all schedulers in the OmiLAXR system.
-    /// Provides common functionality for starting, stopping, and managing scheduled operations.
-    /// Requires derived classes to implement the core timing logic through the Run method.
+    /// Scheduler class for scheduled operations in the OmiLAXR system.
+    /// Combines tick-based and event-driven scheduling.
+    /// Use Init(...) for runtime initialization.
     /// </summary>
-    public abstract class Scheduler
+    public abstract class Scheduler : ScriptableObject, ISerializationCallbackReceiver
     {
-        [Serializable]
-        public abstract class Settings
-        {
-            [Tooltip("Shows that the Schulder is active.")]
-            public bool isActive = true;
-            [Tooltip("Don't wait for first tick.")]
-            public bool tickImmediate = true;
-            [Tooltip("Autostart Scheduler after creation.")]
-            public bool runImmediate = true;
-        }
-        /// <summary>
-        /// Reference to the MonoBehaviour that will own and execute the coroutine.
-        /// This is necessary because only MonoBehaviours can start coroutines in Unity.
-        /// </summary>
-        private readonly MonoBehaviour _owner;
-        
-        /// <summary>
-        /// Reference to the running coroutine. Null when the scheduler is not active.
-        /// Used to keep track of and stop the currently running coroutine when needed.
-        /// </summary>
-        private Coroutine _coroutine;
+        [Header("Scheduler Configuration")]
+        [Tooltip("Shows that the Scheduler is active.")]
+        public bool isActive = true;
+
+        [Tooltip("Don't wait for first tick.")]
+        public bool tickImmediate = true;
+
+        [Tooltip("Autostart Scheduler after creation.")]
+        public bool runImmediate = false;
 
         /// <summary>
-        /// The handler that receives scheduling events (start, tick, end).
-        /// Implements IScheduleHandler to provide a consistent interface for all scheduler types.
+        /// The MonoBehaviour that owns and executes the coroutine.
+        /// Must be set at runtime via Init(), because ScriptableObjects cannot store scene references.
         /// </summary>
+        [NonSerialized]
+        public MonoBehaviour owner;
+
+        [NonSerialized]
+        private Coroutine _coroutine;
+
+        [NonSerialized]
+        private bool _isRunning;
+
+        /// <summary>
+        /// True if the scheduler is currently running.
+        /// </summary>
+        public bool IsRunning => _isRunning;
+
+        /// <summary>
+        /// Raised when the scheduler is stopped.
+        /// </summary>
+        public event Action OnStop;
+
         public event Action OnTick;
         public event Action OnTickStart;
         public event Action OnTickEnd;
 
-        private readonly Settings _settings;
-
-        private bool _isRunning;
-
         /// <summary>
-        /// Initializes a new instance of the Scheduler class.
+        /// Runtime initialization for this scheduler.
+        /// Call this after CreateInstance().
         /// </summary>
-        /// <param name="owner">The MonoBehaviour that will own and execute the coroutine.</param>
-        /// <param name="onTickStart"></param>
-        /// <param name="onTickEnd"></param>
-        /// <param name="settings"></param>
-        /// <param name="onTick"></param>
-        protected Scheduler(MonoBehaviour owner, Settings settings, Action onTick, Action onTickStart = null, Action onTickEnd = null)
+        public virtual void Init(MonoBehaviour owner, Action onTick = null, Action onTickStart = null, Action onTickEnd = null, bool runImmediate = false)
         {
-            _owner = owner;
-            OnTick += onTick;
-            OnTickStart += onTickStart;
-            OnTickEnd += onTickEnd;
-            _settings = settings;
+            this.owner = owner;
+            if (onTick != null) OnTick += onTick;
+            if (onTickStart != null) OnTickStart += onTickStart;
+            if (onTickEnd != null) OnTickEnd += onTickEnd;
+            this.runImmediate = runImmediate;
+
+            if (runImmediate)
+                Start();
         }
 
-        protected virtual void TriggerOnTick() => OnTick?.Invoke();
-        protected virtual void TriggerOnTickStart() => OnTickStart?.Invoke();
-        protected virtual void TriggerOnTickEnd() => OnTickEnd?.Invoke();
-        
-        /// <summary>
-        /// Starts the scheduler. If already running, stops the current scheduler first.
-        /// Calls the handler's OnTickStart method and initiates the coroutine.
-        /// </summary>
-        public void Start()
+        public virtual void Start()
         {
-            if (_isRunning)
+            if (_isRunning || owner == null)
                 return;
-            _settings.isActive = true;
-            OnTickStart?.Invoke();
-            _coroutine = _owner.StartCoroutine(Run(_settings.tickImmediate));
+            isActive = true;
+            TriggerOnTickStart();
+            _coroutine = owner.StartCoroutine(RunInternal(tickImmediate));
             _isRunning = true;
         }
-        
-        /// <summary>
-        /// Stops the scheduler if it's currently running.
-        /// Calls the handler's OnTickEnd method and cleans up the coroutine reference.
-        /// </summary>
-        public void Stop()
+
+        public virtual void Stop()
         {
-            if (!_isRunning)
+            if (!_isRunning || owner == null)
                 return;
-            OnTickEnd?.Invoke();
-            _settings.isActive = false;
+
+            TriggerOnTickEnd();
+            isActive = false;
+
             if (_coroutine != null)
             {
-                _owner.StopCoroutine(_coroutine);
+                owner.StopCoroutine(_coroutine);
                 _coroutine = null;
             }
+
             _isRunning = false;
+            TriggerOnStop();
         }
 
-        /// <summary>
-        /// Private coroutine wrapper that handles the immediate execution option
-        /// before delegating to the derived class's Run implementation.
-        /// </summary>
-        /// <param name="immediate">If true, executes the callback immediately before waiting for the first scheduled event.</param>
-        /// <returns>IEnumerator required for coroutine functionality.</returns>
-        private IEnumerator Run(bool immediate)
-        { 
+        private IEnumerator RunInternal(bool immediate)
+        {
             if (immediate)
                 TriggerOnTick();
-            
+
             yield return Run();
         }
 
         /// <summary>
-        /// Abstract method that derived scheduler classes must implement.
-        /// Defines the core timing logic for when the handler's OnTick method is called.
+        /// Override this to implement custom tick logic.
         /// </summary>
-        /// <returns>An IEnumerator for Unity's coroutine system.</returns>
         protected abstract IEnumerator Run();
+
+        protected virtual void TriggerOnTick() => OnTick?.Invoke();
+        protected virtual void TriggerOnTickStart() => OnTickStart?.Invoke();
+        protected virtual void TriggerOnTickEnd() => OnTickEnd?.Invoke();
+        protected virtual void TriggerOnStop() => OnStop?.Invoke();
+
+        public virtual void OnBeforeSerialize() { }
+
+        public virtual void OnAfterDeserialize()
+        {
+            owner = null;
+            _coroutine = null;
+            _isRunning = false;
+        }
+
+        /// <summary>
+        /// Creates a clone of this scheduler with a new owner assigned.
+        /// Event handlers and runtime state are not copied.
+        /// </summary>
+        /// <typeparam name="T">The scheduler subclass type.</typeparam>
+        /// <param name="newOwner">The MonoBehaviour to assign to the clone.</param>
+        /// <returns>A new instance of the scheduler with the same config and new owner.</returns>
+        public Scheduler Clone(MonoBehaviour newOwner)
+        {
+            var clone = Instantiate(this);
+            clone.owner = newOwner;
+            clone._isRunning = false;
+            clone._coroutine = null;
+
+            // Note: Events are not copied, as UnityEvents/Actions are not serialized.
+            // If desired, caller can reassign them via `Init()`.
+            return clone;
+        }
     }
 }

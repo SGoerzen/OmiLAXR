@@ -19,7 +19,7 @@ namespace OmiLAXR.Filters
     /// </summary>
     [AddComponentMenu("OmiLAXR / 2) Filters / Blacklist Filter")]
     [Description("Filters found objects by a blacklist of tracking names. The names are get with go.GetTrackingName().")]
-    public class BlacklistFilter : Filter
+    public sealed class BlacklistFilter : Filter
     {
         /// <summary>
         /// List of tracking names to exclude from the filtered results.

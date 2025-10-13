@@ -18,7 +18,7 @@ namespace OmiLAXR.Context
     [DisallowMultipleComponent]
     [AddComponentMenu("OmiLAXR / Scenario Context / Registration")]
     [Description("Component for holding a registration UUID.")]
-    public class Registration : LearningContext
+    public sealed class Registration : LearningContext
     {
         /// <summary>
         /// Static reference to the singleton instance.

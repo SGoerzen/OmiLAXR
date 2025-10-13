@@ -16,20 +16,22 @@ namespace OmiLAXR.Components
     public class InteractionEventHandler : MonoBehaviour, IPointerEnterHandler, IPointerExitHandler,
         IPointerDownHandler, IPointerUpHandler
     {
+        public delegate void InteractionEventHandlerAction(InteractionEventHandler sender, InteractionEventArgs args);
         /// <summary>
         /// Contains data about the pointer interaction events.
         /// </summary>
         public struct InteractionEventArgs
         {
+            public string Device { get; set; }
             /// <summary>
             /// Total number of presses recorded since this component was initialized.
             /// </summary>
-            public int TotalPresses { get; set; }
+            public uint TotalPresses { get; set; }
             
             /// <summary>
             /// Number of presses recorded during the current hover.
             /// </summary>
-            public int PressesInHover { get; set; }
+            public uint PressesInHover { get; set; }
             
             /// <summary>
             /// Duration in seconds that the pointer has been hovering over this element.
@@ -53,34 +55,34 @@ namespace OmiLAXR.Components
         private bool _isPressing;
         
         // Sum of how often the button was pressed inside a hover
-        private int _pressHoverSum;
-        private int _pressTotalSum;
+        private uint _pressHoverSum;
+        private uint _pressTotalSum;
 
         /// <summary>
         /// Event triggered when the pointer starts hovering over this element.
         /// </summary>
-        public event Action<InteractionEventArgs> OnHoverStarted;
+        public event InteractionEventHandlerAction OnHoverStarted;
 
         /// <summary>
         /// Event triggered when the pointer stops hovering over this element.
         /// </summary>
-        public event Action<InteractionEventArgs> OnHoverEnded;
+        public event InteractionEventHandlerAction OnHoverEnded;
         
         /// <summary>
         /// Event triggered when the pointer begins pressing this element.
         /// </summary>
-        public event Action<InteractionEventArgs> OnPressStarted;
+        public event InteractionEventHandlerAction OnPressStarted;
         
         /// <summary>
         /// Event triggered when the pointer releases this element after pressing.
         /// </summary>
-        public event Action<InteractionEventArgs> OnPressEnded;
+        public event InteractionEventHandlerAction OnPressEnded;
         
         /// <summary>
         /// Event triggered when a complete click action occurs (press and release while hovering).
         /// Only fires when the element is released while the pointer is still hovering over it.
         /// </summary>
-        public event Action<InteractionEventArgs> OnClicked;
+        public event InteractionEventHandlerAction OnClicked;
         
         /// <summary>
         /// Whether the pointer is currently hovering over this element.
@@ -92,6 +94,23 @@ namespace OmiLAXR.Components
         /// </summary>
         public bool IsPressing => _isPressing;
 
+        public static string GetDeviceName(PointerEventData eventData)
+        {
+            // 1. Prüfe pointerId (klassisch)
+            if (eventData.pointerId == -1)
+                return "Touch";
+            if (eventData.pointerId == 0)
+                return "Mouse";
+            if (eventData.pointerId > 0)
+                return $"Touch {eventData.pointerId}";
+
+            // 2. Optional: Analyse des Raycast-Moduls
+            var moduleType = eventData.pointerPressRaycast.module?.GetType().Name ?? "UnknownModule";
+
+            // 3. Rückfall
+            return $"Unknown input via {moduleType}";
+        }
+        
         /// <summary>
         /// Called when the pointer enters this UI element.
         /// Records the start time and logs the event.
@@ -102,12 +121,13 @@ namespace OmiLAXR.Components
             _isHovering = true;
             _pressHoverSum = 0;
             
-            OnHoverStarted?.Invoke(new InteractionEventArgs()
+            OnHoverStarted?.Invoke(this, new InteractionEventArgs()
             {
                 TotalPresses = _pressTotalSum,
                 PressesInHover = _pressHoverSum,
                 HoverDuration = 0,
-                PressDuration = 0
+                PressDuration = 0,
+                Device = GetDeviceName(eventData)
             });
         }
 
@@ -121,12 +141,13 @@ namespace OmiLAXR.Components
                 return;
             _isHovering = false;
 
-            OnHoverEnded?.Invoke(new InteractionEventArgs()
+            OnHoverEnded?.Invoke(this, new InteractionEventArgs()
             {
                 TotalPresses = _pressTotalSum,
                 PressesInHover = _pressHoverSum,
                 HoverDuration = Time.time - _hoverStartTime,
-                PressDuration = _isPressing ? Time.time - _pressStartTime : 0
+                PressDuration = _isPressing ? Time.time - _pressStartTime : 0,
+                Device = GetDeviceName(eventData)
             });
         }
 
@@ -139,12 +160,13 @@ namespace OmiLAXR.Components
             _pressStartTime = Time.time;
             _isPressing = true;
 
-            OnPressStarted?.Invoke(new InteractionEventArgs()
+            OnPressStarted?.Invoke(this, new InteractionEventArgs()
             {
                 TotalPresses = _pressTotalSum,
                 PressesInHover = _pressHoverSum,
                 HoverDuration = Time.time - _hoverStartTime,
-                PressDuration = 0
+                PressDuration = 0,
+                Device = GetDeviceName(eventData)
             });
         }
 
@@ -168,15 +190,16 @@ namespace OmiLAXR.Components
                 TotalPresses = _pressTotalSum,
                 PressesInHover = _pressHoverSum,
                 HoverDuration = Time.time - _hoverStartTime,
-                PressDuration = pressDuration
+                PressDuration = pressDuration,
+                Device = GetDeviceName(eventData)
             };
 
-            OnPressEnded?.Invoke(eventArgs);
+            OnPressEnded?.Invoke(this, eventArgs);
             
             // If we're still hovering when the press ends, this is considered a "click"
             if (_isHovering)
             {
-                OnClicked?.Invoke(eventArgs);
+                OnClicked?.Invoke(this, eventArgs);
             }
         }
     }

@@ -17,7 +17,7 @@ namespace OmiLAXR.Listeners
     /// </summary>
     [AddComponentMenu("OmiLAXR / 1) Listeners / <GameObjectStateWatcher> Objects Listener")]
     [Description("Provides all <GameObjectStateWatcher> components to pipeline.")]
-    public class GameObjectStateWatcherListener : AutoListener<GameObjectStateWatcher>
+    public sealed class GameObjectStateWatcherListener : AutoListener<GameObjectStateWatcher>
     {
         // Implementation inherited from AutoListener<GameObjectStateWatcher>
         // Automatically detects all GameObjectStateWatcher components in the scene

@@ -274,6 +274,7 @@ namespace OmiLAXR.TrackingBehaviours
 #endif
             unityEvent.AddListener(invoker);
         }
+        
 
         /// <summary>
         /// Removes Unity Event binding.

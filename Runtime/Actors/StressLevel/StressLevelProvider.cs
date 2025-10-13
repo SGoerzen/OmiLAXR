@@ -25,13 +25,13 @@ namespace OmiLAXR.StressLevel
         /// <summary>
         /// Collection of registered stress data providers that contribute to the final calculation
         /// </summary>
-        public List<StressLevelDataProvider> providers = new List<StressLevelDataProvider>();
+        public List<IStressLevelDataProvider> providers = new List<IStressLevelDataProvider>();
 
         /// <summary>
         /// Adds a stress data provider to the collection if not already present
         /// </summary>
         /// <param name="provider">Provider to register</param>
-        public void RegisterProvider(StressLevelDataProvider provider)
+        public void RegisterProvider(IStressLevelDataProvider provider)
         {
             if (!providers.Contains(provider)) providers.Add(provider);
         }
@@ -40,7 +40,7 @@ namespace OmiLAXR.StressLevel
         /// Removes a stress data provider from the collection
         /// </summary>
         /// <param name="provider">Provider to unregister</param>
-        public void UnregisterProvider(StressLevelDataProvider provider)
+        public void UnregisterProvider(IStressLevelDataProvider provider)
         {
             if (providers.Contains(provider)) providers.Remove(provider);
         }

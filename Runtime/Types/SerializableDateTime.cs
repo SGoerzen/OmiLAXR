@@ -13,7 +13,7 @@ namespace OmiLAXR.Types
     /// All dates are treated as UTC to ensure consistency across different time zones.
     /// </summary>
     [Serializable]
-    public class SerializableDateTime
+    public sealed class SerializableDateTime
     {
         /// <summary>Year component (1-9999). Defaults to 2025.</summary>
         public int year = 2025;

@@ -17,7 +17,7 @@ namespace OmiLAXR.Listeners
     /// </summary>
     [AddComponentMenu("OmiLAXR / 1) Listeners / Scene GameObjects Listener")]
     [Description("Provides all GameObjects to pipeline.")]
-    public class SceneGameObjectsListener : AutoListener<GameObject>
+    public sealed class SceneGameObjectsListener : AutoListener<GameObject>
     {
         // Implementation inherited from AutoListener<GameObject>
         // Automatically detects all GameObject instances in the scene

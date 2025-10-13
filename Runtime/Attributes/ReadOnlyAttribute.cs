@@ -13,7 +13,7 @@ namespace OmiLAXR
     /// </summary>
     /// <seealso cref="BeginReadOnlyGroupAttribute"/>
     /// <seealso cref="EndReadOnlyGroupAttribute"/>
-    public class ReadOnlyAttribute : PropertyAttribute { }
+    public sealed class ReadOnlyAttribute : PropertyAttribute { }
 
     /// <summary>
     /// Display one or more fields as read-only in the inspector.
@@ -22,7 +22,7 @@ namespace OmiLAXR
     /// </summary>
     /// <seealso cref="EndReadOnlyGroupAttribute"/>
     /// <seealso cref="ReadOnlyAttribute"/>
-    public class BeginReadOnlyGroupAttribute : PropertyAttribute { }
+    public sealed class BeginReadOnlyGroupAttribute : PropertyAttribute { }
 
     /// <summary>
     /// Use with <see cref="BeginReadOnlyGroupAttribute"/>.
@@ -30,5 +30,5 @@ namespace OmiLAXR
     /// </summary>
     /// <seealso cref="BeginReadOnlyGroupAttribute"/>
     /// <seealso cref="ReadOnlyAttribute"/>
-    public class EndReadOnlyGroupAttribute : PropertyAttribute { }
+    public sealed class EndReadOnlyGroupAttribute : PropertyAttribute { }
 }

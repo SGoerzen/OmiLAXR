@@ -14,7 +14,7 @@ namespace OmiLAXR.Components
     /// </summary>
     [AddComponentMenu("OmiLAXR / Game Objects / Exclude From Tracking")]
     [DisallowMultipleComponent]
-    public class ExcludeFromTracking : MonoBehaviour
+    public sealed class ExcludeFromTracking : MonoBehaviour
     {
         // This component acts as a marker - no additional implementation needed.
         // Its presence on a GameObject indicates exclusion from tracking.

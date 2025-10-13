@@ -10,7 +10,7 @@ namespace OmiLAXR
     /// Can be applied multiple times to the same field.
     /// </summary>
     [System.AttributeUsage(System.AttributeTargets.Field, AllowMultiple = true)]
-    public class GestureAttribute : System.Attribute
+    public sealed class GestureAttribute : System.Attribute
     {
         /// <summary>
         /// Gets the name of the gesture.

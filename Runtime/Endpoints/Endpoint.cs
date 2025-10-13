@@ -27,8 +27,8 @@ namespace OmiLAXR.Endpoints
         /// Total count of successfully recorded statements.
         /// Only updated in Unity Editor for debugging purposes.
         /// </summary>
-        [ReadOnly]
-        public ulong recordedStatements;
+        [field: SerializeField, ReadOnly]
+        public ulong RecordedStatements { get; protected set; } = 0;
 
         // Platform-specific thread usage configuration
         // Threads are disabled on WebGL due to platform limitations
@@ -264,7 +264,7 @@ namespace OmiLAXR.Endpoints
             FlushQueue();
             
             // Log final statistics
-            DebugLog.OmiLAXR.Print($"⛔({GetType().Name}) stopped writing statements. {recordedStatements} statements were sent.");
+            DebugLog.OmiLAXR.Print($"⛔({GetType().Name}) stopped writing statements. {RecordedStatements} statements were sent.");
 
             // Initiate shutdown sequence
             _shuttingDown = true;
@@ -454,7 +454,7 @@ namespace OmiLAXR.Endpoints
         /// <param name="statement">The statement that was successfully sent</param>
         protected void TriggerSentStatement(IStatement statement)
         {
-            recordedStatements++;
+            RecordedStatements++;
             // Notify listeners of successful statement delivery
             OnSentStatement?.Invoke(this, statement);
         }

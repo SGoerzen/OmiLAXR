@@ -23,6 +23,10 @@ namespace OmiLAXR.Endpoints
     [Description("Stores statements as JSONL (JSON per Line) on local path.")]
     public class LocalFileEndpoint : Endpoint
     {
+#if UNITY_2020_1_OR_NEWER && !UNITY_2021_1_OR_NEWER
+        protected override bool useThreads => false;
+#endif
+        
         /// <summary>
         /// Predefined folder locations for storing statement files.
         /// Provides convenient access to common system folders and custom paths.
@@ -36,6 +40,8 @@ namespace OmiLAXR.Endpoints
             HomeFolder,             // User's home directory
             Custom                  // User-defined custom path
         }
+
+        // protected override bool useThreads => false;
 
         /// <summary>
         /// Selected default folder for file storage.

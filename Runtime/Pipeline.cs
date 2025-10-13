@@ -422,7 +422,7 @@ namespace OmiLAXR
         /// <param name="message">Format string for the log message</param>
         /// <param name="ps">Parameters for string formatting</param>
         protected void Log(string message, params object[] ps)
-            => DebugLog.OmiLAXR.Print($"<{GetType().Name}> " + message, ps);
+            => DebugLog.OmiLAXR.Print($"({GetType().Name}) " + message, ps);
 
         /// <summary>
         /// Unity OnEnable callback that triggers pipeline startup.

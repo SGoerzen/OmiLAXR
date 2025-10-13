@@ -16,7 +16,7 @@ namespace OmiLAXR.Context
     [AddComponentMenu("OmiLAXR / Scenario Context / FPS Monitor")]
     [DisallowMultipleComponent]
     [Description("Tracks Frames per Seconds.")]
-    public class FpsMonitor : LearningContext
+    public sealed class FpsMonitor : LearningContext
     {
         /// <summary>
         /// Static reference to the singleton instance.

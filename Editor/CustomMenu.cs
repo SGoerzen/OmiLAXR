@@ -77,6 +77,7 @@ namespace OmiLAXR.Editor
             // Refresh asset view
             AssetDatabase.Refresh();
         }
+
     }
 }
 #endif

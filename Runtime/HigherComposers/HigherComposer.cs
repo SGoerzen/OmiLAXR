@@ -24,6 +24,8 @@ namespace OmiLAXR.Composers.HigherComposers
         /// </summary>
         /// <returns>The name of the composer.</returns>
         public virtual string GetName() => _name;
+        
+        public abstract string GetDataStandardVersion();
 
         public ComposerGroup GetGroup() => ComposerGroup.Other;
         /// <summary>

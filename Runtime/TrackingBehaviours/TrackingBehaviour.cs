@@ -56,34 +56,22 @@ namespace OmiLAXR.TrackingBehaviours
         protected readonly List<Scheduler> Schedulers = new List<Scheduler>();
 
         /// <summary>
-        /// Creates and configures an interval-based scheduler with full settings control.
-        /// The scheduler will repeatedly execute the specified action at regular intervals.
-        /// </summary>
-        /// <param name="onTick">Action to execute at each interval</param>
-        /// <param name="settings">Detailed configuration for the interval timer</param>
-        /// <param name="onTickStart">Optional action called before each tick</param>
-        /// <param name="onTickEnd">Optional action called after each tick</param>
-        /// <returns>Configured IntervalTicker instance for further control</returns>
-        protected IntervalTicker SetInterval(Action onTick, IntervalTicker.Settings settings, Action onTickStart = null, Action onTickEnd = null)
-        {
-            var it = new IntervalTicker(this, settings, onTick, onTickStart, onTickEnd);
-            Schedulers.Add(it);
-            
-            // Start immediately if configured to do so
-            if (settings.runImmediate)
-                it.Start();
-            return it;
-        }
-
-        /// <summary>
         /// Creates a simple interval scheduler with just the tick action and interval duration.
         /// Convenience method for basic interval operations without advanced configuration.
         /// </summary>
         /// <param name="onTick">Action to execute at each interval</param>
         /// <param name="intervalSeconds">Time between executions in seconds</param>
         /// <returns>Configured IntervalTicker instance</returns>
-        protected IntervalTicker SetInterval(Action onTick, float intervalSeconds = 1.0f)
-            => SetInterval(onTick, new IntervalTicker.Settings() { intervalSeconds = intervalSeconds });
+        protected IntervalTicker SetInterval(Action onTick, float intervalSeconds = 1.0f, int ttLTicks = -1)
+            => SetInterval(IntervalTicker.Create(this, intervalSeconds, onTick, ttLTicks, runImmediate: true));
+
+        protected IntervalTicker SetInterval(IntervalTicker ticker) => (IntervalTicker)SetTicker(ticker);
+        
+        protected Scheduler SetTicker(Scheduler ticker)
+        {
+            Schedulers.Add(ticker);
+            return ticker;
+        }
 
         /// <summary>
         /// Creates and configures a timeout-based scheduler with full settings control.
@@ -94,16 +82,8 @@ namespace OmiLAXR.TrackingBehaviours
         /// <param name="onTickStart">Optional action called before timeout starts</param>
         /// <param name="onTickEnd">Optional action called after timeout completes</param>
         /// <returns>Configured TimeoutTicker instance for further control</returns>
-        protected TimeoutTicker SetTimeout(Action onTick, TimeoutTicker.Settings settings, Action onTickStart = null, Action onTickEnd = null)
-        {
-            var to = new TimeoutTicker(this, settings, onTick, onTickStart, onTickEnd);
-            Schedulers.Add(to);
-            
-            // Start immediately if configured to do so
-            if (settings.runImmediate)
-                to.Start();
-            return to;
-        }
+        protected TimeoutTicker SetTimeout(TimeoutTicker timeoutTicker)
+            => (TimeoutTicker)SetTicker(timeoutTicker);
 
         /// <summary>
         /// Creates a simple timeout scheduler with just the tick action and timeout duration.
@@ -113,7 +93,7 @@ namespace OmiLAXR.TrackingBehaviours
         /// <param name="timeoutSeconds">Timeout duration in seconds</param>
         /// <returns>Configured TimeoutTicker instance</returns>
         protected TimeoutTicker SetTimeout(Action onTick, float timeoutSeconds = 1.0f)
-            => SetTimeout(onTick, new TimeoutTicker.Settings() { timeoutSeconds = timeoutSeconds });
+            => SetTimeout(TimeoutTicker.Create(this, timeoutSeconds, onTick, runImmediate: true));
        
         /// <summary>
         /// Initializes the tracking behavior by setting up schedulers and event subscriptions.
@@ -144,7 +124,6 @@ namespace OmiLAXR.TrackingBehaviours
                     if (!enabled)
                         return;
                     OnStartedPipeline(Pipeline);
-                    StartSchedules(); // Begin any scheduled operations
                 };
                 
                 // Handle pipeline preparation for stop
@@ -179,16 +158,23 @@ namespace OmiLAXR.TrackingBehaviours
                 {
                     if (!enabled)
                         return;
-                    // Type optimization: skip selection if T is Object or no objects to process
-                    if (typeof(T) == typeof(Object) || objects.Length == 0)
-                        AfterFilteredObjects(objects as T[]);
-                    else
+                    var selectedObjects = ExtractOrSelect<T>(objects);
+                    var newSelectedObjects = new List<T>();
+                    // Filter objects to match our tracking type and store them
+                    foreach (var o in objects)
                     {
-                        // Filter objects to match our tracking type and store them
-                        var selectedObjects = Select<T>(objects);
-                        AllFilteredObjects.AddRange(selectedObjects);
-                        AfterFilteredObjects(selectedObjects);
+                        if (AllFilteredObjects.Contains(o))
+                            continue;
+                        AllFilteredObjects.Add(o);
                     }
+                    foreach (var s in selectedObjects)
+                    {
+                        if (SelectedObjects.Contains(s))
+                            continue;
+                        SelectedObjects.Add(s);
+                        newSelectedObjects.Add(s);
+                    }
+                    AfterFilteredObjects(newSelectedObjects.ToArray());
                 };
 
                 Pipeline.OnQuit += (_) =>
@@ -260,6 +246,8 @@ namespace OmiLAXR.TrackingBehaviours
         /// </summary>
         /// <param name="objects">Array of filtered objects of type T to begin tracking</param>
         protected abstract void AfterFilteredObjects(T[] objects);
+        
+        protected readonly List<T> SelectedObjects = new List<T>();
 
         /// <summary>
         /// Stores the currently selected objects for tracking.
@@ -267,7 +255,7 @@ namespace OmiLAXR.TrackingBehaviours
         /// through the pipeline and are actively being tracked.
         /// Used for cleanup operations and state management.
         /// </summary>
-        protected readonly List<T> AllFilteredObjects = new List<T>();
+        protected static readonly List<Object> AllFilteredObjects = new List<Object>();
 
         /// <summary>
         /// Starts all registered schedulers if the component is enabled.
@@ -278,7 +266,11 @@ namespace OmiLAXR.TrackingBehaviours
             if (!enabled)
                 return;
             foreach (var scheduler in Schedulers)
+            {
+                if (!scheduler.owner)
+                    scheduler.owner = this;
                 scheduler.Start();
+            }
         }
 
         /// <summary>
@@ -369,6 +361,48 @@ namespace OmiLAXR.TrackingBehaviours
             => objects
                 .Where(o => o.GetType() == typeof(TS) || o.GetType().IsSubclassOf(typeof(TS)))
                 .Select(o => o as TS).ToArray();
+        
+        protected TS[] Extract<TS>(Object[] objects) where TS : Component
+        {
+            return objects
+                .Select(obj =>
+                {
+                    if (obj is GameObject go)
+                        return go.GetComponent<TS>();
+                    if (obj is Component comp)
+                        return comp.GetComponent<TS>();
+                    return null;
+                })
+                .Where(c => c != null)
+                .ToArray();
+        }
+        
+        protected TS[] ExtractOrSelect<TS>(Object[] objects) where TS : Object
+        {
+            var targetType = typeof(TS);
+
+            // If TS is a Component or a subclass of Component, extract via GetComponent
+            if (typeof(Component).IsAssignableFrom(targetType))
+            {
+                return objects
+                    .Select(obj =>
+                    {
+                        if (obj is GameObject go)
+                            return go.GetComponent<TS>();
+                        if (obj is Component comp)
+                            return comp.GetComponent<TS>();
+                        return null;
+                    })
+                    .Where(c => c != null)
+                    .ToArray();
+            }
+
+            // Otherwise, just filter and cast directly
+            return objects
+                .Where(o => targetType.IsAssignableFrom(o.GetType()))
+                .Cast<TS>()
+                .ToArray();
+        }
         
         /// <summary>
         /// Gets the first object of the specified type from an array of Unity Objects.

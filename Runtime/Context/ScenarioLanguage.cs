@@ -3,7 +3,7 @@
 * Copyright (C) 2025 Sergej Görzen <sergej.goerzen@gmail.com>
 * This file is part of OmiLAXR.
 */
-using OmiLAXR.Enums;
+using OmiLAXR.Types;
 using UnityEngine;
 
 namespace OmiLAXR.Context
@@ -15,7 +15,7 @@ namespace OmiLAXR.Context
     /// </summary>
     [AddComponentMenu("OmiLAXR / Scenario Context / Scenario Language")]
     [DisallowMultipleComponent]
-    public class ScenarioLanguage : LearningContext
+    public sealed class ScenarioLanguage : LearningContext
     {
         /// <summary>
         /// Static reference to the singleton instance.

@@ -8,7 +8,7 @@ using System;
 namespace OmiLAXR
 {
     [AttributeUsage(AttributeTargets.Class, Inherited = false)]
-    public class ShutdownOrderAttribute : Attribute
+    public sealed class ShutdownOrderAttribute : Attribute
     {
         public int Order { get; }
 
