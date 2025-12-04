@@ -16,6 +16,7 @@ namespace OmiLAXR.Listeners
     /// <typeparam name="T">The Unity Object type to automatically detect and listen for</typeparam>
     public class AutoListener<T> : Listener where T : Object
     {
+        protected virtual bool IncludeInactive => true;
         /// <summary>
         /// Initiates automatic detection of all objects of type T in the scene.
         /// Called when the listener starts and immediately searches for all instances
@@ -24,7 +25,7 @@ namespace OmiLAXR.Listeners
         public override void StartListening()
         {
             // Use the generic Detect method to find all objects of type T
-            Detect<T>();
+            Detect<T>(IncludeInactive);
         }
     }
 }

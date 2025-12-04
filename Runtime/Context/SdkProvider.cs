@@ -14,7 +14,7 @@ namespace OmiLAXR.Context
             {
                 if (_instance == null)
                 {
-                    _instance = FindObjectOfType<SdkProvider>();
+                    _instance = FindAnyObjectByType<SdkProvider>();
                 }
 
                 return _instance;

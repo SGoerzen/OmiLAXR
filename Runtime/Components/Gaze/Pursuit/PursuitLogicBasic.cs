@@ -131,7 +131,6 @@ namespace OmiLAXR.Components.Gaze.Pursuit
 
                     var endUtc = DateTime.UtcNow;
                     var durationMs = (int)(_elapsedSec * 1000f);
-                    var isValid = false;
 
                     if (durationMs >= minDurationMs && _samples >= 2)
                     {
@@ -148,8 +147,6 @@ namespace OmiLAXR.Components.Gaze.Pursuit
                             targetVelocityDegPerSec: avgTargetVel,
                             sampleCount: _samples
                         );
-
-                        isValid = true;
                     }
 
                     // Debug.Log($"[Pursuit END] duration={durationMs}ms | samples={_samples} | gain={avgGain:F2} | valid={isValid}");

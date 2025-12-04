@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using OmiLAXR.Extensions;
 using OmiLAXR.Types;
 
@@ -45,5 +46,23 @@ namespace OmiLAXR.Components
             var fd = (FaceData)obj;
             return fd.Weights.AreValuesEqual(Weights) && fd.Confidences.AreValuesEqual(Confidences);
         }
+        
+        public override int GetHashCode()
+        {
+            // Hash aus den Array-Inhalten deterministisch und ohne Allokationen bilden
+            var hc = new HashCode();
+
+            // Einbeziehen der Längen zur Unterscheidung unterschiedlicher Größen
+            hc.Add(Weights?.Length ?? 0);
+            for (int i = 0; i < (Weights?.Length ?? 0); i++)
+                hc.Add(Weights[i]);
+
+            hc.Add(Confidences?.Length ?? 0);
+            for (int i = 0; i < (Confidences?.Length ?? 0); i++)
+                hc.Add(Confidences[i]);
+
+            return hc.ToHashCode();
+        }
+
     }
 }

@@ -19,7 +19,6 @@ using System.Collections.Generic;
 using System.ComponentModel;
 using UnityEngine;
 using OmiLAXR.Actors.HeartRate;
-using UnityEngine;
 
 namespace OmiLAXR.TrackingBehaviours
 {
