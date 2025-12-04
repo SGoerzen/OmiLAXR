@@ -47,6 +47,8 @@ namespace OmiLAXR.Utils
         /// </summary>
         private readonly object _lock = new object();
         
+        private bool _isDisposed;
+        
         /// <summary>
         /// Initializes a new BufferedUtf8Writer for the specified file path.
         /// Creates or opens the file and sets up buffering for optimal performance.
@@ -59,6 +61,7 @@ namespace OmiLAXR.Utils
             _bufferedStream = new BufferedStream(_fileStream, bufferSize);
             _writeBuffer = new byte[bufferSize];
             FilePath = path;
+            _isDisposed = false;
         }
 
         /// <summary>
@@ -166,9 +169,13 @@ namespace OmiLAXR.Utils
         {
             lock (_lock)
             {
-                // Ensure all data is written before disposing
-                _bufferedStream.Flush();
-                _bufferedStream.Dispose();
+                if (!_isDisposed)
+                {
+                    // Ensure all data is written before disposing
+                    _bufferedStream.Flush();
+                    _bufferedStream.Dispose();
+                    _isDisposed = true;
+                }
                 _fileStream.Dispose();
             }
         }
