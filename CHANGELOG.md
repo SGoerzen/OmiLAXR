@@ -1,5 +1,16 @@
 # Changelog
 
+## [2.2.1] - 2025-12-04
+
+### Added
+- Added virtual overridable `IncludeInactive` property to `AutoListener<T>` to allow including inactive GameObjects in future lookups. Override with `protected override bool IncludeInactive => false;` to restrict searches to active GameObjects only.
+
+### Fixed
+- Fixed an error that occurred when CSV files of the (CSV) File Endpoint were flushed.
+- Removed various compiler warnings.
+
+---
+
 ## [2.2.0] - 2025-10-13
 
 ### Added
