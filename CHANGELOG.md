@@ -5,9 +5,6 @@
 ### Added
 - Added `string version` to `ToDataStandardString()`, `ToJsonString()` and `ToCsvFormat()` in `IStatement`.
 
-### Fixed
-- Fixed issue that `Learning Record Store` still sends statements by default with version `2.0.0`.
-
 ---
 
 ## [2.2.1] - 2025-12-04
