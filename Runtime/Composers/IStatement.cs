@@ -107,16 +107,17 @@ namespace OmiLAXR.Composers
         /// </summary>
         /// <returns>String representation of the statement data</returns>
         [System.Obsolete("Use ToJsonString(bool pretty = false) instead.", true)]
-        string ToDataStandardString();
-        
+        string ToDataStandardString(string version = null);
+
         /// <summary>
         /// Converts the statement to JSON string format for export or storage.
         /// JSON format provides standardized, human-readable, and machine-parseable
         /// representation of statement data suitable for various endpoints and systems.
         /// </summary>
         /// <param name="pretty">Whether to format JSON with indentation for readability</param>
+        /// <param name="version">Data standard version</param>
         /// <returns>JSON string representation of the statement</returns>
-        string ToJsonString(bool pretty = false);
+        string ToJsonString(bool pretty = false, string version = null);
         
         /// <summary>
         /// Converts the statement to a concise string representation for logging or debugging.
@@ -133,7 +134,7 @@ namespace OmiLAXR.Composers
         /// </summary>
         /// <param name="flatten">Whether to flatten nested objects into separate columns</param>
         /// <returns>CSV format representation of the statement data</returns>
-        CsvFormat ToCsvFormat(bool flatten = false);
+        CsvFormat ToCsvFormat(bool flatten = false, string version = null);
         
         /// <summary>
         /// Gets the timestamp when this statement was created as a formatted string.
