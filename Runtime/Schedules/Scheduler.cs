@@ -60,10 +60,20 @@ namespace OmiLAXR.Schedules
         /// </summary>
         public virtual void Init(MonoBehaviour owner, Action onTick = null, Action onTickStart = null, Action onTickEnd = null, bool runImmediate = false)
         {
+            if (_isRunning)
+                Stop();
+
             this.owner = owner;
+
+            OnTick = null;
+            OnTickStart = null;
+            OnTickEnd = null;
+            OnStop = null;
+
             if (onTick != null) OnTick += onTick;
             if (onTickStart != null) OnTickStart += onTickStart;
             if (onTickEnd != null) OnTickEnd += onTickEnd;
+
             this.runImmediate = runImmediate;
 
             if (runImmediate)
@@ -74,10 +84,12 @@ namespace OmiLAXR.Schedules
         {
             if (_isRunning || owner == null)
                 return;
+
             isActive = true;
+            _isRunning = true;
+
             TriggerOnTickStart();
             _coroutine = owner.StartCoroutine(RunInternal(tickImmediate));
-            _isRunning = true;
         }
 
         public virtual void Stop()
@@ -85,7 +97,6 @@ namespace OmiLAXR.Schedules
             if (!_isRunning || owner == null)
                 return;
 
-            TriggerOnTickEnd();
             isActive = false;
 
             if (_coroutine != null)
@@ -93,6 +104,8 @@ namespace OmiLAXR.Schedules
                 owner.StopCoroutine(_coroutine);
                 _coroutine = null;
             }
+
+            TriggerOnTickEnd();
 
             _isRunning = false;
             TriggerOnStop();
@@ -104,6 +117,17 @@ namespace OmiLAXR.Schedules
                 TriggerOnTick();
 
             yield return Run();
+
+            if (_isRunning)
+            {
+                isActive = false;
+                _coroutine = null;
+
+                TriggerOnTickEnd();
+
+                _isRunning = false;
+                TriggerOnStop();
+            }
         }
 
         /// <summary>

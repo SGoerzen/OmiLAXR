@@ -27,16 +27,27 @@ namespace OmiLAXR.Schedules
 
         private int _tickCount;
 
+        private WaitForSeconds _wait;
+        private float _cachedInterval = -1f;
+
+        private Action _resetTickCountHandler;
+
         /// <summary>
         /// Additional initialization (besides SchedulerTicker.Init).
         /// </summary>
-        public override void Init(MonoBehaviour owner, Action onTick, 
+        public override void Init(MonoBehaviour owner, Action onTick,
             Action onTickStart = null, Action onTickEnd = null,
             bool runImmediate = false)
         {
             base.Init(owner, onTick, onTickStart, onTickEnd, runImmediate);
-            // Reset counter each time a new session starts
-            OnTickStart += () => _tickCount = 0;
+
+            _tickCount = 0;
+
+            if (_resetTickCountHandler != null)
+                OnTickStart -= _resetTickCountHandler;
+
+            _resetTickCountHandler = () => _tickCount = 0;
+            OnTickStart += _resetTickCountHandler;
         }
 
         protected override void TriggerOnTick()
@@ -53,6 +64,12 @@ namespace OmiLAXR.Schedules
         {
             while (isActive)
             {
+                if (!Mathf.Approximately(_cachedInterval, intervalSeconds) || _wait == null)
+                {
+                    _cachedInterval = intervalSeconds;
+                    _wait = new WaitForSeconds(_cachedInterval);
+                }
+
                 if (tTLTicks > -1 && _tickCount >= tTLTicks)
                 {
                     DebugLog.OmiLAXR.Warning("IntervalTicker: Ticks reached limit. Stopping.");
@@ -60,7 +77,7 @@ namespace OmiLAXR.Schedules
                     yield break;
                 }
 
-                yield return new WaitForSeconds(intervalSeconds);
+                yield return _wait;
                 TriggerOnTick();
             }
         }

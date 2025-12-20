@@ -383,12 +383,12 @@ namespace OmiLAXR.Endpoints
             if (_isFlushing) return;
             _isFlushing = true;
 
-            float deadline = Time.realtimeSinceStartup + Mathf.Max(0f, maxSeconds);
-            int totalFlushed = 0;
+            var deadline = Time.realtimeSinceStartup + Mathf.Max(0f, maxSeconds);
+            var totalFlushed = 0;
 
             while (Time.realtimeSinceStartup < deadline)
             {
-                List<IStatement> batch = new List<IStatement>(MaxBatchSize);
+                var batch = new List<IStatement>(MaxBatchSize);
 
                 lock (_queuedStatementsLock)
                 {
