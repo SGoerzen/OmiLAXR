@@ -261,6 +261,8 @@ namespace OmiLAXR.Endpoints
         /// <returns>TransferCode indicating success or failure of the operation</returns>
         protected override TransferCode HandleSending(IStatement statement)
         {
+            if (statement == null)
+                return TransferCode.NoStatements;
             try
             {
                 // Determine the appropriate file and buffer for this statement
