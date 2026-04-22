@@ -48,22 +48,37 @@ namespace OmiLAXR.Schedules
         /// <summary>
         /// Raised when the scheduler is stopped.
         /// </summary>
-        public event Action OnStop;
+        private Action _onStop;
+        private Action _onTick;
+        private Action _onTickStart;
+        private Action _onTickEnd;
 
-        public event Action OnTick;
-        public event Action OnTickStart;
-        public event Action OnTickEnd;
+        public event Action OnStop { add => _onStop += value; remove => _onStop -= value; }
+        public event Action OnTick { add => _onTick += value; remove => _onTick -= value; }
+        public event Action OnTickStart { add => _onTickStart += value; remove => _onTickStart -= value; }
+        public event Action OnTickEnd { add => _onTickEnd += value; remove => _onTickEnd -= value; }
 
         /// <summary>
         /// Runtime initialization for this scheduler.
-        /// Call this after CreateInstance().
+        /// Call this after CreateInstance() or Clone().
         /// </summary>
-        public virtual void Init(MonoBehaviour owner, Action onTick = null, Action onTickStart = null, Action onTickEnd = null, bool runImmediate = false)
+        public virtual void Init(
+            MonoBehaviour owner,
+            Action onTick = null,
+            Action onTickStart = null,
+            Action onTickEnd = null,
+            bool runImmediate = false,
+            bool resetHandlers = true)
         {
             this.owner = owner;
-            if (onTick != null) OnTick += onTick;
-            if (onTickStart != null) OnTickStart += onTickStart;
-            if (onTickEnd != null) OnTickEnd += onTickEnd;
+
+            if (resetHandlers)
+                ResetHandlers();
+
+            if (onTick != null) _onTick += onTick;
+            if (onTickStart != null) _onTickStart += onTickStart;
+            if (onTickEnd != null) _onTickEnd += onTickEnd;
+
             this.runImmediate = runImmediate;
 
             if (runImmediate)
@@ -74,10 +89,13 @@ namespace OmiLAXR.Schedules
         {
             if (_isRunning || owner == null)
                 return;
+
             isActive = true;
-            TriggerOnTickStart();
-            _coroutine = owner.StartCoroutine(RunInternal(tickImmediate));
             _isRunning = true;
+
+            TriggerOnTickStart();
+
+            _coroutine = owner.StartCoroutine(RunInternal(tickImmediate));
         }
 
         public virtual void Stop()
@@ -85,7 +103,6 @@ namespace OmiLAXR.Schedules
             if (!_isRunning || owner == null)
                 return;
 
-            TriggerOnTickEnd();
             isActive = false;
 
             if (_coroutine != null)
@@ -93,6 +110,8 @@ namespace OmiLAXR.Schedules
                 owner.StopCoroutine(_coroutine);
                 _coroutine = null;
             }
+
+            TriggerOnTickEnd();
 
             _isRunning = false;
             TriggerOnStop();
@@ -111,10 +130,18 @@ namespace OmiLAXR.Schedules
         /// </summary>
         protected abstract IEnumerator Run();
 
-        protected virtual void TriggerOnTick() => OnTick?.Invoke();
-        protected virtual void TriggerOnTickStart() => OnTickStart?.Invoke();
-        protected virtual void TriggerOnTickEnd() => OnTickEnd?.Invoke();
-        protected virtual void TriggerOnStop() => OnStop?.Invoke();
+        protected virtual void TriggerOnTick() => _onTick?.Invoke();
+        protected virtual void TriggerOnTickStart() => _onTickStart?.Invoke();
+        protected virtual void TriggerOnTickEnd() => _onTickEnd?.Invoke();
+        protected virtual void TriggerOnStop() => _onStop?.Invoke();
+
+        protected void ResetHandlers()
+        {
+            _onStop = null;
+            _onTick = null;
+            _onTickStart = null;
+            _onTickEnd = null;
+        }
 
         public virtual void OnBeforeSerialize() { }
 
@@ -123,24 +150,26 @@ namespace OmiLAXR.Schedules
             owner = null;
             _coroutine = null;
             _isRunning = false;
+
+            ResetHandlers();
         }
 
         /// <summary>
         /// Creates a clone of this scheduler with a new owner assigned.
         /// Event handlers and runtime state are not copied.
         /// </summary>
-        /// <typeparam name="T">The scheduler subclass type.</typeparam>
         /// <param name="newOwner">The MonoBehaviour to assign to the clone.</param>
         /// <returns>A new instance of the scheduler with the same config and new owner.</returns>
         public Scheduler Clone(MonoBehaviour newOwner)
         {
             var clone = Instantiate(this);
+
             clone.owner = newOwner;
             clone._isRunning = false;
             clone._coroutine = null;
 
-            // Note: Events are not copied, as UnityEvents/Actions are not serialized.
-            // If desired, caller can reassign them via `Init()`.
+            clone.ResetHandlers();
+
             return clone;
         }
     }

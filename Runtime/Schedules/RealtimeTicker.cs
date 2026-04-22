@@ -1,4 +1,10 @@
-﻿using System;
+﻿/*
+ * SPDX-License-Identifier: AGPL-3.0-or-later
+ * Copyright (C) 2025 Sergej Görzen <sergej.goerzen@gmail.com>
+ * This file is part of OmiLAXR.
+ */
+
+using System;
 using System.Collections;
 using UnityEngine;
 
@@ -13,7 +19,7 @@ namespace OmiLAXR.Schedules
         order = 1)]
     public class RealtimeTicker : Scheduler
     {
-       /// <summary>
+        /// <summary>
         /// Run loop: triggers every frame.
         /// </summary>
         protected override IEnumerator Run()
@@ -33,7 +39,8 @@ namespace OmiLAXR.Schedules
             MonoBehaviour owner,
             Action onTick = null,
             Action onTickStart = null,
-            Action onTickEnd = null, bool runImmediate = false)
+            Action onTickEnd = null,
+            bool runImmediate = false)
         {
             var scheduler = CreateInstance<RealtimeTicker>();
             scheduler.Init(owner, onTick, onTickStart, onTickEnd, runImmediate);

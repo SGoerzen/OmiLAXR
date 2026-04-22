@@ -1,5 +1,19 @@
 # Changelog
 
+## [2.2.3] - 2026-04-22
+
+### Changed
+- Improved endpoint sending stability and throughput by refactoring multi-threaded processing in `Endpoint`.
+- Improved scheduler behavior and runtime efficiency in `Scheduler` and `IntervalTicker`.
+- Improved tracking performance across transform and composer internals, including updates to `TransformWatcher`, `TransformTrackingBehaviour`, and pipeline prefabs.
+- Updated package version metadata.
+
+### Fixed
+- Added safeguards against invalid/null statement handling in `LocalFileEndpoint`.
+- Fixed `Frustum` behavior related to issue #17.
+
+---
+
 ## [2.2.2] - 2025-12-09
 
 ### Added

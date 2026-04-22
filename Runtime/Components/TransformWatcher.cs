@@ -1,8 +1,9 @@
 /*
-* SPDX-License-Identifier: AGPL-3.0-or-later
-* Copyright (C) 2025 Sergej Görzen <sergej.goerzen@gmail.com>
-* This file is part of OmiLAXR.
-*/
+ * SPDX-License-Identifier: AGPL-3.0-or-later
+ * Copyright (C) 2025 Sergej Görzen <sergej.goerzen@gmail.com>
+ * This file is part of OmiLAXR.
+ */
+
 using System;
 using UnityEngine;
 using UnityEngine.Events;
@@ -17,23 +18,26 @@ namespace OmiLAXR.Components
     [DisallowMultipleComponent]
     public sealed class TransformWatcher : MonoBehaviour
     {
+        public string scope;
+
         /// <summary>
         /// Data structure to hold information about a transform property change,
         /// including both the previous and current values.
         /// </summary>
-        public struct TransformChange
+        public readonly struct TransformChange
         {
             public readonly bool HasChanged;
+
             /// <summary>
             /// The previous value before the change occurred.
             /// </summary>
             public readonly Vector3 OldValue;
-            
+
             /// <summary>
             /// The new value after the change occurred.
             /// </summary>
             public readonly Vector3 NewValue;
-            
+
             public TransformChange(Vector3 oldValue, Vector3 newValue)
             {
                 OldValue = oldValue;
@@ -42,7 +46,7 @@ namespace OmiLAXR.Components
             }
         }
 
-        public class TransformChangeState
+        public struct TransformChangeState
         {
             public TransformChange Position;
             public TransformChange Rotation;
@@ -60,38 +64,42 @@ namespace OmiLAXR.Components
         }
 
         public TransformIgnore ignore;
-        
+
         /// <summary>
         /// Minimum position change (in units) required to trigger the position change event.
         /// </summary>
         [Tooltip("Minimum position change (in units) required to trigger events")]
+        [Min(0f)]
         public float positionThreshold = .1f;
-        
+
         /// <summary>
         /// Minimum rotation change (in degrees) required to trigger the rotation change event.
         /// </summary>
         [Tooltip("Minimum rotation change (in degrees) required to trigger events")]
+        [Min(0f)]
         public float rotationThreshold = 1.0f;
-        
+
         /// <summary>
         /// Minimum scale change required to trigger the scale change event.
         /// </summary>
         [Tooltip("Minimum scale change required to trigger events")]
+        [Min(0f)]
         public float scaleThreshold = 0.1f;
 
         [Tooltip("Minimum forward change required to trigger events.")]
+        [Min(0f)]
         public float forwardThreshold = 1.0f;
-        
+
         /// <summary>
         /// The most recent position value that exceeded the threshold.
         /// </summary>
         private Vector3 _lastPosition;
-        
+
         /// <summary>
         /// The most recent scale value that exceeded the threshold.
         /// </summary>
         private Vector3 _lastScale;
-        
+
         /// <summary>
         /// The most recent rotation value that exceeded the threshold.
         /// </summary>
@@ -103,46 +111,46 @@ namespace OmiLAXR.Components
         /// Gets the last position that exceeded the threshold.
         /// </summary>
         public Vector3 LastPosition => _lastPosition;
-        
+
         /// <summary>
         /// Gets the last scale that exceeded the threshold.
         /// </summary>
         public Vector3 LastScale => _lastScale;
-        
+
         /// <summary>
         /// Gets the last rotation that exceeded the threshold.
         /// </summary>
         public Vector3 LastRotation => _lastRotation;
 
         public Vector3 LastForward => _lastForward;
-        
+
         /// <summary>
         /// Gets the current position of the transform.
         /// </summary>
         public Vector3 CurrentPosition => transform.position;
-        
+
         /// <summary>
         /// Gets the current local scale of the transform.
         /// </summary>
         public Vector3 CurrentScale => transform.localScale;
-        
+
         /// <summary>
         /// Gets the current rotation of the transform in Euler angles.
         /// </summary>
         public Vector3 CurrentRotation => transform.eulerAngles;
 
         public Vector3 CurrentForward => transform.forward;
-        
+
         /// <summary>
         /// Gets or sets the position from the previous frame.
         /// </summary>
         public Vector3 PreviousPosition { get; private set; } = Vector3.zero;
-        
+
         /// <summary>
         /// Gets or sets the scale from the previous frame.
         /// </summary>
         public Vector3 PreviousScale { get; private set; } = Vector3.zero;
-        
+
         /// <summary>
         /// Gets or sets the rotation from the previous frame in Euler angles.
         /// </summary>
@@ -154,21 +162,24 @@ namespace OmiLAXR.Components
         /// Event triggered when position changes exceed the defined threshold.
         /// Provides the old and new position values.
         /// </summary>
-        [Tooltip("Event triggered when position changes exceed the threshold"), Obsolete("Use GetTransformChangeState() or <TransformWatcherEvents> instead.", true)]
+        [Tooltip("Event triggered when position changes exceed the threshold"),
+         Obsolete("Use GetTransformChangeState() or <TransformWatcherEvents> instead.", true)]
         public UnityEvent<TransformChange> onChangedPosition = new UnityEvent<TransformChange>();
-        
+
         /// <summary>
         /// Event triggered when scale changes exceed the defined threshold.
         /// Provides the old and new scale values.
         /// </summary>
-        [Tooltip("Event triggered when scale changes exceed the threshold"), Obsolete("Use GetTransformChangeState() or <TransformWatcherEvents> instead.", true)]
+        [Tooltip("Event triggered when scale changes exceed the threshold"),
+         Obsolete("Use GetTransformChangeState() or <TransformWatcherEvents> instead.", true)]
         public UnityEvent<TransformChange> onChangedScale = new UnityEvent<TransformChange>();
-        
+
         /// <summary>
         /// Event triggered when rotation changes exceed the defined threshold.
         /// Provides the old and new rotation values in Euler angles.
         /// </summary>
-        [Tooltip("Event triggered when rotation changes exceed the threshold"), Obsolete("Use GetTransformChangeState() or <TransformWatcherEvents> instead.", true)]
+        [Tooltip("Event triggered when rotation changes exceed the threshold"),
+         Obsolete("Use GetTransformChangeState() or <TransformWatcherEvents> instead.", true)]
         public UnityEvent<TransformChange> onChangedRotation = new UnityEvent<TransformChange>();
 
         /// <summary>
@@ -178,70 +189,107 @@ namespace OmiLAXR.Components
         /// <param name="newValue">The new value to compare against.</param>
         /// <param name="threshold">The minimum distance required to register a change.</param>
         /// <returns>True if the change exceeds the threshold, false otherwise.</returns>
-        private bool DetectChange(ref Vector3 curValue, Vector3 newValue, float threshold)
+        private static bool DetectChange(ref Vector3 lastValue, Vector3 newValue, float threshold, out Vector3 oldValue)
         {
-            // Calculate the distance between the current and new values
-            var dis = Vector3.Distance(newValue, curValue);
-            
-            // If the distance is less than or equal to the threshold, no significant change
-            if (dis <= threshold)
+            oldValue = lastValue;
+
+            if (threshold <= 0f)
+            {
+                if (newValue == lastValue) return false;
+                lastValue = newValue;
+                return true;
+            }
+
+            var delta = newValue - lastValue;
+            if (delta.sqrMagnitude <= threshold * threshold)
                 return false;
-            
-            // Update the current value to the new value
-            curValue = newValue;
-            
-            // Return true to indicate a significant change was detected
+
+            lastValue = newValue;
             return true;
         }
-        
+
+        // Cache one computed state per frame so multiple callers do not recompute.
+        private int _cachedFrame = -1;
+        private TransformChangeState _cachedState;
+
+        // Cache raw transform reads once per frame as well.
+        private Vector3 _cachedPos;
+        private Vector3 _cachedScale;
+        private Vector3 _cachedRot;
+        private Vector3 _cachedFwd;
+
+        private void OnEnable()
+        {
+            var t = transform;
+
+            _lastPosition = t.position;
+            _lastScale = t.localScale;
+            _lastRotation = t.eulerAngles;
+            _lastForward = t.forward;
+
+            PreviousPosition = _lastPosition;
+            PreviousScale = _lastScale;
+            PreviousRotation = _lastRotation;
+            PreviousForward = _lastForward;
+
+            _cachedFrame = -1;
+            _cachedState = default;
+        }
+
         /// <summary>
         /// Monitors transform changes every frame and triggers events when changes exceed thresholds.
         /// </summary>
-        public TransformChangeState
-            GetTransformChangeState(TransformIgnore? ignoredChanges = null)
+        public TransformChangeState GetTransformChangeState(TransformIgnore? ignoredChanges = null)
         {
-            // Get the current transform values
-            var pos = transform.position;
-            var scale = transform.localScale;
-            var rotation = transform.eulerAngles;
-            var forward = transform.forward;
+            // Sample only once per frame. If multiple tracking behaviours call this, the second call is O(1).
+            if (_cachedFrame != Time.frameCount)
+            {
+                _cachedFrame = Time.frameCount;
 
-            var ign = ignoredChanges.HasValue ? ignoredChanges.Value : ignore;
+                var t = transform;
 
-            var state = new TransformChangeState();
-            // Check for position changes and trigger events if needed
-            if (!ign.position && DetectChange(ref _lastPosition, pos, positionThreshold))
-            {
-                state.Position = new TransformChange(_lastPosition, pos);
-            }
-            else state.Position = new TransformChange();
-            
-            // Check for rotation changes and trigger events if needed
-            if (!ign.rotation && DetectChange(ref _lastRotation, rotation, rotationThreshold))
-            {
-                state.Rotation = new TransformChange(_lastRotation, rotation);
-            }
-            else state.Rotation = new TransformChange();
-            
-            // Check for scale changes and trigger events if needed
-            if (!ign.scale && DetectChange(ref _lastScale, scale, scaleThreshold))
-            {
-                state.Scale = new TransformChange(_lastScale, scale);
-            }
-            else state.Scale = new TransformChange();
+                _cachedPos = t.position;
+                _cachedScale = t.localScale;
+                _cachedRot = t.eulerAngles;
+                _cachedFwd = t.forward;
 
-            if (!ign.forward && DetectChange(ref _lastForward, forward, forwardThreshold))
-            {
-                state.Forward = new TransformChange(_lastForward, forward);
+                TransformChangeState state = default;
+
+                // Compute using the component-level ignore so the cached state represents the watcher configuration.
+                if (!ignore.position && DetectChange(ref _lastPosition, _cachedPos, positionThreshold, out var oldPos))
+                    state.Position = new TransformChange(oldPos, _cachedPos);
+
+                if (!ignore.rotation && DetectChange(ref _lastRotation, _cachedRot, rotationThreshold, out var oldRot))
+                    state.Rotation = new TransformChange(oldRot, _cachedRot);
+
+                if (!ignore.scale && DetectChange(ref _lastScale, _cachedScale, scaleThreshold, out var oldScale))
+                    state.Scale = new TransformChange(oldScale, _cachedScale);
+
+                if (!ignore.forward && DetectChange(ref _lastForward, _cachedFwd, forwardThreshold, out var oldFwd))
+                    state.Forward = new TransformChange(oldFwd, _cachedFwd);
+
+                PreviousPosition = _cachedPos;
+                PreviousScale = _cachedScale;
+                PreviousRotation = _cachedRot;
+                PreviousForward = _cachedFwd;
+
+                _cachedState = state;
             }
-            else state.Forward = new TransformChange();
-            
-            // Update the previous frame values
-            PreviousPosition = pos;
-            PreviousScale = scale;
-            PreviousRotation = rotation;
-            PreviousForward = forward;
-            return state;
+
+            // Caller-specific ignore masking without recomputing.
+            var ign = ignoredChanges ?? ignore;
+
+            if (!ign.position && !ign.rotation && !ign.scale && !ign.forward)
+                return _cachedState;
+
+            TransformChangeState masked = _cachedState;
+
+            if (ign.position) masked.Position = default;
+            if (ign.rotation) masked.Rotation = default;
+            if (ign.scale) masked.Scale = default;
+            if (ign.forward) masked.Forward = default;
+
+            return masked;
         }
     }
 }

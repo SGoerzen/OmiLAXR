@@ -1,8 +1,9 @@
 /*
-* SPDX-License-Identifier: AGPL-3.0-or-later
-* Copyright (C) 2025 Sergej Görzen <sergej.goerzen@gmail.com>
-* This file is part of OmiLAXR.
-*/
+ * SPDX-License-Identifier: AGPL-3.0-or-later
+ * Copyright (C) 2025 Sergej Görzen <sergej.goerzen@gmail.com>
+ * This file is part of OmiLAXR.
+ */
+
 using System;
 using System.Collections;
 using System.Collections.Generic;
@@ -30,6 +31,9 @@ namespace OmiLAXR.Endpoints
         [field: SerializeField, ReadOnly]
         public ulong RecordedStatements { get; protected set; } = 0;
 
+        private readonly object _queuedStatementsLock = new object();
+        private volatile bool _accepting = true;
+
         // Platform-specific thread usage configuration
         // Threads are disabled on WebGL due to platform limitations
         // Can be disabled globally via OMILAXR_THREADS_DISABLED symbol
@@ -49,26 +53,28 @@ namespace OmiLAXR.Endpoints
 
         // Event system for monitoring statement transfer lifecycle
         // Allows external components to hook into various stages of processing
-        public event EndpointAction OnStartedSending;                           // Fired when sending begins
-        public event EndpointAction OnStoppedSending;                          // Fired when sending completely stops
-        public event EndpointAction OnPausedSending;                           // Fired when sending is paused
-        public event EndpointAction<IStatement> OnSendingStatement;            // Fired before each statement is sent
-        public event EndpointAction<IStatement> OnSentStatement;               // Fired after successful statement delivery
-        public event EndpointAction<List<IStatement>> OnSentBatch;             // Fired after successful batch delivery
-        public event EndpointAction<IStatement> OnFailedSendingStatement;      // Fired when individual statement fails
-        public event EndpointAction<List<IStatement>> OnFailedSendingBatch;    // Fired when entire batch fails
+        public event EndpointAction OnStartedSending; // Fired when sending begins
+        public event EndpointAction OnStoppedSending; // Fired when sending completely stops
+        public event EndpointAction OnPausedSending; // Fired when sending is paused
+        public event EndpointAction<IStatement> OnSendingStatement; // Fired before each statement is sent
+        public event EndpointAction<IStatement> OnSentStatement; // Fired after successful statement delivery
+        public event EndpointAction<List<IStatement>> OnSentBatch; // Fired after successful batch delivery
+        public event EndpointAction<IStatement> OnFailedSendingStatement; // Fired when individual statement fails
+        public event EndpointAction<List<IStatement>> OnFailedSendingBatch; // Fired when entire batch fails
 
         // State tracking properties for external monitoring
-        public bool IsSending { get; private set; }        // True when the endpoint is actively processing statements
-        public bool IsTransferring { get; private set; }   // True during actual network/file transfer operations
+        public bool IsSending { get; private set; } // True when the endpoint is actively processing statements
+        public bool IsTransferring { get; private set; } // True during actual network/file transfer operations
 
         // Threading and coroutine infrastructure
-        private Thread _sendThread;                         // Background thread for statement processing
-        private Coroutine _sendCoroutine;                   // Unity coroutine alternative to threading
+        private Thread _sendThread; // Background thread for statement processing
+        private Coroutine _sendCoroutine; // Unity coroutine alternative to threading
 
         // Queue management for statement processing
-        protected readonly Queue<IStatement> QueuedStatements = new Queue<IStatement>();    // Statements waiting to be sent
-        private readonly Queue<Action> _executionQueue = new Queue<Action>();               // Actions to execute on main thread
+        protected readonly Queue<IStatement>
+            QueuedStatements = new Queue<IStatement>(); // Statements waiting to be sent
+
+        private readonly Queue<Action> _executionQueue = new Queue<Action>(); // Actions to execute on main thread
 
         // Thread synchronization mechanism (only available on thread-supporting platforms)
 #if !OMILAXR_THREADS_DISABLED && !UNITY_WEBGL
@@ -85,6 +91,16 @@ namespace OmiLAXR.Endpoints
         /// Higher values reduce overhead but increase memory usage and transfer size.
         /// </summary>
         protected virtual int MaxBatchSize => 50;
+
+        [Header("Shutdown")] [SerializeField] private bool flushOnStop = true;
+
+        [SerializeField,
+         Tooltip("Max seconds spent flushing on StopSending (0 = try flush all). For benchmarks use ~0-2s.")]
+        private float flushOnStopSecondsBudget = 0f;
+
+        [SerializeField,
+         Tooltip("If flushing exceeds budget, drop remaining queued statements (recommended for benchmarks).")]
+        private bool dropRemainingAfterBudget = false;
 
         /// <summary>
         /// Main worker loop for threaded statement processing.
@@ -105,7 +121,8 @@ namespace OmiLAXR.Endpoints
                     if (_shuttingDown) break;
 
                     // Log errors for unsuccessful transfers (except normal "no statements" case)
-                    if (result != TransferCode.Success && result != TransferCode.NoStatements && result != TransferCode.Queued)
+                    if (result != TransferCode.Success && result != TransferCode.NoStatements &&
+                        result != TransferCode.Queued)
                     {
                         DebugLog.OmiLAXR?.Error($"Failed to send statements. Error code: {result}");
                     }
@@ -146,7 +163,8 @@ namespace OmiLAXR.Endpoints
                 if (_shuttingDown) break;
 
                 // Log errors for unsuccessful transfers (except normal "no statements" case)
-                if (result != TransferCode.Success && result != TransferCode.NoStatements && result != TransferCode.Queued)
+                if (result != TransferCode.Success && result != TransferCode.NoStatements &&
+                    result != TransferCode.Queued)
                 {
                     DebugLog.OmiLAXR?.Error($"Failed to send statements. Error code: {result}");
                 }
@@ -181,14 +199,26 @@ namespace OmiLAXR.Endpoints
             // Reset shutdown flag for new sending session
             _shuttingDown = false;
 
+            // Allow enqueueing again
+            _accepting = true;
+
+            // Handle queue management based on reset parameter
+            if (resetQueue)
+            {
+                lock (_queuedStatementsLock)
+                {
+                    QueuedStatements.Clear(); // Remove all pending statements
+                }
+            }
+
             // Initialize appropriate worker based on platform capabilities
             if (useThreads)
             {
                 // Create and start background thread for statement processing
                 _sendThread = new Thread(SendWorkerLoop)
                 {
-                    IsBackground = true,                                    // Allow application to exit even if thread is running
-                    Name = $"EndpointThread-{GetType().Name}"              // Descriptive name for debugging
+                    IsBackground = true, // Allow application to exit even if thread is running
+                    Name = $"EndpointThread-{GetType().Name}" // Descriptive name for debugging
                 };
                 _sendThread.Start();
             }
@@ -205,14 +235,14 @@ namespace OmiLAXR.Endpoints
             // Notify external listeners that sending has started
             OnStartedSending?.Invoke(this);
 
-            // Handle queue management based on reset parameter
-            if (resetQueue)
-                QueuedStatements.Clear();   // Remove all pending statements
-            else
-                FlushQueue();               // Process existing statements immediately
-
             // Update state to reflect active sending
             IsSending = true;
+
+            // Wake the worker in case there is already work pending
+#if !OMILAXR_THREADS_DISABLED && !UNITY_WEBGL
+            if (useThreads)
+                _signal.Set();
+#endif
         }
 
         /// <summary>
@@ -256,29 +286,71 @@ namespace OmiLAXR.Endpoints
         /// </summary>
         public virtual void StopSending()
         {
-            // Only stop if currently sending
-            if (!IsSending)
+            // Robust guard: only skip if nothing is running anymore
+            if (!IsSending && _sendThread == null && _sendCoroutine == null)
                 return;
-            
-            // Process any remaining statements in the queue before stopping
-            FlushQueue();
-            
-            // Log final statistics
-            DebugLog.OmiLAXR.Print($"⛔({GetType().Name}) stopped writing statements. {RecordedStatements} statements were sent.");
+
+            // Stop accepting new statements immediately to prevent enqueue during shutdown
+            _accepting = false;
 
             // Initiate shutdown sequence
             _shuttingDown = true;
 
-            // Clean up worker based on current mode
+            // Wake the worker if it's waiting (thread-enabled platforms only)
+#if !OMILAXR_THREADS_DISABLED && !UNITY_WEBGL
             if (useThreads)
+                _signal.Set();
+#endif
+
+            // Reliability: flush pending statements on stop (thread-safe)
+            if (flushOnStop)
             {
-                // Wait for thread to finish processing current batch
-                _sendThread?.Join();
-                _sendThread = null;
+                if (flushOnStopSecondsBudget > 0f)
+                {
+                    FlushQueueBudget(flushOnStopSecondsBudget);
+
+                    if (dropRemainingAfterBudget)
+                    {
+                        lock (_queuedStatementsLock)
+                            QueuedStatements.Clear();
+                    }
+                }
+                else
+                {
+                    // "Flush all" (can take long, but no intentional loss)
+                    FlushQueue();
+                }
             }
             else
             {
-                // Stop coroutine if running
+                // No flush requested: drop remaining to guarantee fast shutdown
+                lock (_queuedStatementsLock)
+                    QueuedStatements.Clear();
+            }
+
+            // Clean up worker based on current mode (bounded waiting)
+            if (useThreads)
+            {
+                if (_sendThread != null)
+                {
+                    const int joinMs = 2000;
+                    if (!_sendThread.Join(joinMs))
+                    {
+                        // Thread is background; avoid blocking shutdown forever
+                        try
+                        {
+                            _sendThread.Interrupt();
+                        }
+                        catch
+                        {
+                        }
+                    }
+
+                    _sendThread = null;
+                }
+            }
+            else
+            {
                 if (_sendCoroutine != null)
                 {
                     StopCoroutine(_sendCoroutine);
@@ -289,15 +361,51 @@ namespace OmiLAXR.Endpoints
             // Update state to reflect stopped sending
             IsSending = false;
 
+            // Log final statistics
+            DebugLog.OmiLAXR.Print(
+                $"⛔({GetType().Name}) stopped writing statements. {RecordedStatements} statements were sent.");
+
             // Notify external listeners that sending has stopped
             OnStoppedSending?.Invoke(this);
         }
 
         // Unity lifecycle event handlers
-        protected override void OnEnable() => StartSending();      // Auto-start when component becomes active
-        protected virtual void OnDisable() => StopSending();       // Clean stop when component is deactivated
-        private void OnDestroy() => StopSending();                 // Ensure cleanup when component is destroyed
+        protected override void OnEnable() => StartSending(); // Auto-start when component becomes active
+        protected virtual void OnDisable() => StopSending(); // Clean stop when component is deactivated
+        private void OnDestroy() => StopSending(); // Ensure cleanup when component is destroyed
 
+        /// <summary>
+        /// Processes queued statements for a bounded time budget.
+        /// This avoids long shutdowns when many statements are pending.
+        /// </summary>
+        protected void FlushQueueBudget(float maxSeconds)
+        {
+            if (_isFlushing) return;
+            _isFlushing = true;
+
+            var deadline = Time.realtimeSinceStartup + Mathf.Max(0f, maxSeconds);
+            var totalFlushed = 0;
+
+            while (Time.realtimeSinceStartup < deadline)
+            {
+                var batch = new List<IStatement>(MaxBatchSize);
+
+                lock (_queuedStatementsLock)
+                {
+                    while (batch.Count < MaxBatchSize && QueuedStatements.Count > 0)
+                        batch.Add(QueuedStatements.Dequeue());
+                }
+
+                if (batch.Count == 0) break;
+
+                TransferStatements(batch);
+                totalFlushed += batch.Count;
+            }
+
+            DebugLog.OmiLAXR.Print($"🪄({GetType().Name}) budget-flushed {totalFlushed} statements in <= {maxSeconds:0.###}s.");
+            _isFlushing = false;
+        }
+        
         /// <summary>
         /// Adds a statement to the sending queue for asynchronous processing.
         /// Thread-safe operation that signals workers when new statements are available.
@@ -305,13 +413,17 @@ namespace OmiLAXR.Endpoints
         /// <param name="statement">The statement to be queued for sending</param>
         public virtual void SendStatement(IStatement statement)
         {
+            if (!_accepting || _shuttingDown) return;
+
             // Add statement to the processing queue
-            QueuedStatements.Enqueue(statement);
+            lock (_queuedStatementsLock)
+            {
+                QueuedStatements.Enqueue(statement);
+            }
 
             // Signal thread worker that new work is available (thread-enabled platforms only)
 #if !OMILAXR_THREADS_DISABLED && !UNITY_WEBGL
-            if (useThreads)
-                _signal.Set();
+            if (useThreads) _signal.Set();
 #endif
         }
 
@@ -323,22 +435,24 @@ namespace OmiLAXR.Endpoints
         {
             if (_isFlushing) return;
             _isFlushing = true;
-            lock (_executionQueue)
-            {
-                var count = QueuedStatements.Count;
 
+            int count;
+            List<IStatement> batch = null;
+
+            lock (_queuedStatementsLock)
+            {
+                count = QueuedStatements.Count;
                 if (count > 0)
                 {
-                    var batch = QueuedStatements.ToList();
-                    TransferStatements(batch);
-                    foreach (var statement in batch)
-                        print(statement.ToShortString());
+                    batch = QueuedStatements.ToList();
                     QueuedStatements.Clear();
                 }
-
-                // Log flush operation with statement count
-                DebugLog.OmiLAXR.Print($"🪄({GetType().Name}) flushed {count} statements.");
             }
+
+            if (batch != null && batch.Count > 0)
+                TransferStatements(batch);
+
+            DebugLog.OmiLAXR.Print($"🪄({GetType().Name}) flushed {count} statements.");
             _isFlushing = false;
         }
 
@@ -390,10 +504,14 @@ namespace OmiLAXR.Endpoints
                 Debug.LogException(ex);
 
                 // Handle failure by re-queuing statements and triggering failure events
-                foreach (var statement in batch)
+                lock (_queuedStatementsLock)
                 {
-                    TriggerFailedStatement(statement);
-                    QueuedStatements.Enqueue(statement);   // Re-queue for retry
+                    foreach (var statement in batch)
+                    {
+                        TriggerFailedStatement(statement);
+                        //if (!_shuttingDown) QueuedStatements.Enqueue(statement);
+                        QueuedStatements.Enqueue(statement);
+                    }
                 }
 
                 TriggerFailedBatch(batch);
@@ -406,14 +524,18 @@ namespace OmiLAXR.Endpoints
         /// Called before each batch is sent, useful for setup operations.
         /// </summary>
         /// <param name="batch">The batch about to be processed</param>
-        protected virtual void BeforeHandleSendingBatch(List<IStatement> batch) { }
+        protected virtual void BeforeHandleSendingBatch(List<IStatement> batch)
+        {
+        }
 
         /// <summary>
         /// Hook for derived classes to perform operations after batch processing.
         /// Called after each batch is sent, useful for cleanup operations.
         /// </summary>
         /// <param name="batch">The batch that was just processed</param>
-        protected virtual void AfterHandleSendingBatch(List<IStatement> batch) { }
+        protected virtual void AfterHandleSendingBatch(List<IStatement> batch)
+        {
+        }
 
         /// <summary>
         /// Coordinates the transfer of a batch of statements with proper state management.
@@ -498,18 +620,17 @@ namespace OmiLAXR.Endpoints
         /// <returns>Result code indicating processing outcome</returns>
         protected virtual TransferCode HandleQueue()
         {
-            var batch = new List<IStatement>();
+            var batch = new List<IStatement>(MaxBatchSize);
 
             // Build batch up to maximum size from available queued statements
-            while (batch.Count < MaxBatchSize && QueuedStatements.Count > 0)
+            lock (_queuedStatementsLock)
             {
-                batch.Add(QueuedStatements.Dequeue());
+                while (batch.Count < MaxBatchSize && QueuedStatements.Count > 0)
+                    batch.Add(QueuedStatements.Dequeue());
             }
 
             // Transfer the batch if statements are available, otherwise return no-statements code
-            return batch.Count > 0
-                ? TransferStatements(batch)
-                : TransferCode.NoStatements;
+            return batch.Count > 0 ? TransferStatements(batch) : TransferCode.NoStatements;
         }
 
         /// <summary>

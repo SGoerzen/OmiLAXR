@@ -27,22 +27,39 @@ namespace OmiLAXR.Schedules
 
         private int _tickCount;
 
+        [NonSerialized] private WaitForSeconds _wait;
+        [NonSerialized] private float _cachedInterval = -1f;
+
         /// <summary>
-        /// Additional initialization (besides SchedulerTicker.Init).
+        /// Additional initialization (besides Scheduler.Init).
         /// </summary>
-        public override void Init(MonoBehaviour owner, Action onTick, 
-            Action onTickStart = null, Action onTickEnd = null,
-            bool runImmediate = false)
+        public override void Init(
+            MonoBehaviour owner,
+            Action onTick,
+            Action onTickStart = null,
+            Action onTickEnd = null,
+            bool runImmediate = false,
+            bool resetHandlers = true)
         {
-            base.Init(owner, onTick, onTickStart, onTickEnd, runImmediate);
-            // Reset counter each time a new session starts
-            OnTickStart += () => _tickCount = 0;
+            base.Init(owner, onTick, onTickStart, onTickEnd, runImmediate, resetHandlers);
+        }
+
+        protected override void TriggerOnTickStart()
+        {
+            _tickCount = 0;
+            base.TriggerOnTickStart();
         }
 
         protected override void TriggerOnTick()
         {
             base.TriggerOnTick();
             _tickCount++;
+
+            if (tTLTicks > -1 && _tickCount >= tTLTicks)
+            {
+                DebugLog.OmiLAXR.Warning("IntervalTicker: Ticks reached limit. Stopping.");
+                Stop();
+            }
         }
 
         /// <summary>
@@ -53,14 +70,17 @@ namespace OmiLAXR.Schedules
         {
             while (isActive)
             {
-                if (tTLTicks > -1 && _tickCount >= tTLTicks)
+                if (!Mathf.Approximately(_cachedInterval, intervalSeconds) || _wait == null)
                 {
-                    DebugLog.OmiLAXR.Warning("IntervalTicker: Ticks reached limit. Stopping.");
-                    Stop();
-                    yield break;
+                    _cachedInterval = intervalSeconds;
+                    _wait = new WaitForSeconds(_cachedInterval);
                 }
 
-                yield return new WaitForSeconds(intervalSeconds);
+                yield return _wait;
+
+                if (!isActive)
+                    yield break;
+
                 TriggerOnTick();
             }
         }
@@ -80,7 +100,7 @@ namespace OmiLAXR.Schedules
             var ticker = CreateInstance<IntervalTicker>();
             ticker.intervalSeconds = interval;
             ticker.tTLTicks = tTLTicks;
-            ticker.Init(owner, onTick, onTickStart, onTickEnd, runImmediate);
+            ticker.Init(owner, onTick, onTickStart, onTickEnd, runImmediate, resetHandlers: true);
             return ticker;
         }
     }

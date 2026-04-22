@@ -1,4 +1,5 @@
 using UnityEngine;
+using System.Globalization;
 
 namespace OmiLAXR.Types
 {
@@ -59,5 +60,14 @@ namespace OmiLAXR.Types
 
             return new Frustum(zNear, zFar, fovX, fovY);
         }
+
+        public override string ToString()
+            => string.Format(
+                CultureInfo.InvariantCulture,
+                "Frustum(zNear={0:0.###}, zFar={1:0.###}, fovX={2:0.###}, fovY={3:0.###})",
+                ZNear,
+                ZFar,
+                FovX,
+                FovY);
     }
 }

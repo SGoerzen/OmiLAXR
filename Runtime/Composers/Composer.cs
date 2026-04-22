@@ -23,37 +23,51 @@ namespace OmiLAXR.Composers
         where T : PipelineComponent, ITrackingBehaviour
         where TStatement : class, IStatement
     {
-        
         /// <summary>
         /// Array of tracking behaviors this composer is processing
         /// </summary>
         [HideInInspector] public T[] trackingBehaviours;
-        
+
+        /// <summary>
+        /// If true, statements are dropped when no handlers are registered.
+        /// Prevents unbounded memory growth if endpoints are disabled.
+        /// </summary>
+        [Tooltip("If true, statements are dropped when no handlers are registered.")]
+        public bool dropStatementsIfNoHandlers = true;
+
+        /// <summary>
+        /// Optional cap for queued statements when dropStatementsIfNoHandlers is false.
+        /// 0 = unlimited (not recommended for benchmarks).
+        /// </summary>
+        [Tooltip("Optional cap for queued statements when dropStatementsIfNoHandlers is false. 0 = unlimited.")]
+        [Min(0)]
+        public int maxQueuedStatements = 0;
+
         /// <summary>
         /// Cache for storing statements with string keys
         /// </summary>
         private readonly Dictionary<string, TStatement> _statementCache = new Dictionary<string, TStatement>();
-        
+
         /// <summary>
         /// Cache for storing statements with integer keys
         /// </summary>
         private readonly Dictionary<int, TStatement> _statementCacheInt = new Dictionary<int, TStatement>();
-        
+
         /// <summary>
         /// Stores a statement in cache with string key
         /// </summary>
         public void StoreStatement(string key, TStatement statement)
             => _statementCache[key] = statement;
-            
+
         /// <summary>
         /// Stores a statement in cache with integer key
         /// </summary>
         public void StoreStatement(int key, TStatement statement)
             => _statementCacheInt[key] = statement;
-        
+
         public void StoreStatement(ITrackingBehaviour tb, GameObject target, TStatement statement)
             => StoreStatement(CombineHash(tb.GetHashCode(), target.GetHashCode()), statement);
-        
+
         /// <summary>
         /// Retrieves a cached statement by string key. Optionally removes it from the cache.
         /// </summary>
@@ -69,17 +83,16 @@ namespace OmiLAXR.Composers
 
             return null;
         }
-        
+
         [System.Runtime.CompilerServices.MethodImpl(System.Runtime.CompilerServices.MethodImplOptions.AggressiveInlining)]
         private static int CombineHash(int h1, int h2)
         {
 #if UNITY_2021_2_OR_NEWER
-    return System.HashCode.Combine(h1, h2);
+            return System.HashCode.Combine(h1, h2);
 #else
             unchecked { return ((h1 << 5) + h1) ^ h2; }
 #endif
         }
-
 
         /// <summary>
         /// Retrieves a cached statement by integer key. Optionally removes it from the cache.
@@ -105,7 +118,7 @@ namespace OmiLAXR.Composers
             var key = CombineHash(tb.GetHashCode(), target.GetHashCode());
             return RestoreStatement(key, erase);
         }
-        
+
         /// <summary>
         /// Initializes the composer, finds tracking behaviors, and starts composition
         /// </summary>
@@ -124,7 +137,15 @@ namespace OmiLAXR.Composers
                 Compose(trackingBehaviour);
 
             // Process any queued statements
-            HandleWaitList();
+            FlushWaitList();
+        }
+
+        protected virtual void OnDisable()
+        {
+            // Prevent retaining large amounts of data between enable/disable cycles
+            _waitList.Clear();
+            _statementCache.Clear();
+            _statementCacheInt.Clear();
         }
 
         /// <summary>
@@ -138,12 +159,12 @@ namespace OmiLAXR.Composers
         /// Cached composer name derived from class name
         /// </summary>
         private string _name;
-        
+
         /// <summary>
         /// Returns the display name of this composer
         /// </summary>
         public virtual string GetName() => _name;
-        
+
         /// <summary>
         /// Returns the logical grouping for this composer
         /// </summary>
@@ -153,11 +174,27 @@ namespace OmiLAXR.Composers
         /// Indicates if this is a higher-level composer that processes other composers' output
         /// </summary>
         public virtual bool IsHigherComposer => false;
-        
+
         /// <summary>
         /// Event fired after a statement has been composed and is ready for delivery
         /// </summary>
-        public event ComposerAction<IStatement> AfterComposed;
+        private event ComposerAction<IStatement> _afterComposed;
+
+        /// <summary>
+        /// Public event wrapper for handler registration.
+        /// </summary>
+        public event ComposerAction<IStatement> AfterComposed
+        {
+            add
+            {
+                _afterComposed += value;
+                FlushWaitList();
+            }
+            remove
+            {
+                _afterComposed -= value;
+            }
+        }
 
         /// <summary>
         /// Queue for statements waiting for event handlers to be registered
@@ -189,19 +226,25 @@ namespace OmiLAXR.Composers
         {
             if (!enabled)
                 return;
+
             // Set ownership and composer information
             statement.SetOwner(statementOwner);
 
-            // If no handlers registered, queue statement for later
-            if (AfterComposed?.GetInvocationList().Length < 1)
+            // If no handlers registered, drop or queue statement for later
+            if (_afterComposed == null)
             {
-                print("Enqueued statement: " + statement.ToShortString() + " in waitlist.");
+                if (dropStatementsIfNoHandlers)
+                    return;
+
+                if (maxQueuedStatements > 0 && _waitList.Count >= maxQueuedStatements)
+                    return;
+
                 _waitList.Add(statement);
                 return;
             }
-            
+
             // Send statement to registered handlers
-            AfterComposed?.Invoke(this, statement);
+            _afterComposed.Invoke(this, statement);
         }
 
         /// <summary>
@@ -239,26 +282,17 @@ namespace OmiLAXR.Composers
         /// <summary>
         /// Processes queued statements when event handlers become available
         /// </summary>
-        private void HandleWaitList()
+        private void FlushWaitList()
         {
-            // Send all queued statements if handlers are now available
-            if (_waitList.Count > 0 && AfterComposed?.GetInvocationList().Length > 0)
+            if (_waitList.Count == 0 || _afterComposed == null)
+                return;
+
+            for (var i = 0; i < _waitList.Count; i++)
             {
-                foreach (var statement in _waitList)
-                {
-                    AfterComposed?.Invoke(this, statement);
-                }
-
-                _waitList.Clear();
+                _afterComposed.Invoke(this, _waitList[i]);
             }
-        }
 
-        /// <summary>
-        /// Checks for queued statements each frame and processes them when handlers become available
-        /// </summary>
-        private void Update()
-        {
-            HandleWaitList();
+            _waitList.Clear();
         }
     }
 }

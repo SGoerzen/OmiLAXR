@@ -34,6 +34,11 @@ namespace OmiLAXR.Schedules
             bool runImmediate = false)
         {
             this.timeoutSeconds = timeoutSeconds;
+
+            // Timeout should not tick immediately, otherwise it fires twice:
+            // once immediately (RunInternal) and once after timeout.
+            tickImmediate = false;
+
             base.Init(owner, onTick, onTickStart, onTickEnd, runImmediate);
         }
 
@@ -42,17 +47,15 @@ namespace OmiLAXR.Schedules
         /// </summary>
         protected override IEnumerator Run()
         {
+            yield return new WaitForSeconds(timeoutSeconds);
+
             if (!isActive)
                 yield break;
 
-            TriggerOnTickStart();
+            TriggerOnTick();
 
-            yield return new WaitForSeconds(timeoutSeconds);
-
-            if (isActive)
-                TriggerOnTick();
-
-            TriggerOnTickEnd();
+            // One-shot scheduler: stop after the tick so OnTickEnd fires exactly once (via Stop()).
+            Stop();
         }
 
         /// <summary>

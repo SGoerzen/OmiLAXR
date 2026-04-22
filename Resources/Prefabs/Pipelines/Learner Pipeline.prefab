@@ -366,6 +366,9 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   intervalSeconds: 1
+  windowSeconds: 30
+  minSamplesForStats: 5
+  computeHrvEstimates: 1
 --- !u!114 &1061375823253536262
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -391,6 +394,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   scheduler: {fileID: 0}
+  scope: learner
   detectOnChange: 1
   ignore:
     position: 0
